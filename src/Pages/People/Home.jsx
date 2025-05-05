@@ -14,6 +14,7 @@ import AddCardMenu from "../People/cards/AddCardMenu";
 const Home = () => {
   const [time, setTime] = useState({ hours: "00", minutes: "00", period: "AM" });
   const [cards, setCards] = useState([]);
+  const weeklyHours = [3, 4, 2, 6, 7, 1, 3]; // Mocked weekly hours
 
   const addCard = (type) => {
     if (!cards.find((c) => c.type === type)) {
@@ -29,7 +30,10 @@ const Home = () => {
     const props = { key: card.id, onDelete: () => removeCard(card.id) };
     switch (card.type) {
       case "feeds": return <FeedsCard {...props} />;
-      case "attendance": return <AttendanceCard {...props} />;
+      case "attendance": return <AttendanceCard 
+      weeklyData={weeklyHours}
+      onDelete={() => console.log("Deleted attendance card")}
+      />;
       case "holidays": return <HolidaysCard {...props} />;
       case "todo": return <ToDoCard {...props} />;
       default: return null;
