@@ -114,11 +114,11 @@ const Navbar = () => {
                     // Keep "People" link active if any subroute under "/people" is active
                     name === "People"
                       ? currentPath.startsWith("/people") || isActive
-                        ? "relative group p-2 rounded-md bg-secondary"
-                        : "relative group p-2 rounded-md hover:bg-secondary"
+                        ? "relative group p-2 rounded-md bg-teal-700"
+                        : "relative group p-2 rounded-md hover:bg-teal-700"
                       : isActive
-                      ? "relative group p-2 rounded-md bg-secondary"
-                      : "relative group p-2 rounded-md hover:bg-secondary"
+                      ? "relative group p-2 rounded-md bg-teal-700"
+                      : "relative group p-2 rounded-md hover:bg-teal-700"
                   }
                 >
                     <Icon className="w-6 h-6 text-white" />
@@ -249,7 +249,7 @@ const Navbar = () => {
             <div className="relative ml-4">
               <button
                 onClick={() => setSettingsOpen(!settingsOpen)}
-                className="p-1 text-white rounded-md hover:bg-secondary"
+                className="p-1 text-white rounded-md hover:bg-teal-700"
               >
                 <span className="sr-only">Open settings</span>
                 <Cog6ToothIcon className="w-6 h-6" />

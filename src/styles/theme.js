@@ -5,7 +5,7 @@ export const predefinedThemes = [
       text: "#ffffff",
       background: "#60a5fa",
       primary: "7FABA4",
-      secondary: "#60a5fa",
+      secondary: "#faf6ff ",
       
     },
   },
@@ -15,7 +15,7 @@ export const predefinedThemes = [
       text: "#0f172a",
       background: "#e0f2fe",
       primary: "#7FABA4",
-      secondary: "#F8F8F8",
+      secondary: "#faf6ff",
     },
   },
   {
@@ -33,7 +33,7 @@ export const predefinedThemes = [
       text: "#f5f3ff",
       background: "#6b21a8",
       primary: "#a855f7",
-      secondary: "#d8b4fe",
+      secondary: "#f7f0fe",
     },
   },
   {
@@ -50,7 +50,7 @@ export const predefinedThemes = [
     colors: {
       text: "#1f2937",
       background: "#ffffff",
-      primary: "#3b82f6",
+      primary: "#1e40af",
       secondary: "#93c5fd",
     },
   },

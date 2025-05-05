@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   TrashIcon,
   PlusIcon,
   PencilIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/react/24/solid";
-import {
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  IconButton,
-} from "@material-tailwind/react";
 
 const defaultTasks = [
   {
@@ -37,9 +30,21 @@ const ToDoCard = ({ onDelete }) => {
   const [newDesc, setNewDesc] = useState("");
   const [newDueDate, setNewDueDate] = useState("");
   const [editing, setEditing] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef();
 
   useEffect(() => {
     setTasks(defaultTasks);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const addTask = () => {
@@ -95,27 +100,30 @@ const ToDoCard = ({ onDelete }) => {
           </p>
         </div>
 
-        {/* Menu Icon Top Right */}
-        <Menu
-          placement="bottom-end"
-          allowHover={false}
-          dismiss={{ itemPress: false, outsidePress: true }}
-        >
-          <MenuHandler>
-            <IconButton variant="text" size="sm">
-              <EllipsisVerticalIcon className="h-5 w-5 text-gray-600" />
-            </IconButton>
-          </MenuHandler>
-          <MenuList>
-            <MenuItem
-              onClick={onDelete}
-              className="text-red-500 flex items-center gap-2"
-            >
-              <TrashIcon className="w-4 h-4" />
-              Delete Card
-            </MenuItem>
-          </MenuList>
-        </Menu>
+        {/* Custom Dropdown */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-md hover:bg-gray-100 transition"
+          >
+            <EllipsisVerticalIcon className="h-5 w-5 text-gray-600" />
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
+              <button
+                onClick={() => {
+                  onDelete();
+                  setMenuOpen(false);
+                }}
+                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+              >
+                <TrashIcon className="w-4 h-4 mr-2" />
+                Delete Card
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Add Task Form */}
