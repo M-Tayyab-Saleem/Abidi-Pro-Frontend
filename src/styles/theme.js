@@ -6,7 +6,7 @@ export const predefinedThemes = [
       text: "#0f172a",
       background: "#f9f7f3",
       primary: "#7FABA4",
-      secondary: "#d8e2dc",
+      secondary: "#FFFDF6",
       Hover: "#caf0f8",
       heading: "#0b090a",
       description: "#354f52",

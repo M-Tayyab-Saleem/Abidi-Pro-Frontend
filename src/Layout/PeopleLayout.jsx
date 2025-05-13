@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import PeopleSubNavbar from "../../Components/PeopleSubNavbar";
+import PeopleSubNavbar from "../Components/PeopleSubNavbar";
 
 const PeopleLayout = () => {
   return (

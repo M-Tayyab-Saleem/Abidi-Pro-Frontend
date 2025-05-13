@@ -2,9 +2,18 @@ import React from "react";
 import { Navbar, MobileNav, IconButton, Button } from "@material-tailwind/react";
 import { NavLink } from "react-router-dom";
 import { CalendarDaysIcon, PhoneIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 const PeopleSubNavbar = () => {
   const [openNav, setOpenNav] = React.useState(false);
+  
+
+  const [checkInButton, setCheckInButton] = useState(false);
+
+  const handleButton = () =>{
+    setCheckInButton((prev) => !prev)
+  }
+
 
   const links = [
     { name: "Home", path: "/people" },
@@ -48,9 +57,13 @@ const PeopleSubNavbar = () => {
         {/* Check In Button (left) */}
         <Button
           size="large"
-          className="bg-green-400 text-green-800 font-semibold shadow hover:bg-green-300 transition px-5 py-3"
+          className={` w-32 text-center text-green-800 font-semibold shadow  transition px-5 py-3
+            ${checkInButton ? "bg-red-400 text-red-800" : "bg-green-400 text-green-800"}`
+            
+          }
+          onClick={handleButton}
         >
-          Check In
+          {checkInButton ? "Check Out" : "Check In"}
         </Button>
 
         {/* Center Nav Links */}
