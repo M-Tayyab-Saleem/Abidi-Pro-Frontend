@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardBody } from "@material-tailwind/react";
-import FeedsCard from "../People/cards/FeedsCard";
-import AttendanceCard from "../People/cards/AttendanceCard";
-import HolidaysCard from "../People/cards/HolidaysCard";
-import ToDoCard from "./cards/TodoCard";
-import NotesCard from "./cards/NotesCard";
-import AddCardMenu from "../People/cards/AddCardMenu";
-import RecentActivitiesCard from "./cards/RecentActivitiesCard";
-import UpcomingBirthdaysCard from "./cards/UpcomingBirthdaysCard";
-import LeaveLogCard from "./cards/LeaveLogCard";
+import FeedsCard from "../../Components/home/FeedsCard";
+import AttendanceCard from "../../Components/home/AttendanceCard";
+import HolidaysCard from "../../Components/home/HolidaysCard";
+import ToDoCard from "../../Components/home/TodoCard";
+import NotesCard from "../../Components/home/NotesCard";
+import AddCardMenu from "../../Components/home/AddCardMenu";
+import RecentActivitiesCard from "../../Components/home/RecentActivitiesCard";
+import UpcomingBirthdaysCard from "../../Components/home/UpcomingBirthdaysCard";
+import LeaveLogCard from "../../Components/home/LeaveLogCard";
 
 const Home = () => {
   const [time, setTime] = useState({ hours: "00", minutes: "00", period: "AM" });

@@ -221,16 +221,10 @@ const Navbar = () => {
                       Settings
                     </Link>
                     <Link
-                      to="/logout"
+                      to="/auth/login"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Sign out
-                    </Link>
-                    <Link
-                      to="/login"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                     login
                     </Link>
                   </div>
                 )}

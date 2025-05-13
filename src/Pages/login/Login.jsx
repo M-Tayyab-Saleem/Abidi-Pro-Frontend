@@ -26,7 +26,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#274744]">
+    // <div className="flex items-center justify-center h-screen bg-[#274744]">
       <form onSubmit={handleLogin} className="bg-white bg-opacity-30 backdrop-filter backdrop-blur-lg p-8 rounded-xl   w-96">
                     <div className="flex justify-center mb-4">
                     <img
@@ -73,7 +73,7 @@ const Login = () => {
                             <input type="checkbox" className="mr-1" /> Remember me
                         </label>
                         {/* <span className="text-blue-300 cursor-pointer">Forgot Password?</span> */}
-                        <Link to="/forgot-password" className="text-blue-300 cursor-pointer">
+                        <Link to="/auth/forgot-password" className="text-blue-300 cursor-pointer">
                             Forgot Password?
                         </Link>
                         </div>
@@ -82,7 +82,7 @@ const Login = () => {
                         Login
                         </button>
                     </form>
-                    </div>
+                    // </div>
   );
 };
 

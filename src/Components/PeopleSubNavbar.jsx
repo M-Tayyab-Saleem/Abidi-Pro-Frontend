@@ -11,6 +11,8 @@ const PeopleSubNavbar = () => {
     { name: "Time Tracker", path: "/people/timetracker" },
     { name: "Files", path: "/people/files" },
     { name: "Profile", path: "/people/profile" },
+    { name: "Leave Tracker", path: "/people/leaveTracker" },
+    { name: "Admin", path: "/people/leaveTrackerAdmin" },
   ];
 
   React.useEffect(() => {

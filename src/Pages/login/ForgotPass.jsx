@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 const ForgotPasswordPage = () => {
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#1a2a2f] to-[#274744] px-4">
+    // <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#1a2a2f] to-[#274744] px-4">
       <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl shadow-lg p-10 max-w-md w-full text-white text-center border border-white border-opacity-20 flex">
                 <div className="">
                     <h1 className="text-2xl font-semibold mb-4">Check Your Email</h1>
@@ -11,7 +11,7 @@ const ForgotPasswordPage = () => {
                         
                         </p>
 
-                        <Link to="/login" className="text-blue-300 hover:underline text-center block mt-4">
+                        <Link to="/auth/login" className="text-blue-300 hover:underline text-center block mt-4">
                                 
                                 Back to Login
                         </Link>
@@ -29,7 +29,7 @@ const ForgotPasswordPage = () => {
             </div>
 
         
-    </div>
+    // </div>
   );
 };
 

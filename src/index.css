@@ -26,6 +26,9 @@ body {
 .text-text {
   color: var(--color-text);
 }
+.text-text-white {
+  color: var(--color-background);
+}
 .bg-primary {
   background-color: var(--color-primary);
 }
