@@ -20,7 +20,6 @@ import FileTabs from "./Pages/People/FileTabs";
 import ProjectDashBoard from "./Pages/Projects/ProjectDashBoard";
 import Projects from "./Pages/Projects/Projects";
 import Project from "./Pages/Projects/Project";
-import ProjectLayout from "./layout/ProjectLayout";
 function App() {
   return (
     <>
@@ -60,8 +59,8 @@ function App() {
           
         </Route>
         <Route path="/time/*" element={<AppLayout />}>
-          <Route index element={<TimeTracker />} />
-          
+        <Route index element={<TimeTracker />} />
+         
         </Route>
         <Route path="/ticket/*" element={<AppLayout />}>
           <Route index element={TimeTracker} />
@@ -69,10 +68,10 @@ function App() {
           <Route path ="leaveTracker" element={<LeaveTracker/>}/>
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
         </Route>
-         <Route path="/projects/*" element={<ProjectLayout />}>
-          <Route path="dashBoard" index element={<ProjectDashBoard />} />
+         <Route path="/project/*" element={<AppLayout />}>
+          <Route  index path="projectDashboard"  element={<ProjectDashBoard />} />
           <Route path="projects" element={<Projects />} />
-          <Route path="project" element={<Project />} />
+          <Route path="projectDetailed" element={<Project />} />
 
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
         </Route>

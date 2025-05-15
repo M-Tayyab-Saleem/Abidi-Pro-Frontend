@@ -8,10 +8,11 @@ const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
   const [checkInButton, setCheckInButton] = useState(false);
   const { pathname } = useLocation();
-
   const moduleKey = pathname.split("/")[1];
+  // console.log(moduleConfigs)
   const config = moduleConfigs[moduleKey];
-  const links = config?.links || [];
+  const links = config?.links  || [];
+  console.log(links,"hello2")
 
   const handleButton = () => {
     setCheckInButton((prev) => !prev);
@@ -29,7 +30,7 @@ const SubNavbar = () => {
   <li key={link.name}>
     <NavLink
       to={link.path}
-      end={link.path === `/${moduleKey}`} // Apply 'end' only on base route
+      // end={link.path === `/${moduleKey}`} // Apply 'end' only on base route
       className={({ isActive }) =>
         `px-3 py-2 rounded-md transition-colors duration-100 ${
           isActive ? "bg-primary text-white" : "text-text hover:text-text"

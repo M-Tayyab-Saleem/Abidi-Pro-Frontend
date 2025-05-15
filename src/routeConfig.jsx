@@ -44,4 +44,13 @@ export const moduleConfigs = {
       { name: "All Tickets", path: "/role" },
     ],
   },
+   project: {
+    basePath: "/project",
+    subNavbarKey: "project",
+    links: [
+      { name: "Project DashBoard", path: "/project/projectDashboard" },
+      { name: "Projects", path: "/project/projects" },
+      { name: "Project", path: "/project/projectDetailed" },
+    ],
+  },
 };
