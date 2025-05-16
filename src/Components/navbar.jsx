@@ -177,25 +177,25 @@ const Navbar = () => {
 
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="sm:hidden px-2 pt-2 pb-3 space-y-1 bg-primary text-white">
-            {navLinks.map(({ name, to, icon: Icon }) => (
-              <Link
-                key={name}
-                to={to}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center space-x-2 rounded-md px-3 py-2 ${
-                  currentPath === to ? "bg-secondary" : "hover:bg-secondary"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span>{name}</span>
-              </Link>
-            ))}
-          </div>
-        )}
-      </nav>
+      {/* Mobile menu panel */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden px-2 pt-2 pb-3 space-y-1 bg-primary text-white">
+          {navLinks.map(({ name, to, icon: Icon }) => (
+            <Link
+              key={name}
+              to={to}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center space-x-2 rounded-md px-3 py-2 ${
+                currentPath === to ? "bg-secondary" : "hover:bg-secondary"
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{name}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </nav>
     </>
   );
 };
