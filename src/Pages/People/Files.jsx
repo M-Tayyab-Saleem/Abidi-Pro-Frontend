@@ -1,17 +1,11 @@
-
-
 import React, { useState } from "react";
 import { FaRegFolder } from "react-icons/fa6";
 import { IoListOutline, IoFilterSharp } from "react-icons/io5";
 import FileTabs from "./FileTabs";
 import FileTable from "./FileTable";
 import FolderGrid from "./FolderGrid";
-import { FiUpload } from "react-icons/fi";
-
-
-import Button from "@mui/material/Button";
-import UploadIcon from "@mui/icons-material/Upload";
 import UploadModal from "./UploadModal";
+import OpenFolderScreen from "./OpenFolderScreen";
 
 const Files = () => {
   const [activeTab, setActiveTab] = useState("sharedWithMe");
@@ -19,13 +13,20 @@ const Files = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [open, setOpen] = useState(false);
   const [folders, setFolders] = useState([]);
+  const [openedFolder, setOpenedFolder] = useState(null);
 
   const handleAddFolder = (newFolder) => {
-  setFolders((prev) => [...prev, newFolder]);
-};
+    setFolders((prev) => [...prev, newFolder]);
+  };
 
   return (
     <div className="min-h-screen bg-[#dce3f0] p-4 m-6 rounded-lg shadow-md ">
+
+  {/* If a folder is opened, just show OpenFolderScreen */}
+  {openedFolder ? (
+    <OpenFolderScreen folder={openedFolder} onClose={() => setOpenedFolder(null)} />
+  ) : (
+    <>
       {/* FILE TABS */}
       <FileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
@@ -39,7 +40,6 @@ const Files = () => {
             <option className="text-gray-700">50</option>
           </select>
           <span className="text-sm text-heading">entries</span>
-          {/* <label className="text-sm text-heading">Search</label> */}
           <input
             type="text"
             placeholder="Search..."
@@ -78,24 +78,29 @@ const Files = () => {
       <div className="mb-4">
         {viewMode === "grid" ? (
           <>
-            <div className="flex justify-end">
-              <Button
-                variant="contained"
-                startIcon={<UploadIcon />}
-                onClick={() => setOpen(true)}
-              >
-                Upload Document
-              </Button>
-            </div>
-               <UploadModal open={open} onClose={() => setOpen(false)} setFolders={setFolders} folders={folders} onCreate={handleAddFolder} />
-            <FolderGrid folders={folders} searchTerm={searchTerm} />
+            <UploadModal
+              open={open}
+              onClose={() => setOpen(false)}
+              setFolders={setFolders}
+              folders={folders}
+              onCreate={handleAddFolder}
+            />
+            <FolderGrid
+              folders={folders}
+              searchTerm={searchTerm}
+              onOpenFolder={setOpenedFolder}
+            />
           </>
         ) : (
           <FileTable searchTerm={searchTerm} />
         )}
       </div>
-    </div>
+    </>
+  )}
+</div>
   );
 };
 
 export default Files;
+
+

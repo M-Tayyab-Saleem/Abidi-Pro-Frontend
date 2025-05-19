@@ -1,13 +1,23 @@
+import  { useState } from "react";
+import { Box, Button, Drawer, TextField } from "@mui/material";
+import { toast } from "react-toastify"; // Optional: if you're using toast
+import UploadIcon from "@mui/icons-material/Upload";
 
-
-import React, { useState } from "react";
-import { Modal, Box, Button, TextField } from "@mui/material";
-
-const UploadModal = ({ open, onClose, onCreate }) => {
+const UploadModal = ({ onCreate }) => {
   const [folderName, setFolderName] = useState("");
   const [file, setFile] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const toggleDrawer = (open) => () => {
+    setDrawerOpen(open);
+  };
 
   const handleSubmit = () => {
+    if (!folderName.trim()) {
+      toast?.error?.("Folder name is required");
+      return;
+    }
+
     const newFolder = {
       name: folderName,
       file: file ? file.name : "",
@@ -17,44 +27,54 @@ const UploadModal = ({ open, onClose, onCreate }) => {
     onCreate(newFolder);
     setFolderName("");
     setFile(null);
-    onClose();
+    setDrawerOpen(false);
   };
 
-  return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          width: 400,
-          bgcolor: "white",
-          p: 4,
-          mx: "auto",
-          mt: "20vh",
-          borderRadius: 2,
-          outline: "none",
-          
-         
-        }}
+  const drawerContent = (
+    <Box
+      sx={{
+        width: 350,
+        padding: 3,
+      }}
+      role="presentation"
+    >
+      <h2>Create Folder</h2>
+      <TextField
+        label="Folder Name"
+        fullWidth
+        value={folderName}
+        onChange={(e) => setFolderName(e.target.value)}
+        margin="normal"
+       
+      />
+
+      {file && <p>Selected: {file.name}</p>}
+      <Button
+        onClick={handleSubmit}
+        sx={{ backgroundColor: "lightgrey", color: "black" }}
       >
-        <h2>Create Folder</h2>
-        <TextField
-          label="Folder Name"
-          fullWidth
-          value={folderName}
-          onChange={(e) => setFolderName(e.target.value)}
-          margin="normal"
-        />
-        <Button component="label" variant="contained" sx={{ my: 2 , mx:3}}>
-          Upload File
-          <input type="file" hidden onChange={(e) => setFile(e.target.files[0])} />
+        Create Folder
+      </Button>
+    </Box>
+  );
+
+  return (
+    <>
+      <div className="flex justify-end">
+        <Button
+          onClick={toggleDrawer(true)}
+          startIcon={<UploadIcon />}
+         sx={{backgroundColor:"bg-primary", color:"black" }}
+        >
+          Upload Document
         </Button>
-        {file && <p>Selected: {file.name}</p>}
-        <Button variant="contained" onClick={handleSubmit} >
-          Create Folder
-        </Button>
-      </Box>
-    </Modal>
+      </div>
+
+      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+        {drawerContent}
+      </Drawer>
+    </>
   );
 };
 
 export default UploadModal;
-

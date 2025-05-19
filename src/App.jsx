@@ -23,7 +23,7 @@ import Project from "./Pages/Projects/Project";
 import UserManagement from "./Pages/Admin/UserManagement";
 import LeaveRequest from "./Pages/People/LeaveRequest";
 import Ticket from "./Pages/People/Ticket";
-
+import ApproveTimelogs from "./Pages/People/ApproveTimelogs";
 function App() {
   return (
     <>
@@ -64,7 +64,9 @@ function App() {
           
         </Route>
         <Route path="/time/*" element={<AppLayout />}>
-        <Route index element={<TimeTracker />} />
+ <Route index element={<Navigate to="history" replace />} /> 
+
+          <Route  index path="history"  element={<TimeTracker />} />        <Route path="approve" element={<ApproveTimelogs />} />
          
         </Route>
         <Route path="/tickets/*" element={<AppLayout />}>
@@ -74,7 +76,7 @@ function App() {
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
         </Route>
          <Route path="/project/*" element={<AppLayout />}>
-           <Route index element={<Navigate to="projectDashboard" replace />} />  // ✅ Redirect
+           <Route index element={<Navigate to="projectDashboard" replace />} /> 
 
           <Route  index path="projectDashboard"  element={<ProjectDashBoard />} />
           <Route path="projects" element={<Projects />} />

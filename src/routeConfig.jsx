@@ -32,8 +32,8 @@ export const moduleConfigs = {
     basePath: "/time",
     subNavbarKey: "time",
     links: [
-      { name: "Time Tracker", path: "/time" },
-      { name: "Approve Timelogs", path: "/role" },
+      { name: "Time Tracker", path: "/time/history" },
+      { name: "Approve Timelogs", path: "/time/approve" },
     ],
   },
   ticket: {

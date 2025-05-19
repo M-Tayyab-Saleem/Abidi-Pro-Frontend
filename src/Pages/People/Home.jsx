@@ -13,6 +13,8 @@ import LeaveLogCard from "../../Components/home/LeaveLogCard";
 const Home = () => {
   const [time, setTime] = useState({ hours: "00", minutes: "00", period: "AM" });
   const [cards, setCards] = useState([]);
+
+  
   
 
   const addCard = (type) => {
