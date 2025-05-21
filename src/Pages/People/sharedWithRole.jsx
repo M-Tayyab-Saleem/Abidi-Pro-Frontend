@@ -4,14 +4,13 @@ import { IoListOutline, IoFilterSharp } from "react-icons/io5";
 
 import FileTable from "./FileTable";
 import FolderGrid from "./FolderGrid";
-import UploadModal from "./UploadModal";
+
 import OpenFolderScreen from "./OpenFolderScreen";
 
 const Role = () => {
- 
   const [viewMode, setViewMode] = useState("table");
   const [searchTerm, setSearchTerm] = useState("");
-  const [open, setOpen] = useState(false);
+
   const [folders, setFolders] = useState([]);
   const [openedFolder, setOpenedFolder] = useState(null);
 
@@ -29,8 +28,6 @@ const Role = () => {
         />
       ) : (
         <>
-
-
           {/* Search and View Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center mb-5 space-y-2 sm:space-y-0 sm:space-x-4 justify-between bg-white rounded-lg px-8 py-4">
             <div className="flex items-center space-x-4">
@@ -86,13 +83,6 @@ const Role = () => {
           <div className="mb-4">
             {viewMode === "grid" ? (
               <>
-                <UploadModal
-                  open={open}
-                  onClose={() => setOpen(false)}
-                  setFolders={setFolders}
-                  folders={folders}
-                  onCreate={handleAddFolder}
-                />
                 <FolderGrid
                   folders={folders}
                   searchTerm={searchTerm}

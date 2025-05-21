@@ -88,7 +88,6 @@ const Navbar = () => {
     { name: "Files", to: "/file", icon: FolderIcon },
     { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
     { name: "Projects", to: "/project", icon: GrProjects },
-   { name: "FAQ", to:"/faq", icon:TbUserQuestion},
 
     { name: "Admin ", to: "/admin", icon: UsersIcon },
   ];

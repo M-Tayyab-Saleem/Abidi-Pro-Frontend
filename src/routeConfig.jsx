@@ -4,12 +4,8 @@ export const moduleConfigs = {
     subNavbarKey: "people",
     links: [
       { name: "Home", path: "/people" },
-      { name: "Time Tracker", path: "/people/timetracker" },
-      { name: "Files", path: "/people/files" },
       { name: "Profile", path: "/people/profile" },
-      { name: "Leave Tracker", path: "/people/leaveTracker" },
       {name: "FAQ", path: "/people/FAQs"},
-      { name: "Admin", path: "/people/leaveTrackerAdmin" },
     ],
   },
   leave: {
@@ -65,4 +61,5 @@ export const moduleConfigs = {
       { name: "Activity Logs", path: "/admin/logs" },
     ],
   },
+
 };
