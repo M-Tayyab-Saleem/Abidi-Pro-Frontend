@@ -15,8 +15,8 @@ import { GrProjects } from "react-icons/gr";
 import api from "../axios";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { clearUser } from "../Store/userSlice";
  import { TbUserQuestion } from "react-icons/tb";
+import { logoutUser } from "../Store/authSlice";
 
 import { IconButton } from "@material-tailwind/react";
 const Navbar = () => {
@@ -71,18 +71,16 @@ const Navbar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
- 
-  const handleLogout = async () => {
-    try {
-      await api.post("/auth/logout");
-      dispatch(clearUser());
- 
-      toast.success("Logged out successfully");
-      navigate("/auth/login");
-    } catch (err) {
-      toast.error("Logout failed. Try again.");
-    }
-  };
+const handleLogout = async () => {
+  try {
+    await api.post("/auth/logout");
+    dispatch(logoutUser());
+    navigate("/auth/login");
+    toast.success("Logged out successfully");
+  } catch (err) {
+    toast.error("Logout failed. Try again.");
+  }
+};
 
   const navLinks = [
     { name: "Home", to: "/people", icon: IoHomeOutline },

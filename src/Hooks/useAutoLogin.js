@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { silentRefresh } from '../Store/authSlice';
- 
+
 let isCheckingAuth = false;
- 
+
 const useAutoLogin = () => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
- 
+
   useEffect(() => {
     if (isAuthenticated || isCheckingAuth) {
       return;
     }
- 
+
     const checkAuth = async () => {
       try {
         isCheckingAuth = true;
@@ -23,11 +23,9 @@ const useAutoLogin = () => {
         isCheckingAuth = false;
       }
     };
- 
-    // Always try to check session
+
     checkAuth();
   }, [dispatch, isAuthenticated]);
 };
- 
+
 export default useAutoLogin;
- 
