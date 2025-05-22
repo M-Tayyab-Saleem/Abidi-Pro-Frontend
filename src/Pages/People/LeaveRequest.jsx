@@ -70,57 +70,74 @@ const LeaveRequest = () => {
   ];
  
   return (
-    <div className="px-4 py-2">
-      <div className="p-8 rounded-xl bg-primary">
-        <h1 className="flex text-text-white font-bold text-sm">
-          People/<h3 className="font-normal">Leave Tracker/Apply Leave</h3>
+    // MainBody
+    <div className='px-4 py-2 '>
+      {/* roundercorner main Content */}
+      <div className='p-8 rounded-xl bg-primary'>
+       
+
+
+                  {/* Route */}
+        <h1 className='flex text-text-white font-bold text-sm'>
+          People/<h3 className='font-normal'>Leave Tracker/Apply Leave</h3>
         </h1>
- 
-        <div className="mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium">
-          <div className="px-2 my-4 text-lg">Applied Leave</div>
- 
-          {loading ? (
+        <div className='flex flex-col mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium'>
+          <div className='px-2 my-4 text-lg'>Applied Leave</div>
+            {loading ? (
             <div className="text-white px-4">Loading...</div>
           ) : errorMsg ? (
             <div className="text-red-400 px-4">{errorMsg}</div>
           ) : leaveRecord.length === 0 ? (
             <div className="text-white px-4">No leave records found.</div>
-          ) : (
+          ):(
             <>
-              <div className="bg-primary py-4 grid grid-cols-[1fr_2fr_2fr_3fr_1fr] rounded-t-lg text-white">
-                <span className="text-center">Date</span>
-                <span className="text-center">Leave Type</span>
-                <span className="text-center">Reason</span>
-                <span className="text-center">Duration in days</span>
-                <span className="text-center">Status</span>
-              </div>
- 
-              {leaveRecord.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-background py-4 grid grid-cols-[1fr_2fr_2fr_3fr_1fr] rounded-t-lg text-description"
-                >
-                  <span className="text-center">{item.date}</span>
-                  <span className="text-center">{item.leaveType}</span>
-                  <span className="text-center">{item.reason}</span>
-                  <span className="text-center">{item.duration}</span>
-                  <span
-                    className={`text-center ${
-                      item.status === "Approved"
-                        ? "bg-completed"
-                        : item.status === "Rejected"
-                        ? "bg-red-400"
-                        : "bg-slate-500 text-white"
-                    } text-white px-2 py-1 rounded-sm`}
-                  >
-                    {item.status}
-                  </span>
-                </div>
-              ))}
-            </>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-left border-separate border-spacing-0">
+              <thead className="bg-primary rounded-t-lg">
+                <tr>
+                  {["Date", "Leave Type", "Reason", "Duration In Day", "Status"].map((header, index) => (
+                    <th
+          key={index}
+          className={`p-3 font-medium text-white whitespace-nowrap border-r last:border-none border-gray-300
+            ${index === 0 ? "rounded-tl-lg" : ""}
+            ${index === 4 ? "rounded-tr-lg" : ""}
+          `}
+        >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {leaveRecord.length > 0 ? (
+                  leaveRecord.map((item, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="p-3 whitespace-nowrap">{item.date}</td>
+                      <td className="p-3 whitespace-nowrap">{item.leaveType}</td>
+                      <td className="p-3 whitespace-nowrap">{item.reason}</td>
+                      <td className="p-3 whitespace-nowrap">{item.duration}</td>
+                      <td className={`p-3 whitespace-nowrap text-center ${item.status == "Approved" ? 'bg-completed' : 'bg-slate-500 text-white'}rounded-sm `}>{item.status}</td>
+                    </tr>
+                  ))
+                ) : (
+                  [...Array(8)].map((_, index) => (
+                    <tr key={index} className="border-b">
+                      {[...Array(7)].map((__, colIndex) => (
+                        <td key={colIndex} className="p-3">
+                          <div className="h-4 bg-gray-100 rounded" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+              </>
           )}
         </div>
       </div>
+
  
       <ApplyLeaveModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>

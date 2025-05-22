@@ -24,8 +24,8 @@ const totalPages = Math.ceil(users.length / itemsPerPage);
   onToday={() => console.log('Today')}
 />
 
-        <button className="flex items-center gap-2 bg-[#86B2AA] text-white text-sm px-4 py-2 rounded-md hover:brightness-110">
-          Sort By <FaSortDown className="text-xs" />
+        <button className="flex items-center gap-2 bg-[#86B2AA] text-white text-xs md:text-sm px-4 py-2 rounded-md hover:brightness-110">
+          Sort <FaSortDown className="text-xs" />
         </button>
         {/* <button onClick={()=>openModal()} className="flex items-center gap-2 bg-[#86B2AA] text-white text-sm px-4 py-2 rounded-md hover:brightness-110">
           <FaPlus /> New Project

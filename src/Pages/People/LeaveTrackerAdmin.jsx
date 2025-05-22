@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
 import StatusDropDown from "../../Components/StatusDropDown";
+import { FaPlus } from "react-icons/fa";
+import HolidayTable from "../../Components/HolidayTable";
+import AddHolidayModal from "../../Components/AddHolidayModal";
  
 const LeaveTrackerAdmin = () => {
   const [departmentLeaveRecord, setDepartmentLeaveRecord] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
+
  
   const fetchLeaves = async () => {
     try {
@@ -52,30 +57,6 @@ const LeaveTrackerAdmin = () => {
     <div className="px-4 py-2">
       {/* roundercorner main Content */}
       <div className="p-8 rounded-xl bg-primary">
-        {/* Route */}
-        {/* <h1 className='flex text-text-white font-bold text-sm'>
-                    People/<h3 className='font-normal'>Leave Tracker/Summary</h3>
-                </h1> */}
-        {/* Top Tab */}
-        {/* <div className='flex mt-2 bg-background px-6 py-1 w-60 rounded-md items-center justify-around text-xs'>
-                    <span className='px-2'>Summary</span>
-                    <div className='w-[1px] h-8 bg-black'></div>
-                    <span className='px-2'>Leave Request</span>
-                </div> */}
-        {/* LeaveSummaryDiv */}
-        {/* <div className='mt-3 bg-background px-6 py-1  rounded-md text-sm font-medium'>
-                    <div className='flex justify-between items-center align-bottom '>
-                        <div>
-                            <div className='px-2 text-lg'>Leave Summary</div>
-                            <div className=''>
-                                <h1 className='px-2 text-xs font-light mt-3 ml-1'>Available Leaves        :   02</h1>
-                                <h1 className='px-2 text-xs font-light mt-2 ml-1 '>Booked Leaves        :   20</h1>
-                            </div>
-                        </div>
-                        <button className='bg-[#76FA9E] h-8 px-4 rounded-lg text-xs'>Apply Now</button>
-                    </div>
- 
-                </div> */}
         {/* attendance summary card view horizontal */}
         {/* Route */}
         <h1 className="flex text-text-white font-bold text-sm">
@@ -84,37 +65,73 @@ const LeaveTrackerAdmin = () => {
  
         <div className="mt-3 bg-background px-6 py-1  rounded-md text-sm font-medium">
           <div className="px-2 my-4 text-lg">Applied Leave</div>
-          <div className="bg-primary py-4 grid grid-cols-[1fr_1fr_1fr_2fr_1fr_1fr_1fr_1fr] rounded-t-lg text-white">
-            <span className="text-center">Date</span>
-            <span className="text-center">Id</span>
-            <span className="text-center">Name</span>
-            <span className="text-center">Email</span>
-            <span className="text-center">Leave Type</span>
-            <span className=" whitespace-normal break-words px-2">Reason</span>
-            <span className="text-center">Duration in days</span>
-            <span className="text-center">Status</span>
-          </div>
-          {departmentLeaveRecord.map((item, index) => (
-            <div
-              key={item.id}
-              className="bg-background py-4 grid grid-cols-[1fr_1fr_1fr_2fr_1fr_1fr_1fr_1fr] rounded-t-lg text-description"
-            >
-              <span className="text-center">{item.date}</span>
-              <span className="text-center">{item.id.slice(-4)}</span>
-              <span className="text-center">{item.name}</span>
-              <span className="text-center">{item.email}</span>
-              <span className="text-center">{item.leaveType}</span>
-              <span className="text-center whitespace-normal break-words px-2">
-                {item.reason}
-              </span>
-              <span className="text-center">{item.duration}</span>
-              <StatusDropDown
-                status={item.status}
-                onChange={(newStatus) => handleStatusChange(item.id, newStatus)}
-              />
-            </div>
-          ))}
+          <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left border-separate border-spacing-0">
+          <thead className="bg-primary rounded-t-lg">
+            <tr>
+              {["Date", "Id", "Name", "Email", "Leave Type","Duration In Days","Reason", "Status"].map((header, index) => (
+                <th
+                  key={index}
+className={`p-3 font-medium text-white whitespace-nowrap border-r last:border-none border-gray-300
+            ${index === 0 ? "rounded-tl-lg" : ""}
+            ${index === 7 ? "rounded-tr-lg" : ""}`}>
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {departmentLeaveRecord.length > 0 ? (
+              departmentLeaveRecord.map((task, index) => (
+                <tr key={index} className="border-b hover:bg-gray-50">
+                  <td className="p-3 whitespace-nowrap">{task.date}</td>
+                  <td className="p-3 whitespace-nowrap">{task.id}</td>
+                  <td className="p-3 whitespace-nowrap">{task.name}</td>
+                  <td className="p-3 whitespace-nowrap">{task.email}</td>
+                  <td className="p-3 whitespace-nowrap">{task.leaveType}</td>
+                  <td className="p-3 whitespace-nowrap">{task.reason}</td>
+                  <td className="p-3 whitespace-nowrap">{task.duration}</td>
+                  {/* <td className="p-3 whitespace-nowrap">{task.status}</td> */}
+                  <td>
+                  <StatusDropDown
+                  className="p-3 whitespace-nowrap"
+            status={task.status}
+            onChange={(newStatus) => {
+              setDepartmentLeaveRecord((records) =>
+                records.map((row, i) =>
+                  i === index ? { ...row, status: newStatus } : row
+                )
+              );
+            }}
+          />
+          </td>
+                </tr>
+              ))
+            ) : (
+              [...Array(8)].map((_, index) => (
+                <tr key={index} className="border-b">
+                  {[...Array(7)].map((__, colIndex) => (
+                    <td key={colIndex} className="p-3">
+                      <div className="h-4 bg-gray-100 rounded" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
         </div>
+         <div className='p-4 mt-3 bg-background px-6 pb-8 rounded-md text-sm font-semibold'>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className=''>Upcoming Holidays And Leaves</h1>
+            <button onClick={() => setIsOpen(i => !i)} className="flex items-center gap-2 bg-[#86B2AA] text-white text-sm px-4 py-2 rounded-md hover:brightness-110">
+              <FaPlus /> Add Holiday
+            </button>                </div>
+          <HolidayTable />
+        </div>
+        <AddHolidayModal isOpen={isOpen} setIsOpen={setIsOpen} />
+
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ const MyTasksTable = ({ tasks, setTasks,children}) => {
               {["Task Name", "Description", "Start Date", "End Date", "Assigned By", "Priority", "Status"].map((header, index) => (
                 <th
                   key={index}
-                  className="p-3 font-medium text-gray-700 border-r last:border-none border-gray-300"
+                  className="p-3 font-medium text-gray-700 border-r whitespace-nowrap last:border-none border-gray-300"
                 >
                   {header}
                 </th>
@@ -54,15 +54,15 @@ const MyTasksTable = ({ tasks, setTasks,children}) => {
                key={index}
             //    className="border-b hover:bg-gray-50"
                >
-                  <td className="p-3">{task.name}</td>
-                  <td className="p-3">{task.description}</td>
-                  <td className="p-3">{task.startDate}</td>
-                  <td className="p-3">{task.endDate}</td>
-                  <td className="p-3">{task.assignedBy}</td>
+                  <td className="p-3 whitespace-nowrap">{task.name}</td>
+                  <td className="p-3 whitespace-nowrap">{task.description}</td>
+                  <td className="p-3 whitespace-nowrap">{task.startDate}</td>
+                  <td className="p-3 whitespace-nowrap">{task.endDate}</td>
+                  <td className="p-3 whitespace-nowrap">{task.assignedBy}</td>
                   {/* <td className="p-3">{task.assignedBy}</td> */}
-                  <td className="p-3">{task.priority}</td>
+                  <td className="p-3 whitespace-nowrap">{task.priority}</td>
                   {/* <td className="p-3">{task.status}</td> */}
-                  <td className="p-3 h-full">
+                  <td className="p-3  h-full">
                    <TaskStatusDropDown
                     status={task.status}
                     onChange={(newStatus) => {

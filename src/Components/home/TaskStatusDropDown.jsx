@@ -26,7 +26,7 @@ const TaskStatusDropDown = ({ status, onChange }) => {
           e.stopPropagation();
           toggleDropdown();
         }}
-        className={`w-full h-full flex items-center justify-center cursor-pointer px-3 py-1 rounded-sm ${statusColor[status] || 'bg-slate-500 text-white'}`}
+        className={`w-full h-full flex items-center justify-center whitespace-nowrap cursor-pointer px-3 py-1 rounded-sm ${statusColor[status] || 'bg-slate-500 text-white'}`}
       >
         {status}
       </div>

@@ -81,8 +81,9 @@ function App() {
               <AppLayout />
           }
         >
-           <Route index element={<Navigate to="/people/home" />} />
-          <Route index path="home" element={<Home />} />
+          <Route index element={<Home />} />
+          <Route path="timetracker" element={<TimeTracker />} />
+          <Route path="files" element={<Files />} />
           <Route path="profile" element={<Profile />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="FAQs" element={<FAQs />} />

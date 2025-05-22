@@ -105,16 +105,16 @@ const LeaveTracker = () => {
                 </>} */}
               {/* </div> */}
               {/* LeaveSummaryDiv */}
-              <div className='mt-3 bg-background px-6 py-1  rounded-md text-sm font-medium'>
-                <div className='flex justify-between items-center align-bottom '>
+              <div className='mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium'>
+                <div className='flex flex-col items-center sm:flex sm:flex-row sm:justify-between sm:items-center  '>
                   <div>
-                    <div className='px-2 text-lg'>Leave Summary</div>
+                    <div className='px-2 text-sm md:text-2xl sm:text-xl'>Leave Summary</div>
                     <div className=''>
                       <h1 className='px-2 text-xs font-light mt-3 ml-1'>Available Leaves        :   02</h1>
                       <h1 className='px-2 text-xs font-light mt-2 ml-1 '>Booked Leaves        :   20</h1>
                     </div>
                   </div>
-                  <button onClick={() => setIsOpen(i => !i)} className='bg-[#76FA9E] h-8 px-4 rounded-lg text-xs'>Apply Now</button>
+                  <button onClick={() => setIsOpen(i => !i)} className='bg-[#76FA9E] h-8 px-4 mt-4 rounded-lg text-xs'>Apply Now</button>
                 </div>
 
               </div>

@@ -18,24 +18,24 @@ const StatusDropDown = ({ status, onChange }) => {
   };
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="flex relative text-left">
       <div
         onClick={(e)=>{e.stopPropagation();
             toggleDropdown()}}
-        className={`cursor-pointer px-3 py-1 rounded-sm text-center ${statusColor[status] || 'bg-slate-500 text-white'}`}
+        className={`cursor-pointer px-3 py-1 w-full h-fit rounded-sm text-center ${statusColor[status] || 'bg-slate-500 text-white'}`}
       >
         {status}
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow-lg">
+        <div className="absolute z-10 mt-1 w-full  bg-white border border-gray-300 rounded shadow-lg">
           {statuses.map((s) => (
             <div
               key={s}
               onClick={(e) =>{e.stopPropagation();
                  handleStatusChange(s)}
                 }
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-3 py-2 w-max hover:bg-gray-100 cursor-pointer"
             >
               {s}
             </div>

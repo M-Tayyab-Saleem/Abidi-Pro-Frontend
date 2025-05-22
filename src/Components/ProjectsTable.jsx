@@ -24,7 +24,7 @@ const ProjectsTable = ({ projects, openModal }) => {
               {["ID", "Project Name", "Project Owner", "No.Of User", "Status", "Start Date", "End Date"].map((header, index) => (
                 <th
                   key={index}
-                  className={`p-3 font-medium text-gray-700 border-r last:border-none border-gray-300`}
+                  className={`p-3 font-medium text-gray-700 border-r whitespace-nowrap last:border-none border-gray-300`}
                 >
                   {header}
                 </th>
@@ -35,13 +35,13 @@ const ProjectsTable = ({ projects, openModal }) => {
             {projects.length > 0 ? (
               projects.map((project, index) => (
                 <tr key={index} className="border-b hover:bg-gray-50">
-                  <td className="p-3">{project.id}</td>
-                  <td className="p-3">{project.name}</td>
-                  <td className="p-3">{project.owner}</td>
-                  <td className="p-3">{project.users}</td>
-                  <td className="p-3">{project.status}</td>
-                  <td className="p-3">{project.startDate}</td>
-                  <td className="p-3">{project.endDate}</td>
+                  <td className="p-3 whitespace-nowrap">{project.id}</td>
+                  <td className="p-3 whitespace-nowrap">{project.name}</td>
+                  <td className="p-3 whitespace-nowrap">{project.owner}</td>
+                  <td className="p-3 whitespace-nowrap">{project.users}</td>
+                  <td className="p-3 whitespace-nowrap">{project.status}</td>
+                  <td className="p-3 whitespace-nowrap">{project.startDate}</td>
+                  <td className="p-3 whitespace-nowrap">{project.endDate}</td>
                 </tr>
               ))
             ) : (
