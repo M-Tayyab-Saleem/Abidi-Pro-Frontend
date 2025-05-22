@@ -1,7 +1,6 @@
 import { FiEye, FiDownload } from "react-icons/fi";
 
 const FileTable = ({ searchTerm = "" }) => {
- 
   const files = [
     {
       name: "Front end development",
@@ -41,74 +40,67 @@ const FileTable = ({ searchTerm = "" }) => {
     },
     {
       name: "Bootstrap document",
-      sharedBy: "Poppy-Rose",
+      sharedBy: "Poppy‑Rose",
       sharedOn: "22/11/2022",
       category: "Transfer Bank",
     },
   ];
 
-  // Filter files based on search term (searching name, sharedBy, and category)
-  const filteredFiles = files.filter(file => {
-    const searchLower = searchTerm.toLowerCase();
+  const filtered = files.filter((f) => {
+    const s = searchTerm.toLowerCase();
     return (
-      file.name.toLowerCase().includes(searchLower) ||
-      file.sharedBy.toLowerCase().includes(searchLower) ||
-      file.category.toLowerCase().includes(searchLower)
+      f.name.toLowerCase().includes(s) ||
+      f.sharedBy.toLowerCase().includes(s) ||
+      f.category.toLowerCase().includes(s)
     );
   });
 
   return (
-    <div className="overflow-x-auto w-full">
-      <table className="min-w-full bg-background text-sm rounded-lg shadow-md">
-        <thead className="text-heading">
-          <tr>
-            <th className="text-left py-2 px-4">Files</th>
-            <th className="text-left py-2 px-4">Shared by</th>
-            <th className="text-left py-2 px-4">Shared on</th>
-            <th className="text-left py-2 px-4">Category</th>
-            <th className="text-left py-2 px-4">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredFiles.length > 0 ? (
-            filteredFiles.map((file, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-primary" : "bg-background"}
-              >
-                <td className="py-2 px-4">{file.name}</td>
-                <td className="py-2 px-4">{file.sharedBy}</td>
-                <td className="py-2 px-4">{file.sharedOn}</td>
-                <td className="py-2 px-4">{file.category}</td>
-                <td className="py-2 px-4 flex items-center space-x-2">
-                  <button 
-                    title="View" 
-                    className="hover:text-purple-700 transition-colors"
-                  >
-                    <FiEye className="text-lg text-purple-600" />
-                  </button>
-                  <button 
-                    title="Download"
-                    className="hover:text-green-700 transition-colors"
-                  >
-                    <FiDownload className="text-lg text-green-600" />
-                  </button>
+    <div className="bg-white rounded-xl shadow p-4 w-full">
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left border-separate border-spacing-0">
+          <thead className="bg-gray-100">
+            {["Files", "Shared by", "Shared on", "Category", "Actions"].map(
+              (h) => (
+                <th
+                  key={h}
+                  className="p-3 font-medium text-gray-700 border-r last:border-none border-gray-300"
+                >
+                  {h}
+                </th>
+              )
+            )}
+          </thead>
+          <tbody>
+            {filtered.length ? (
+              filtered.map((file, i) => (
+                <tr key={i} className="border-b hover:bg-gray-50">
+                  <td className="p-3">{file.name}</td>
+                  <td className="p-3">{file.sharedBy}</td>
+                  <td className="p-3">{file.sharedOn}</td>
+                  <td className="p-3">{file.category}</td>
+                  <td className="p-3 flex items-center gap-3">
+                    <button title="View" className="hover:brightness-110">
+                      <FiEye className="text-lg text-purple-600" />
+                    </button>
+                    <button title="Download" className="hover:brightness-110">
+                      <FiDownload className="text-lg text-green-600" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="p-4 text-center text-gray-500">
+                  {searchTerm
+                    ? `No files found matching “${searchTerm}”`
+                    : "No files available"}
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center py-4 text-heading">
-                {searchTerm ? (
-                  `No files found matching "${searchTerm}"`
-                ) : (
-                  "No files available"
-                )}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

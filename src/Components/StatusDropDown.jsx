@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const StatusDropDown = ({ status, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const statuses = ['Approve',  'Reject']; // Customize as needed
+  const statuses = ['Approved',  'Rejected']; // Customize as needed
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 

@@ -4,11 +4,8 @@ export const moduleConfigs = {
     subNavbarKey: "people",
     links: [
       { name: "Home", path: "/people" },
-      { name: "Time Tracker", path: "/people/timetracker" },
-      { name: "Files", path: "/people/files" },
       { name: "Profile", path: "/people/profile" },
-      { name: "Leave Tracker", path: "/people/leaveTracker" },
-      { name: "Admin", path: "/people/leaveTrackerAdmin" },
+      {name: "FAQ", path: "/people/FAQs"},
     ],
   },
   leave: {
@@ -24,8 +21,9 @@ export const moduleConfigs = {
     basePath: "/file",
     subNavbarKey: "file",
     links: [
-      { name: "Shared with me", path: "/file" },
-      { name: "Shared with Role", path: "/role" },
+        { name: "Shared with me", path: "/file/shared" },
+      { name: "Shared with Role", path: "/file/role" },
+      {name: "Upload Document", path:"/file/upload"}
     ],
   },
   time: {
@@ -63,4 +61,5 @@ export const moduleConfigs = {
       { name: "Activity Logs", path: "/admin/logs" },
     ],
   },
+
 };

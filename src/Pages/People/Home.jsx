@@ -9,11 +9,20 @@ import AddCardMenu from "../../Components/home/AddCardMenu";
 import RecentActivitiesCard from "../../Components/home/RecentActivitiesCard";
 import UpcomingBirthdaysCard from "../../Components/home/UpcomingBirthdaysCard";
 import LeaveLogCard from "../../Components/home/LeaveLogCard";
+import { useTimeLog } from "./TimeLogContext";
 
+function format(sec) {
+  const h = String(Math.floor(sec / 3600)).padStart(2, "0");
+  const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
+  const s = String(sec % 60).padStart(2, "0");
+  return { h, m, s };
+}
 const Home = () => {
   const [time, setTime] = useState({ hours: "00", minutes: "00", period: "AM" });
   const [cards, setCards] = useState([]);
 
+  const { elapsed } = useTimeLog();   
+  const { h, m, s } = format(elapsed);
   
   
 
@@ -90,10 +99,11 @@ const Home = () => {
         {/* Clock */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1">
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{time.hours}</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{h}</div>
             <div className="text-lg font-bold">:</div>
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{time.minutes}</div>
-            <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm ml-1">{time.period}</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{m}</div>
+            <div className="text-lg font-bold">:</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{s}</div>
           </div>
         </div>
       </CardBody>
@@ -112,3 +122,4 @@ const Home = () => {
 };
 
 export default Home;
+

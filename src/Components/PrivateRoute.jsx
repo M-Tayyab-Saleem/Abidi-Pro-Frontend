@@ -1,19 +1,16 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import api from "../axios";
  
 const PrivateRoute = ({ children }) => {
-  const [authorized, setAuthorized] = useState(null);
+  const user = useSelector((state) => state.user.userInfo);
  
-  useEffect(() => {
-    api.get("/auth/me")
-      .then(() => setAuthorized(true))
-      .catch(() => setAuthorized(true));
-  }, []);
+  if (user === null)
+    return <div className="text-white text-center mt-10">Checking session...</div>;
  
-  if (authorized === null) return <div className="text-white text-center mt-10">Checking session...</div>;
-  return authorized ? children : <Navigate to="/auth/login" />;
+  return user ? children : <Navigate to="/auth/login" />;
 };
  
 export default PrivateRoute;
+ 
+ 
  

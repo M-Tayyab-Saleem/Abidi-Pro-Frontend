@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Search, Clock, Filter, SortDesc, Plus } from "lucide-react";
 import { FaUserCircle } from "react-icons/fa";
-import AdminRaiseTicketModal from "../Tickets/AdminRaiseTicketModal"; // Import your modal component
+import AdminRaiseTicketModal from "../../Pages/Tickets/AdminRaiseTicketModal";
+import { useNavigate } from "react-router-dom";
+
+
 
 const AdminTickets = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
@@ -9,6 +12,8 @@ const AdminTickets = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [showModal, setShowModal] = useState(false); // ✅ modal state
+
+  const navigate = useNavigate();
 
   const [tickets, setTickets] = useState([
     {
@@ -88,7 +93,7 @@ const AdminTickets = () => {
                 <Filter className="h-4 w-4" />
               </button>
               {filterOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-20">
+                <div className="absolute right-0 mt-2 w-30 bg-white border rounded shadow-md z-20">
                   <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
                     High Priority
                   </button>
@@ -110,7 +115,7 @@ const AdminTickets = () => {
                 <SortDesc className="h-4 w-4" />
               </button>
               {sortOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-20">
+                <div className="absolute right-0 mt-2 w-30 bg-white border rounded shadow-md z-20">
                   <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
                     Newest
                   </button>
@@ -164,9 +169,13 @@ const AdminTickets = () => {
                         <option>In Progress</option>
                         <option>Closed</option>
                       </select>
-                      <button className="border border-gray-300 px-3 py-1 rounded text-sm">
-                        Assign
-                      </button>
+                      
+<button
+  onClick={() => navigate(`/admin/assign-ticket/${ticket.id.replace("#", "")}`, { state: { ticket } })}
+  className="border border-gray-300 px-3 py-1 rounded text-sm"
+>
+  Assign
+</button>
                     </div>
                   </td>
                 </tr>
