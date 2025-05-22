@@ -1,16 +1,16 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
  
+ 
 const PrivateRoute = ({ children }) => {
-  const user = useSelector((state) => state.user.userInfo);
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
  
-  if (user === null)
-    return <div className="text-white text-center mt-10">Checking session...</div>;
+  if (loading) {
+    return <div className="text-white text-center mt-10">Loading...</div>;
+  }
  
-  return user ? children : <Navigate to="/auth/login" />;
+  return isAuthenticated ? children : <Navigate to="/auth/login" replace />;
 };
  
 export default PrivateRoute;
- 
- 
  

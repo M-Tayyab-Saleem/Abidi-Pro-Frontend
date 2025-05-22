@@ -1,26 +1,33 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { setUser, clearUser } from "../store/userSlice";
-import api from "../axios";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { silentRefresh } from '../Store/authSlice';
+ 
+let isCheckingAuth = false;
  
 const useAutoLogin = () => {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
  
   useEffect(() => {
-    const checkSession = async () => {
+    if (isAuthenticated || isCheckingAuth) {
+      return;
+    }
+ 
+    const checkAuth = async () => {
       try {
-        const res = await api.get("/auth/refresh");
-        dispatch(setUser(res.data.user));
-      } catch (err) {
-        dispatch(clearUser());
-        console.log("Session expired or invalid");
+        isCheckingAuth = true;
+        await dispatch(silentRefresh());
+      } catch (error) {
+        console.error("Auto login failed:", error);
+      } finally {
+        isCheckingAuth = false;
       }
     };
  
-    checkSession();
-  }, [dispatch]);
+    // Always try to check session
+    checkAuth();
+  }, [dispatch, isAuthenticated]);
 };
  
 export default useAutoLogin;
- 
  

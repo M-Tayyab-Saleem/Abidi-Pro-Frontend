@@ -1,17 +1,18 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
- 
+import useAutoLogin from "../Hooks/useAutoLogin";
  
 const PublicRoute = ({ children }) => {
-  const user = useSelector((state) => state.user.userInfo);
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  useAutoLogin();
  
-  if (user === null) {
+  if (loading) {
     return <div className="text-white text-center mt-10">Checking session...</div>;
   }
  
-  return user ? <Navigate to="/people" /> : children;
+  return isAuthenticated ? <Navigate to="/people" /> : children;
 };
  
- 
 export default PublicRoute;
+ 
  

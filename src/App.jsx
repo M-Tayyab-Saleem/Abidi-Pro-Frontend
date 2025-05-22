@@ -41,9 +41,13 @@ import Role from "./Pages/People/sharedWithRole";
 import UploadDocument from "./Pages/People/UploadDocument";
 import FAQs from "./Pages/People/FAQ";
 // import RequestHR from "./Pages/People/
+import SessionMonitor from "./Components/sessionMonitor";
+import useTokenRefresh from "./Hooks/useTokenRefresh";
+ 
 function App() {
   return (
     <>
+      <SessionMonitor />
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -62,7 +66,9 @@ function App() {
         <Route
           path="/auth"
           element={
+            <PublicRoute>
               <AuthLayout />
+              </PublicRoute>
           }
         >
           <Route index path="login" element={<Login />} />
@@ -78,7 +84,9 @@ function App() {
         <Route
           path="/people/*"
           element={
+            <PrivateRoute>
               <AppLayout />
+            </PrivateRoute>
           }
         >
           <Route index element={<Home />} />
