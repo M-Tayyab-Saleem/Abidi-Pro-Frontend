@@ -27,6 +27,7 @@ const Home = () => {
   const [cards, setCards] = useState([]);
 
   const { elapsed } = useTimeLog();   
+  console.log(elapsed,"timer.com")
   const { h, m, s } = format(elapsed);
   
   

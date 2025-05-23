@@ -16,11 +16,11 @@ const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
   const [checkInButton, setCheckInButton] = useState(false);
   const { pathname } = useLocation();
- 
   const moduleKey = pathname.split("/")[1];
   const config = moduleConfigs[moduleKey];
   const links = config?.links || [];
- 
+  const data=useSelector(state=>state)
+  console.log(data,"wowkjj")
   const handleButton = () => {
     setCheckInButton((prev) => !prev);
   };
@@ -30,7 +30,6 @@ const SubNavbar = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
- 
   const navLinks = (
     <ul className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-6 text-sm font-medium">
       {links.map((link) => (

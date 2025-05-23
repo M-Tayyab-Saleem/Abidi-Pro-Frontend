@@ -4,21 +4,29 @@ import { Navbar, MobileNav, IconButton, Button } from "@material-tailwind/react"
 import { CalendarDaysIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import { moduleConfigs } from "../routeConfig";
 import { useTimeLog } from "../Pages/People/TimeLogContext";
+import CircularProgress from '@mui/material/CircularProgress';
+import { toast } from "react-toastify";
 
 const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
- const { start, checkIn, checkOut } = useTimeLog();
+ const { start, checkIn, checkOut,loading,error } = useTimeLog();
   const checkedIn = Boolean(start);
   const { pathname } = useLocation();
   const moduleKey = pathname.split("/")[1];
   // console.log(moduleConfigs)
   const config = moduleConfigs[moduleKey];
   const links = config?.links  || [];
-  console.log(links,"hello2")
+//  console.log(links,"hello2")
+useEffect(()=>{
+  error&&
+  toast.error(error?.message);
 
-  const handleButton = () => {
-    setCheckInButton((prev) => !prev);
-  };
+},[error])
+
+  // console.log(data,"wowsdfsd")
+
+ 
+
 
   useEffect(() => {
     const handleResize = () => window.innerWidth >= 960 && setOpenNav(false);
@@ -62,7 +70,8 @@ const SubNavbar = () => {
           }`}
           onClick={checkedIn ? checkOut : checkIn}
         >
-          {checkedIn ? "Check Out" : "Check In"}
+          {loading?<CircularProgress size={15} color="primary" />:checkedIn ? "Check Out" : "Check In"}
+
         </Button>
 
         {/* Nav Links Center */}

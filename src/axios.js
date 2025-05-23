@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import store from "./Store";
+import {store} from "./Store";
 import { logoutUser } from "./Store/authSlice";
 import { silentRefresh } from "./Store/authSlice";
 
