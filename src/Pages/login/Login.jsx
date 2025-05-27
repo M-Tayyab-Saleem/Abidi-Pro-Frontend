@@ -66,7 +66,7 @@ const Login = () => {
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full sm:min-w-[400px] max-w-[500px] bg-white bg-opacity-10 p-6 sm:p-8 rounded-xl shadow-md"
+        className=" my-4 w-full sm:min-w-[400px] max-w-[500px] bg-white bg-opacity-10 p-6 sm:p-8 rounded-xl shadow-md "
       >
         <div className="flex justify-center mb-4">
           <img

@@ -14,8 +14,6 @@ import TimeoffBalanceCard from "../../Components/home/TimeoffBalanceCard";
 import TasksAssignedToMeCard from "../../Components/home/TasksAssignedToMeCard";
 import { useTimeLog } from "./TimeLogContext";
 
-
-
 function format(sec) {
   const h = String(Math.floor(sec / 3600)).padStart(2, "0");
   const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
@@ -23,14 +21,16 @@ function format(sec) {
   return { h, m, s };
 }
 const Home = () => {
-  const [time, setTime] = useState({ hours: "00", minutes: "00", period: "AM" });
+  const [time, setTime] = useState({
+    hours: "00",
+    minutes: "00",
+    period: "AM",
+  });
   const [cards, setCards] = useState([]);
 
-  const { elapsed } = useTimeLog();   
-  console.log(elapsed,"timer.com")
+  const { elapsed } = useTimeLog();
+  console.log(elapsed, "timer.com");
   const { h, m, s } = format(elapsed);
-  
-  
 
   const addCard = (type) => {
     if (!cards.find((c) => c.type === type)) {
@@ -45,7 +45,8 @@ const Home = () => {
   const renderCard = (card) => {
     const props = { key: card.id, onDelete: () => removeCard(card.id) };
     switch (card.type) {
-      case "feeds": return <FeedsCard {...props} />;
+      case "feeds":
+        return <FeedsCard {...props} />;
       case "attendance": {
         const sampleData = [
           { day: "Mon", hours: 6 },
@@ -56,18 +57,30 @@ const Home = () => {
           { day: "Sat", hours: 0 },
           { day: "Sun", hours: 5 },
         ];
-        return <AttendanceCard weeklyData={sampleData} onDelete={props.onDelete} />;
+        return (
+          <AttendanceCard weeklyData={sampleData} onDelete={props.onDelete} />
+        );
       }
-      case "holidays": return <HolidaysCard {...props} />;
-      case "todo": return <ToDoCard {...props} />;
-      case "notes": return <NotesCard {...props} />;
-      case "recent activities": return <RecentActivitiesCard {...props}/>;
-      case "birthdays": return <UpcomingBirthdaysCard {...props}/>;
-      case "leavelog": return <LeaveLogCard {...props} />;
-      case "upcomingDeadlines": return <UpcomingDeadlinesCard/>;
-      case "timeoffBalance": return <TimeoffBalanceCard/>;
-      case "tasksAssignedToMe": return <TasksAssignedToMeCard/>;
-      default: return null;
+      case "holidays":
+        return <HolidaysCard {...props} />;
+      case "todo":
+        return <ToDoCard {...props} />;
+      case "notes":
+        return <NotesCard {...props} />;
+      case "recent activities":
+        return <RecentActivitiesCard {...props} />;
+      case "birthdays":
+        return <UpcomingBirthdaysCard {...props} />;
+      case "leavelog":
+        return <LeaveLogCard {...props} />;
+      case "upcomingDeadlines":
+        return <UpcomingDeadlinesCard />;
+      case "timeoffBalance":
+        return <TimeoffBalanceCard />;
+      case "tasksAssignedToMe":
+        return <TasksAssignedToMeCard />;
+      default:
+        return null;
     }
   };
 
@@ -82,37 +95,41 @@ const Home = () => {
       setTime({ hours: hours.toString().padStart(2, "0"), minutes, period });
     };
 
-    
-
     updateTime();
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  
-
   return (
     <Card className="relative flex flex-col bg-clip-border rounded-xl text-gray-700 overflow-hidden bg-primary p-5 border m-4 shadow-sm min-h-[700px] border-none">
-      <CardBody className="bg-background rounded-lg border-0 shadow-sm flex items-center justify-between gap-4 p-3 sm:p-5 md:p-6">
+      <CardBody className="bg-background rounded-lg border-0 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 md:p-6">
         {/* Greeting */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <div className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full bg-teal-500 text-white flex items-center justify-center text-sm sm:text-base md:text-xl font-bold">
             P
           </div>
           <div className="truncate">
-            <h2 className="text-xl text-heading font-semibold truncate">Hey, Paul!</h2>
+            <h2 className="text-lg sm:text-xl text-heading font-semibold truncate">
+              Hey, Paul!
+            </h2>
             <p className="text-description text-sm">Have a great day</p>
           </div>
         </div>
 
         {/* Clock */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-1">
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{h}</div>
-            <div className="text-lg font-bold">:</div>
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{m}</div>
-            <div className="text-lg font-bold">:</div>
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-2 rounded font-semibold text-lg">{s}</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
+              {h}
+            </div>
+            <div className="text-base sm:text-lg font-bold">:</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
+              {m}
+            </div>
+            <div className="text-base sm:text-lg font-bold">:</div>
+            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
+              {s}
+            </div>
           </div>
         </div>
       </CardBody>
@@ -131,4 +148,3 @@ const Home = () => {
 };
 
 export default Home;
-

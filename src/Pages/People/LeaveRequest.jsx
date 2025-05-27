@@ -77,16 +77,13 @@ const LeaveRequest = () => {
        
 
 
-                  {/* Route */}
-        <h1 className='flex text-text-white font-bold text-sm'>
-          People/<h3 className='font-normal'>Leave Tracker/Apply Leave</h3>
-        </h1>
+                  
         <div className='flex flex-col mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium'>
           <div className='px-2 my-4 text-lg'>Applied Leave</div>
             {loading ? (
             <div className="text-white px-4">Loading...</div>
           ) : errorMsg ? (
-            <div className="text-red-400 px-4">{errorMsg}</div>
+            <div className="text-red-400 px-2">{errorMsg}</div>
           ) : leaveRecord.length === 0 ? (
             <div className="text-white px-4">No leave records found.</div>
           ):(

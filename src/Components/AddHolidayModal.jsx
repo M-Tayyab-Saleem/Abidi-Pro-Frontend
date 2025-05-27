@@ -8,7 +8,7 @@ const AddHolidayModal = ({isOpen,setIsOpen}) => {
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-30 z-[9999] flex justify-end">
           {/* Modal Panel */}
-          <div className="w-full sm:w-1/2 bg-white h-full p-6 shadow-lg rounded-l-lg relative z-80">
+          <div className="w-75 sm:w-1/2 bg-white h-full p-6 shadow-lg rounded-l-lg relative z-80">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Add Holiday</h2>
               <button

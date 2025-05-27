@@ -62,7 +62,9 @@ const NotesCard = ({ onDelete }) => {
       <div className="flex justify-between items-start mb-4">
         <div>
           <h2 className="text-heading font-semibold">Notes</h2>
-          <p className="text-sm text-cardDescription">Write and edit personal notes</p>
+          <p className="text-sm text-cardDescription">
+            Write and edit personal notes
+          </p>
         </div>
 
         {/* Dropdown menu */}
@@ -92,7 +94,7 @@ const NotesCard = ({ onDelete }) => {
       </div>
 
       {/* Add Note Input */}
-      <div className="flex mb-4 gap-2">
+      <div className="flex flex-col sm:flex-row mb-4 gap-2">
         <input
           type="text"
           className="flex-1 border px-3 py-2 rounded text-sm"
@@ -103,7 +105,7 @@ const NotesCard = ({ onDelete }) => {
         />
         <button
           onClick={addNote}
-          className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 transition"
+          className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 transition mt-2 sm:mt-0 sm:ml-2"
         >
           Add
         </button>

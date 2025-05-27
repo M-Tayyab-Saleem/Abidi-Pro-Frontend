@@ -52,12 +52,7 @@ const AdminDashBoard = () => {
         available: 0,
         badgeColor: 'bg-[#AAC8FF]',
       },
-      // {
-      //   icon: <FaTools />,
-      //   label: 'Compensatory',
-      //   available: 0,
-      //   badgeColor: 'bg-purple-400',
-      // },
+     
     ];
 
 
