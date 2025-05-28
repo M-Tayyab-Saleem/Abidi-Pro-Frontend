@@ -79,8 +79,8 @@ useEffect(()=>{
 
         {/* Contact Icons Right */}
         <div className="hidden lg:flex items-center space-x-4">
-          <PhoneIcon className="w-5 h-5 text-text hover:text-blue-500 cursor-pointer" />
-          <CalendarDaysIcon className="w-5 h-5 text-text hover:text-blue-500 cursor-pointer" />
+          <PhoneIcon className="w-5 h-5 text-text hover:text-teal-700 cursor-pointer" />
+          <CalendarDaysIcon className="w-5 h-5 text-text hover:text-teal-700 cursor-pointer" />
         </div>
 
         {/* Mobile toggle */}

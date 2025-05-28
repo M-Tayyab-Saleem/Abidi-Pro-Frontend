@@ -77,143 +77,161 @@ const Ticket = () => {
 
   return (
     <div className="bg-primary m-5 rounded-2xl min-h-[700px] p-4 md:p-6">
-      <div className="text-text bg-background rounded-lg shadow-md p-4 md:p-6 min-h-[700px] ">
+      <div className="text-text rounded-lg  p-4 md:p-6 min-h-[700px] ">
         {/* Header Controls */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-          <div className="flex items-center w-full md:w-auto">
-            <span className="mr-2">Show</span>
-            <select
-              className="border text-tblBody rounded px-2 py-1 mr-2 flex-shrink-0"
-              value={entriesPerPage}
-              onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-            >
-              {[10, 25, 50, 100].map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-            <span>entries</span>
-          </div>
+        <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
+          {/* Top controls section - responsive layout */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full">
+            {/* Entries dropdown and search - stacks on mobile, inline on desktop */}
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3 lg:mb-0">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <label className="text-sm text-heading whitespace-nowrap">
+                  Show
+                </label>
+                <select
+                  className="text-sm px-2 py-1 text-heading bg-secondary rounded-md shadow-md"
+                  value={entriesPerPage}
+                  onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                >
+                  {[10, 25, 50, 100].map((num) => (
+                    <option key={num} value={num} className="text-gray-700">
+                      {num}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-sm text-heading">entries</span>
+              </div>
 
-          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-            <div className="relative flex-grow md:flex-grow-0 w-full md:w-auto">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-8 pr-4 py-2 border rounded w-full text-tblBody"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <div className="relative w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="border-0 pl-9 pr-3 py-1.5 rounded-md shadow-md w-full sm:w-64 text-sm bg-secondary text-description"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              </div>
             </div>
 
-            <button
-              className="bg-primary text-text px-4 py-2 rounded whitespace-nowrap w-full md:w-auto"
-              onClick={() => setShowModal(true)}
-            >
-              Raise a Ticket
-            </button>
+            {/* Right-side controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowModal(true)}
+                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md shadow-md"
+              >
+                Raise a Ticket
+              </button>
 
-            {/* Only show menu button on small screens */}
-            <button
-              className="md:hidden border rounded p-2 w-full flex justify-center"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+              {/* Mobile menu toggle */}
+              <button
+                className="sm:hidden p-2 border rounded bg-white shadow-md"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                <Menu className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="w-full overflow-auto rounded-lg mt-5 shadow-lg">
-          <table className="min-w-full table-auto text-sm md:text-base">
-            <thead>
-              <tr className="bg-primary text-tblHead text-left whitespace-nowrap">
-                <th className="px-2 py-3 md:px-4">Ticket ID</th>
-                <th className="px-2 py-3 md:px-4">Date</th>
-                <th className="px-2 py-3 md:px-4">Subject</th>
-                <th className="px-2 py-3 md:px-4">Email</th>
-                <th className="px-2 py-3 md:px-4">Attachment</th>
-                <th className="px-2 py-3 md:px-4">Status</th>
-                <th className="px-2 py-3 md:px-4 hidden sm:table-cell">
-                  Comment
-                </th>
-                <th className="px-2 py-3 md:px-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentTickets.map((ticket) => (
-                <tr
-                  key={ticket.id}
-                  className="bg-white hover:bg-gray-50 text-tblBody border-t"
-                >
-                  <td className="px-2 py-3 md:px-4 whitespace-nowrap">
-                    {ticket.id}
-                  </td>
-                  <td className="px-2 py-3 md:px-4 whitespace-nowrap">
-                    {ticket.date}
-                  </td>
-                  <td className="px-2 py-3 md:px-4 whitespace-nowrap">
-                    {ticket.subject}
-                  </td>
-                  <td className="px-2 py-3 md:px-4 whitespace-nowrap">
-                    {ticket.email || "—"}
-                  </td>
-                  <td className="px-2 py-3 md:px-4 whitespace-nowrap">
-                    {ticket.attachment ? (
-                      <span className="text-green-600 text-sm bg-green-200 cursor-pointer rounded-3xl p-1">
-                        {ticket.attachment.name}
-                      </span>
-                    ) : (
-                      <span className="text-gray-700 tex-sm bg-gray-300 p-1 rounded-3xl w-full">
-                        No file
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-2 py-3 md:px-4">
-                    <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                        ticket.status === "opened"
-                          ? "bg-green-200 text-green-800"
-                          : "bg-red-200 text-red-800"
-                      }`}
-                    >
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td className="px-2 py-3 md:px-4 hidden sm:table-cell">
-                    {ticket.comment}
-                  </td>
-                  <td className="px-2 py-3 md:px-4">
-                    <div className="flex items-center gap-2">
-                      {/* View */}
-                      <button
-                        onClick={() => setSelectedTicket(ticket)}
-                        title="View"
-                        className="p-1 rounded bg-blue-100 text-blue-600 hover:bg-blue-200 hover:text-blue-800 transition"
-                      >
-                        <FaEye className="h-4 w-4" />
-                      </button>
-                      {/* Delete */}
-                      <button
-                        onClick={() => handleDelete(ticket.id)}
-                        title="Delete"
-                        className="p-1 rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 transition"
-                      >
-                        <FiTrash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+        <div className="bg-white rounded-xl shadow p-4 w-full mt-5">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-left border-separate border-spacing-0">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Ticket ID
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Date
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Subject
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Email
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Attachment
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300">
+                    Status
+                  </th>
+                  <th className="p-3 font-medium text-gray-700 border-r border-gray-300 hidden sm:table-cell">
+                    Comment
+                  </th>
+                  <th className="p-3 font-medium text-gray-700">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentTickets.length ? (
+                  currentTickets.map((ticket) => (
+                    <tr key={ticket.id} className="border-b hover:bg-gray-50">
+                      <td className="p-3">{ticket.id}</td>
+                      <td className="p-3">{ticket.date}</td>
+                      <td className="p-3">{ticket.subject}</td>
+                      <td className="p-3">{ticket.email || "—"}</td>
+                      <td className="p-3">
+                        {ticket.attachment ? (
+                          <span className="text-green-600 text-xs bg-green-100 rounded-full px-2 py-1 inline-block">
+                            {ticket.attachment.name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500 text-xs bg-gray-200 rounded-full px-2 py-1 inline-block">
+                            No file
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+                            ticket.status === "opened"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {ticket.status}
+                        </span>
+                      </td>
+                      <td className="p-3 hidden sm:table-cell">
+                        {ticket.comment}
+                      </td>
+                      <td className="p-3 flex items-center gap-3">
+                        <button
+                          title="View"
+                          onClick={() => setSelectedTicket(ticket)}
+                          className="hover:brightness-110"
+                        >
+                          <FaEye className="text-lg text-[#7FABA4]" />
+                        </button>
+                        <button
+                          title="Delete"
+                          onClick={() => handleDelete(ticket.id)}
+                          className="hover:brightness-110"
+                        >
+                          <FiTrash2 className="text-lg text-red-400" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8} className="p-4 text-center text-gray-500">
+                      {searchTerm
+                        ? `No tickets found matching “${searchTerm}”`
+                        : "No tickets available"}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col md:flex-row justify-between items-center mt-4">
+        {/* <div className="flex flex-col md:flex-row justify-between items-center mt-4">
           <div>
             Showing {filteredTickets.length > 0 ? indexOfFirstTicket + 1 : 0} to{" "}
             {Math.min(indexOfLastTicket, filteredTickets.length)} of{" "}
@@ -243,7 +261,7 @@ const Ticket = () => {
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Modals */}
         {showModal && (
@@ -267,3 +285,4 @@ const Ticket = () => {
 };
 
 export default Ticket;
+

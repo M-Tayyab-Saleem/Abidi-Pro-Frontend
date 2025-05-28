@@ -29,12 +29,12 @@ const RaiseTicketModal = ({ onClose, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end items-stretch bg-black bg-opacity-50">
-      <div className="bg-white w-full sm:max-w-[90%] md:max-w-[500px] h-full p-6 shadow-xl transform transition-transform duration-300 translate-x-0 rounded-tl-3xl rounded-bl-3xl overflow-auto">
+      <div className="bg-white w-75 sm:max-w-[90%] md:max-w-[500px] h-full p-6 shadow-xl transform transition-transform duration-300 translate-x-0 rounded-tl-3xl rounded-bl-3xl overflow-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold">Raise a Ticket</h2>
           <button
             onClick={onClose}
-            className="text-black text-lg font-bold hover:text-red-500"
+            className="text-black text-lg font-bold hover:text-grey-200"
           >
             ×
           </button>
@@ -101,17 +101,17 @@ const RaiseTicketModal = ({ onClose, onSubmit }) => {
           <div className="flex justify-between mt-4">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-200 text-blue-800 rounded hover:bg-blue-300"
+              className="px-4 py-2 bg-[#497a71] text-white hover:bg-[#99c7be] hover:text-black"
             >
               Submit
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={onClose}
               className="px-4 py-2 bg-red-300 text-red-800 rounded hover:bg-red-400"
             >
               Cancel
-            </button>
+            </button> */}
           </div>
         </form>
       </div>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const ProjectCard = ({ title, value, badgeColor, icon }) => {
     return (
-        <div className="relative bg-white rounded-2xl shadow-md px-4 py-6 mb-4  flex items-center justify-between w-78">
+        <div className="relative bg-white rounded-2xl shadow-md px-4 py-6 mb-8  flex items-center justify-between w-78">
             {/* Badge */}
             <div className={`absolute -top-6 left-4 ${badgeColor} text-white p-4 rounded-lg`}>
                 {icon}

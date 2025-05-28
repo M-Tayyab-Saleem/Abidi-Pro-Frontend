@@ -288,7 +288,7 @@ const ProjectDashBoard = () => {
         </div>
 
         {/* Responsive Cards */}
-        <div className="mt-6 flex flex-wrap gap-4 sm:gap-6">
+        <div className="mt-12 flex flex-wrap gap-4 sm:gap-6">
           {leaveData.map((item, index) => (
             <div key={index} className="w-full sm:w-[48%] lg:w-[23%]">
               <ProjectCard

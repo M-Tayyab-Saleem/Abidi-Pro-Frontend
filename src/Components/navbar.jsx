@@ -165,7 +165,7 @@ const handleLogout = async () => {
               <div className="relative hidden sm:block">
                 <button
                   onClick={() => setSettingsOpen(!settingsOpen)}
-                  className="p-1 text-white rounded-md hover:bg-secondary"
+                  className="p-1 text-white rounded-md hover:bg-teal-700"
                 >
                   <span className="sr-only">Open settings</span>
                   <Cog6ToothIcon className="w-6 h-6" />
@@ -232,7 +232,7 @@ const handleLogout = async () => {
                 key={name}
                 to={to}
                 onClick={() => setOpenNav(false)}
-                className={`flex items-center space-x-2 rounded-md px-3 py-2 ${currentPath === to ? "bg-secondary" : "hover:bg-secondary"
+                className={`flex items-center space-x-2 rounded-md px-3 py-2 ${currentPath === to ? "hover:bg-[#99c7be]" : "hover:bg-[#99c7be] hover:text-black"
                   }`}
               >
                 <Icon className="w-5 h-5" />

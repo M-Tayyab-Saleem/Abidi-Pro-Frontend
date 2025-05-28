@@ -62,9 +62,9 @@ const AdminDashBoard = () => {
     <div className='px-4 py-2 '>
       {/* roundercorner main Content */}
       <div className='p-8 rounded-xl bg-primary'>
-      <div className='bg-white px-8 py-4 font-semibold rounded-lg'>Admin Dashboard</div>
+      <div className='bg-white px-8 py-4 font-semibold rounded-lg mb-5'>Admin Dashboard</div>
        {/* attendance summary card view horizontal */}
-        <div className='my-8 flex flex-wrap items-start justify-start gap-6 '>
+        <div className='mt-12 flex flex-wrap items-start justify-start gap-6 '>
           {
             leaveData.map((item, index) => {
               return (
@@ -74,7 +74,7 @@ const AdminDashBoard = () => {
           }
         </div>
         <div>
-          <AdminDashboardCards donutData={donutData} barData={barData} />;
+          <AdminDashboardCards donutData={donutData} barData={barData} />
         </div>
       </div>    
     </div>

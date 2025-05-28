@@ -61,7 +61,7 @@ const AdminDashboardCards = ({ donutData, barData }) => {
       </div>
 
     </div>
-  );
-};
+  )
+}
 
 export default AdminDashboardCards;
