@@ -91,7 +91,9 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route index element={<Home />} />
+          <Route index element={<Navigate to="/people/home" />} />
+          <Route 
+          path='home' element={<Home />} />
           <Route path="timetracker" element={<TimeTracker />} />
           <Route path="files" element={<Files />} />
           <Route path="profile" element={<Profile />} />

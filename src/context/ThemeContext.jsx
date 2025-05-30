@@ -2,17 +2,30 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { predefinedThemes } from "../styles/theme";
 
 const ThemeContext = createContext();
+function safeJSONParse(key, fallback) {
+  const raw = localStorage.getItem(key);
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    console.warn(`Couldn’t parse "${key}" from localStorage:`, err);
+    return fallback;
+  }
+}
 
 export const ThemeProvider = ({ children }) => {
-  const [themes] = useState(() => {
-    const saved = JSON.parse(localStorage.getItem("themes"));
-    return saved?.length ? saved : predefinedThemes;
-  });
+ const [themes] = useState(() => {
+  // Try to load an array; if missing or empty, use predefinedThemes
+  const parsed = safeJSONParse("themes", []);
+  return Array.isArray(parsed) && parsed.length 
+    ? parsed 
+    : predefinedThemes;
+});
 
-  const [selectedTheme, setSelectedTheme] = useState(() => {
-    return JSON.parse(localStorage.getItem("selectedTheme")) || themes[0];
-  });
-
+const [selectedTheme, setSelectedTheme] = useState(() => {
+  // Default to the first theme if nothing saved
+  return safeJSONParse("selectedTheme", themes[0]);
+});
   useEffect(() => {
     applyTheme(selectedTheme);
   }, [selectedTheme]);

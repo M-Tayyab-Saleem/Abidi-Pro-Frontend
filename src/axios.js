@@ -5,7 +5,7 @@ import { logoutUser } from "./Store/authSlice";
 import { silentRefresh } from "./Store/authSlice";
 
 const api = axios.create({
-  baseURL: "https://9d00-39-35-235-214.ngrok-free.app/api/web",
+  baseURL: "http://localhost:4000/api/web",
   withCredentials: true,
   timeout: 10000,
 });
