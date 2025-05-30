@@ -43,7 +43,8 @@ import FAQs from "./Pages/People/FAQ";
 // import RequestHR from "./Pages/People/
 import SessionMonitor from "./Components/sessionMonitor";
 import useTokenRefresh from "./Hooks/useTokenRefresh";
- 
+import AssignTicket from "./Pages/Tickets/AssignTickets";
+
 function App() {
   useAutoLogin();
   useTokenRefresh();
@@ -70,7 +71,7 @@ function App() {
           element={
             <PublicRoute>
               <AuthLayout />
-              </PublicRoute>
+            </PublicRoute>
           }
         >
           <Route index path="login" element={<Login />} />
@@ -92,8 +93,8 @@ function App() {
           }
         >
           <Route index element={<Navigate to="/people/home" />} />
-          <Route 
-          path='home' element={<Home />} />
+          <Route
+            path='home' element={<Home />} />
           <Route path="timetracker" element={<TimeTracker />} />
           <Route path="files" element={<Files />} />
           <Route path="profile" element={<Profile />} />
@@ -109,7 +110,7 @@ function App() {
         </Route>
 
         <Route path="/file/*" element={<AppLayout />}>
-        <Route index element={<Navigate to="/file/shared" />} />
+          <Route index element={<Navigate to="/file/shared" />} />
           <Route index path="shared" element={<Files />} />
           <Route path="role" element={<Role />} />
           <Route path="upload" element={<UploadDocument />} />
@@ -138,10 +139,10 @@ function App() {
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
         </Route>
 
-  <Route path="/faq/*" element={<AppLayout />}>
-            <Route index element={<FAQs/>} />
-             {/* <Route path="requestHR" element={<RequestHR/>} /> */}
-          </Route>
+        <Route path="/faq/*" element={<AppLayout />}>
+          <Route index element={<FAQs />} />
+          {/* <Route path="requestHR" element={<RequestHR/>} /> */}
+        </Route>
 
         <Route path="/admin/*" element={<AppLayout />}>
           <Route index element={<Navigate to="adminDashboard" replace />} /> //
@@ -149,6 +150,7 @@ function App() {
           <Route index path="adminDashboard" element={<AdminDashBoard />} />
           <Route path="userManagement" element={<UserManagement />} />
           <Route path="logs" element={<ActivityLogs />} />
+          <Route path="assign-ticket/:ticketId" element={<AssignTicket />} />
         </Route>
       </Routes>
     </>

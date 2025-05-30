@@ -143,12 +143,12 @@ const AssignTicket = () => {
           {/* Ticket Header */}
           <div className="p-4 border-b">
             <div className="flex flex-col md:flex-row md:items-center gap-2">
-               <button
-          className="text-gray-600 hover:text-gray-900"
-          onClick={() => navigate("/admin/admintickets")} 
-        >
-          <ArrowLeft size={20} />
-        </button>
+              <button
+                className="text-gray-600 hover:text-gray-900"
+                onClick={() => navigate("/admin/admintickets")}
+              >
+                <ArrowLeft size={20} />
+              </button>
 
               <div className="flex-1">
                 <h2 className="text-lg text-nowrap font-semibold flex flex-wrap items-center gap-2 text-text">
@@ -176,11 +176,10 @@ const AssignTicket = () => {
                             <button
                               key={status}
                               onClick={() => handleStatusChange(status)}
-                              className={`px-4 py-2 text-left text-sm hover:bg-gray-100 ${
-                                ticket.status === status
+                              className={`px-4 py-2 text-left text-sm hover:bg-gray-100 ${ticket.status === status
                                   ? "bg-yellow-50 font-semibold text-yellow-700"
                                   : ""
-                              }`}
+                                }`}
                             >
                               {status}
                             </button>
@@ -215,11 +214,10 @@ const AssignTicket = () => {
                   <button
                     onClick={() => setAssignDropdownOpen(!assignDropdownOpen)}
                     className={`px-3 py-2 shadow-md rounded flex items-center gap-2 transition-colors
-      ${
-        selectedAssignee
-          ? "bg-green-500 text-white"
-          : "bg-primary hover:bg-primary/65 text-text"
-      }
+      ${selectedAssignee
+                        ? "bg-green-500 text-white"
+                        : "bg-primary hover:bg-primary/65 text-text"
+                      }
     `}
                   >
                     <span>
@@ -254,11 +252,10 @@ const AssignTicket = () => {
                           onClick={() => {
                             assignToUser(selectedAssignee);
                           }}
-                          className={`w-full mt-2 py-1 rounded text-sm ${
-                            selectedAssignee
+                          className={`w-full mt-2 py-1 rounded text-sm ${selectedAssignee
                               ? "bg-green-500 text-white hover:bg-green-600"
                               : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                          }`}
+                            }`}
                           disabled={!selectedAssignee}
                         >
                           Confirm
@@ -402,30 +399,30 @@ const AssignTicket = () => {
                     >
                       <span className="w-1 h-1 rounded-full text-text mt-2"></span>
                       {activity.type === "created" && (
-  <span>
-    Ticket created{" "}
-    <span className="text-xs text-gray-500">{activity.time}</span>
-  </span>
-)}
-{activity.type === "assigned" && (
-  <span>
-    Assigned to {activity.to}{" "}
-    <span className="text-xs text-gray-500">{activity.time}</span>
-  </span>
-)}
-{activity.type === "responded" && (
-  <span>
-    {activity.by} responded{" "}
-    <span className="text-xs text-gray-500">{activity.time}</span>
-  </span>
-)}
-{activity.type === "statusChanged" && (
-  <span>
-    Status changed to{" "}
-    <span className="font-semibold">{activity.to}</span>{" "}
-    <span className="text-xs text-gray-500">{activity.time}</span>
-  </span>
-)}
+                        <span>
+                          Ticket created{" "}
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </span>
+                      )}
+                      {activity.type === "assigned" && (
+                        <span>
+                          Assigned to {activity.to}{" "}
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </span>
+                      )}
+                      {activity.type === "responded" && (
+                        <span>
+                          {activity.by} responded{" "}
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </span>
+                      )}
+                      {activity.type === "statusChanged" && (
+                        <span>
+                          Status changed to{" "}
+                          <span className="font-semibold">{activity.to}</span>{" "}
+                          <span className="text-xs text-gray-500">{activity.time}</span>
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>

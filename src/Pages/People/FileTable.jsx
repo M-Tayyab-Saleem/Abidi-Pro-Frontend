@@ -1,55 +1,13 @@
+
 import { FiEye, FiDownload } from "react-icons/fi";
 
-const FileTable = ({ searchTerm = "" }) => {
-  const files = [
-    {
-      name: "Front end development",
-      sharedBy: "Brad Mason",
-      sharedOn: "06/09/2022",
-      category: "Transfer Bank",
-    },
-    {
-      name: "UI Templates",
-      sharedBy: "Sanderson",
-      sharedOn: "25/09/2022",
-      category: "Cash on Delivery",
-    },
-    {
-      name: "Approval for design",
-      sharedBy: "Jun Redfern",
-      sharedOn: "04/10/2022",
-      category: "Transfer Bank",
-    },
-    {
-      name: "Start dates of upcoming",
-      sharedBy: "Miriam Kidd",
-      sharedOn: "17/10/2022",
-      category: "Transfer Bank",
-    },
-    {
-      name: "UI/UX",
-      sharedBy: "Dominic",
-      sharedOn: "24/10/2022",
-      category: "Cash on Delivery",
-    },
-    {
-      name: "HTML CSS Files",
-      sharedBy: "Shanice",
-      sharedOn: "01/11/2022",
-      category: "Transfer Bank",
-    },
-    {
-      name: "Bootstrap document",
-      sharedBy: "Poppy‑Rose",
-      sharedOn: "22/11/2022",
-      category: "Transfer Bank",
-    },
-  ];
+const FileTable = ({files,onDownload,loading, searchTerm = "" }) => {
 
+console.log(files,"from component")
   const filtered = files.filter((f) => {
     const s = searchTerm.toLowerCase();
     return (
-      f.name.toLowerCase().includes(s) ||
+      f.fileName.toLowerCase().includes(s) ||
       f.sharedBy.toLowerCase().includes(s) ||
       f.category.toLowerCase().includes(s)
     );
@@ -75,7 +33,7 @@ const FileTable = ({ searchTerm = "" }) => {
             {filtered.length ? (
               filtered.map((file, i) => (
                 <tr key={i} className="border-b hover:bg-gray-50">
-                  <td className="p-3">{file.name}</td>
+                  <td className="p-3">{file.fileName}</td>
                   <td className="p-3">{file.sharedBy}</td>
                   <td className="p-3">{file.sharedOn}</td>
                   <td className="p-3">{file.category}</td>
