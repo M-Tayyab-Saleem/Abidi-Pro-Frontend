@@ -46,6 +46,9 @@ const attendanceTimerSlice=createSlice({
         error:null,
     },
     reducers:{
+      setError(state,action){
+        state.error=action.payload
+      }
 
     },
     extraReducers:(builder)=>{
@@ -74,4 +77,5 @@ const attendanceTimerSlice=createSlice({
         })
     }
 })
+export const { setError } = attendanceTimerSlice.actions;
 export default attendanceTimerSlice.reducer

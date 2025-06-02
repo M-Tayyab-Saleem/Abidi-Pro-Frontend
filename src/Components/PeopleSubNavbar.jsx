@@ -6,26 +6,31 @@ import { moduleConfigs } from "../routeConfig";
 import { useTimeLog } from "../Pages/People/TimeLogContext";
 import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from "react-toastify";
+import { setError } from "../api/attendanceTimer";
 
 const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
- const { start, checkIn, checkOut,loading,error } = useTimeLog();
+  const { start, checkIn, checkOut, loading, error } = useTimeLog();
   const checkedIn = Boolean(start);
   const { pathname } = useLocation();
   const moduleKey = pathname.split("/")[1];
   // console.log(moduleConfigs)
   const config = moduleConfigs[moduleKey];
-  const links = config?.links  || [];
-//  console.log(links,"hello2")
-useEffect(()=>{
-  error&&
-  toast.error(error?.message);
+  const links = config?.links || [];
+  //  console.log(links,"hello2")
+  useEffect(() => {
+    error && (() => {
+      setTimeout(() => {
+        dispatch(setError(null));
+        console.log("setting error to nll")
+      }, 1000);
+    })()
 
-},[error])
+  }, [error])
 
   // console.log(data,"wowsdfsd")
 
- 
+
 
 
   useEffect(() => {
@@ -36,21 +41,20 @@ useEffect(()=>{
 
   const navLinks = (
     <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-6 text-sm font-medium">
-     {links.map((link) => (
-  <li key={link.name}>
-    <NavLink
-      to={link.path}
-      // end={link.path === `/${moduleKey}`} // Apply 'end' only on base route
-      className={({ isActive }) =>
-        `px-3 py-2 rounded-md transition-colors duration-100 ${
-          isActive ? "bg-primary text-white" : "text-text hover:text-text"
-        }`
-      }
-    >
-      {link.name}
-    </NavLink>
-  </li>
-))}
+      {links.map((link) => (
+        <li key={link.name}>
+          <NavLink
+            to={link.path}
+            // end={link.path === `/${moduleKey}`} // Apply 'end' only on base route
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-md transition-colors duration-100 ${isActive ? "bg-primary text-white" : "text-text hover:text-text"
+              }`
+            }
+          >
+            {link.name}
+          </NavLink>
+        </li>
+      ))}
 
     </ul>
   );
@@ -61,16 +65,15 @@ useEffect(()=>{
     <Navbar className="fixed top-12 z-10 max-w-full rounded-nonemy-2 px-4 my-4 py-2 lg:px-8 lg:py-4 bg-background shadow-none border-none">
       <div className="flex items-center justify-between text-blue-gray-900">
         {/* Check In/Out Button */}
-         <Button
+        <Button
           size="large"
-          className={`w-32 text-center font-semibold shadow transition px-5 py-3 ${
-            checkedIn
+          className={`w-32 text-center font-semibold shadow transition px-5 py-3 ${checkedIn
               ? "bg-red-400 text-red-800"
               : "bg-green-400 text-green-800"
-          }`}
+            }`}
           onClick={checkedIn ? checkOut : checkIn}
         >
-          {loading?<CircularProgress size={15} color="primary" />:checkedIn ? "Check Out" : "Check In"}
+          {loading ? <CircularProgress size={15} color="primary" /> : checkedIn ? "Check Out" : "Check In"}
 
         </Button>
 
@@ -84,7 +87,7 @@ useEffect(()=>{
         </div>
 
         {/* Mobile toggle */}
-         <IconButton
+        <IconButton
           variant="text"
           className="ml-auto h-6 w-6 lg:hidden"
           onClick={() => setOpenNav(!openNav)}

@@ -59,6 +59,7 @@ export const moduleConfigs = {
       { name: "Admin DashBoard", path: "/admin/adminDashboard" },
       { name: "User Management", path: "/admin/userManagement" },
       { name: "Activity Logs", path: "/admin/logs" },
+      { name: "Assign Ticket", path: "/admin/assign-ticket/:ticketId" },
     ],
   },
 
