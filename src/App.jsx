@@ -75,7 +75,7 @@ function App() {
         >
           <Route index path="login" element={<Login />} />
           <Route path="forgot-password" element={<ForgotPass />} />
-          <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="reset-password/:token" element={<ResetPassword />} />
           <Route path="verify-otp" element={<VerifyOtp />} />
         </Route>
 
