@@ -3,20 +3,7 @@ import api from '../axios';
 
 export const loginInitiated = createAction('auth/loginInitiated');
 
-export const silentRefresh = createAsyncThunk(
-  'auth/silentRefresh',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get('/auth/refresh-token', {
-        withCredentials: true,
-        _silentRefresh: true
-      });
-      return response.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data || "Session expired");
-    }
-  }
-);
+
 
 export const loginUser = createAsyncThunk(
   'auth/login',

@@ -1,13 +1,17 @@
   // src/Store/index.js or src/store.js
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // localStorage
+import storage from "redux-persist/lib/storage";
 import authReducer from "./authSlice";
-import attendanceTImerSlice from '../api/attendanceTimer'; // correct spelling?
+import attendanceTImerSlice from '../api/attendanceTimer'; 
+import projectReducer from "./projectSlice";
+import taskReducer from "./taskSlice";
 
 // 🧩 Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
+  projects: projectReducer,
+  tasks: taskReducer,
   attendanceTimer: attendanceTImerSlice,
 });
 
@@ -24,9 +28,10 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 // 🏗 Create store
 const store = configureStore({
   reducer: persistedReducer,
+  
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Required by redux-persist
+      serializableCheck: false, 
     }),
 });
 

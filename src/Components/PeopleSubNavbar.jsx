@@ -7,6 +7,7 @@ import { useTimeLog } from "../Pages/People/TimeLogContext";
 import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from "react-toastify";
 import { setError } from "../api/attendanceTimer";
+import { useDispatch } from "react-redux";
 
 const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
