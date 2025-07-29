@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../../axios"; // Adjust path if needed
+import api from "../../axios";
  
 const ResetPassword = () => {
   const { token } = useParams();
