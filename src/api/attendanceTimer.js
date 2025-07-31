@@ -22,20 +22,18 @@ export const checkInNow = createAsyncThunk(
  
 export const checkOutNow = createAsyncThunk(
   'employee/checkout',
-  async ( data,{ rejectWithValue }) => {
-        console.log(data,"checkout")
+  async (userId, { rejectWithValue }) => {
     try {
-      const response = await api.post('/timetrackers/check-out',  {userId:data} , {
+      const response = await api.post('/timetrackers/check-out', { userId }, {
         withCredentials: true
       });
-      console.log(response.data,"success from api slice")
       return response.data;
     } catch (err) {
-         console.log(err.response.data,"error from api")
       return rejectWithValue(err.response?.data || "checkOut failed");
     }
   }
 );
+
  
 const attendanceTimerSlice=createSlice({
     name:'employee',

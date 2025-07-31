@@ -7,7 +7,7 @@ import { useTimeLog } from "../Pages/People/TimeLogContext";
 import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from "react-toastify";
 import { setError } from "../api/attendanceTimer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const SubNavbar = () => {
   const [openNav, setOpenNav] = useState(false);
@@ -15,30 +15,48 @@ const SubNavbar = () => {
   const checkedIn = Boolean(start);
   const { pathname } = useLocation();
   const moduleKey = pathname.split("/")[1];
-  // console.log(moduleConfigs)
+  const dispatch = useDispatch();
+  
+  // Get user info from Redux store
+  const userInfo = useSelector((state) => state.auth.user);
+  const userId = userInfo?._id || userInfo?.id;
+
+  console.log('SubNavbar - User ID:', userId);
+  console.log('SubNavbar - User Info:', userInfo);
+
   const config = moduleConfigs[moduleKey];
   const links = config?.links || [];
-  //  console.log(links,"hello2")
+
   useEffect(() => {
     error && (() => {
       setTimeout(() => {
         dispatch(setError(null));
-        console.log("setting error to nll")
+        console.log("setting error to null")
       }, 1000);
     })()
-
-  }, [error])
-
-  // console.log(data,"wowsdfsd")
-
-
-
-
+  }, [error]);
+  
   useEffect(() => {
     const handleResize = () => window.innerWidth >= 960 && setOpenNav(false);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleCheckIn = () => {
+    if (!userId) {
+      toast.error("User ID not found. Please refresh and try again.");
+      return;
+    }
+    checkIn(userId);
+  };
+
+ const handleCheckOut = () => {
+  if (!userId) {
+    toast.error("User ID not found. Please refresh and try again.");
+    return;
+  }
+  checkOut(); // No need to pass userId here as it's handled in TimeLogContext
+};
 
   const navLinks = (
     <ul className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-6 text-sm font-medium">
@@ -46,7 +64,6 @@ const SubNavbar = () => {
         <li key={link.name}>
           <NavLink
             to={link.path}
-            // end={link.path === `/${moduleKey}`} // Apply 'end' only on base route
             className={({ isActive }) =>
               `px-3 py-2 rounded-md transition-colors duration-100 ${isActive ? "bg-primary text-white" : "text-text hover:text-text"
               }`
@@ -56,7 +73,6 @@ const SubNavbar = () => {
           </NavLink>
         </li>
       ))}
-
     </ul>
   );
 
@@ -69,13 +85,13 @@ const SubNavbar = () => {
         <Button
           size="large"
           className={`w-32 text-center font-semibold shadow transition px-5 py-3 ${checkedIn
-              ? "bg-red-400 text-red-800"
-              : "bg-green-400 text-green-800"
+            ? "bg-red-400 text-red-800"
+            : "bg-green-400 text-green-800"
             }`}
-          onClick={checkedIn ? checkOut : checkIn}
+          onClick={checkedIn ? handleCheckOut : handleCheckIn}
+          disabled={loading || !userId}
         >
           {loading ? <CircularProgress size={15} color="primary" /> : checkedIn ? "Check Out" : "Check In"}
-
         </Button>
 
         {/* Nav Links Center */}

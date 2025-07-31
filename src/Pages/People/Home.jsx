@@ -13,6 +13,8 @@ import UpcomingDeadlinesCard from "../../Components/home/UpcomingDeadlinesCard";
 import TimeoffBalanceCard from "../../Components/home/TimeoffBalanceCard";
 import TasksAssignedToMeCard from "../../Components/home/TasksAssignedToMeCard";
 import { useTimeLog } from "./TimeLogContext";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 function format(sec) {
   const h = String(Math.floor(sec / 3600)).padStart(2, "0");
@@ -21,6 +23,9 @@ function format(sec) {
   return { h, m, s };
 }
 const Home = () => {
+  const userInfo = useSelector((state) => state.auth.user);
+  const firstName = userInfo?.name || "User";
+
   const [time, setTime] = useState({
     hours: "00",
     minutes: "00",
@@ -106,11 +111,11 @@ const Home = () => {
         {/* Greeting */}
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <div className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full bg-teal-500 text-white flex items-center justify-center text-sm sm:text-base md:text-xl font-bold">
-            P
+            {firstName.charAt(0).toUpperCase()}
           </div>
           <div className="truncate">
             <h2 className="text-lg sm:text-xl text-heading font-semibold truncate">
-              Hey, Paul!
+              Hey, {firstName}!
             </h2>
             <p className="text-description text-sm">Have a great day</p>
           </div>

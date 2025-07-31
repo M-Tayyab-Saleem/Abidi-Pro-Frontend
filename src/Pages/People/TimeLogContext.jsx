@@ -14,7 +14,6 @@ export function TimeLogProvider({ children }) {
 
   const { checkInn, checkOut: checkout, loading, error } = data?.attendanceTimer;
 
-  // 🔄 get check-in time and convert to ms
   const checkInTime = checkInn?.log?.checkInTime || null;
   const start = checkInTime ? new Date(checkInTime).getTime() : null;
 
@@ -25,7 +24,7 @@ export function TimeLogProvider({ children }) {
       setElapsed(Math.floor((Date.now() - start) / 1000));
     }, 1000);
 
-    return () => clearInterval(intervalRef.current); // ✅ clears on unmount/change
+    return () => clearInterval(intervalRef.current);
   }, [start]);
 
   const checkIn = () => {
@@ -34,13 +33,21 @@ export function TimeLogProvider({ children }) {
     }
   };
 
-  const checkOut = () => {
-    if (start && checkInn) {
-      dispatch(checkOutNow(user?.id));
-      clearInterval(intervalRef.current); // ✅ stop ticking
-      setElapsed(0); // ✅ reset timer immediately
-    }
-  };
+  // const checkOut = () => {
+  //   if (start && checkInn) {
+  //     dispatch(checkOutNow(user?.id));
+  //     clearInterval(intervalRef.current); // ✅ stop ticking
+  //     setElapsed(0); // ✅ reset timer immediately
+  //   }
+  // };
+const checkOut = () => {
+  if (start && checkInn) {
+    dispatch(checkOutNow(user?.id)); // Ensure user.id is passed correctly
+    clearInterval(intervalRef.current);
+    setElapsed(0);
+  }
+};
+
 
   return (
     <TimeLogContext.Provider
