@@ -47,11 +47,11 @@ const TimeTracker = () => {
   useEffect(() => {
     fetchTimeLogs();
   }, []); // Run once on mount
-    const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     { title: "Time Tracker", component: <TimeTracker /> },
-    { title: "Approve Timelogs", component: <ApproveTimelogs /> }
+    // { title: "Approve Timelogs", component: <ApproveTimelogs /> }
   ];
   const handleNavigation = (direction) => {
     setActiveSheet(direction === "previous" ? "previous" : "current");
@@ -68,15 +68,15 @@ const TimeTracker = () => {
   };
 
   // Filter logs by selected date
-  const filteredData = selectedDate 
+  const filteredData = selectedDate
     ? timeLogs.filter(item => {
-        const itemDate = parseDate(item.date);
-        return (
-          itemDate.getDate() === selectedDate.getDate() &&
-          itemDate.getMonth() === selectedDate.getMonth() &&
-          itemDate.getFullYear() === selectedDate.getFullYear()
-        );
-      })
+      const itemDate = parseDate(item.date);
+      return (
+        itemDate.getDate() === selectedDate.getDate() &&
+        itemDate.getMonth() === selectedDate.getMonth() &&
+        itemDate.getFullYear() === selectedDate.getFullYear()
+      );
+    })
     : timeLogs;
 
   // Calculate total hours for the selected date
@@ -190,7 +190,7 @@ const TimeTracker = () => {
       <div className="min-h-screen bg-primary p-4 m-6 rounded-lg shadow-md">
 
         {/* Tab Bar */}
-        <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
+        {/* <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
           {tabs.map((item, index) => (
             <div key={item.title} className="flex items-center">
               <button
@@ -208,182 +208,186 @@ const TimeTracker = () => {
               )}
             </div>
           ))}
-        </div>
+        </div> */}
         {/* Header */}
-        {
-          activeTab == 0 ?
+        {/* {
+          activeTab == 0 ? */}
             <>
               <div className="flex flex-col bg-background w-full sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 bg-white p-4 rounded-md">
                 <h2 className="text-text sm:text-lg text-black mx-4">Time Tracker</h2>
 
-          <div className="flex flex-wrap items-center gap-3 mx-4">
-            <button
-              onClick={navigateToPreviousDay}
-              className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
-            >
-              <FaAngleLeft size={16} />
-            </button>
+                <div className="flex flex-wrap items-center gap-3 mx-4">
+                  <button
+                    onClick={navigateToPreviousDay}
+                    className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
+                  >
+                    <FaAngleLeft size={16} />
+                  </button>
 
-            <div className="relative">
-              <button
-                className="px-2 py-1 bg-primary rounded flex items-center gap-2 hover:bg-primary-dark"
-                onClick={() => setShowCalendar(!showCalendar)}
-              >
-                <IoCalendarNumberOutline size={20} />
-                {selectedDate && (
-                  <span className="text-sm">{formatDate(selectedDate)}</span>
-                )}
-              </button>
+                  <div className="relative">
+                    <button
+                      className="px-2 py-1 bg-primary rounded flex items-center gap-2 hover:bg-primary-dark"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <IoCalendarNumberOutline size={20} />
+                      {selectedDate && (
+                        <span className="text-sm">{formatDate(selectedDate)}</span>
+                      )}
+                    </button>
 
-              {showCalendar && (
-                <div className="absolute z-50 mt-2 bg-white shadow-lg rounded">
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={(date) => {
-                      setSelectedDate(date);
-                      setShowCalendar(false);
-                    }}
-                    inline
-                  />
+                    {showCalendar && (
+                      <div className="absolute z-50 mt-2 bg-white shadow-lg rounded">
+                        <DatePicker
+                          selected={selectedDate}
+                          onChange={(date) => {
+                            setSelectedDate(date);
+                            setShowCalendar(false);
+                          }}
+                          inline
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={navigateToNextDay}
+                    className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
+                  >
+                    <FaAngleRight size={16} />
+                  </button>
                 </div>
+                <div className="mx-4">
+                  <span className="text-sm text-text">
+                    Submitted Hours | {totalHours.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Loading and Error States */}
+              {loading && (
+                <div className="text-center p-4">Loading time logs...</div>
               )}
+              {error && (
+                <div className="text-red-500 p-4 text-center">{error}</div>
+              )}
+
+              {/* Table */}
+              {!loading && !error && (
+                <div className="bg-background rounded-xl shadow p-4 w-full overflow-x-auto">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={selectedDate ? selectedDate.getTime() : 'all'}
+                      initial={{ x: 300, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -300, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <table className="min-w-full text-sm text-left border-separate border-spacing-0">
+                        <thead className="bg-primary text-white">
+                          <tr>
+                            {[
+                              "Job Title",
+                              "Date",
+                              "Description",
+                              "Hours",
+                              "Attachment",
+                              "Actions",
+                            ].map((heading) => (
+                              <th
+                                key={heading}
+                                className="p-3 font-medium border-r last:border-none border-gray-300"
+                              >
+                                {heading}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedData.length ? (
+                            paginatedData.map((item, index) => (
+                              <tr key={item._id} className="border-b hover:bg-gray-50 cursor-pointer" >
+                                <td className="p-3" onClick={() => handleViewLog(item)}>{item.job || "-"}</td>
+                                <td className="p-3" onClick={() => handleViewLog(item)}>{new Date(item.date).toLocaleDateString()}</td>
+                                <td className="p-3" onClick={() => handleViewLog(item)}>{item.description}</td>
+                                <td className="p-3" onClick={() => handleViewLog(item)}>{item.hours}</td>
+                                <td className="p-3" onClick={() => handleViewLog(item)}>{item.attachments?.[0]?.originalname || "-"}</td>
+                                <td className="p-3 flex gap-2">
+                                  <button
+                                    onClick={() => handleViewLog(item)}
+                                    className="text-blue-600 hover:text-blue-800"
+                                  >
+                                    <IoEye />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingLogId(item._id);
+                                      setModalMode("edit");
+                                      setIsAddTimeLogModalOpen(true);
+                                    }}
+                                    className="text-green-600 hover:text-green-800"
+                                  >
+                                    <IoPencil />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    <IoTrash />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan={7} className="p-4 text-center text-gray-500">
+                                {selectedDate
+                                  ? `No time logs found for ${formatDate(selectedDate)}`
+                                  : "No time logs found"}
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+                
+              )}
+              </>
+              {/* :null
+              } */}
             </div>
 
-            <button
-              onClick={navigateToNextDay}
-              className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
-            >
-              <FaAngleRight size={16} />
-            </button>
-          </div>
-          <div className="mx-4">
-            <span className="text-sm text-text">
-              Submitted Hours | {totalHours.toFixed(2)}
-            </span>
-          </div>
-        </div>
-
-        {/* Loading and Error States */}
-        {loading && (
-          <div className="text-center p-4">Loading time logs...</div>
-        )}
-        {error && (
-          <div className="text-red-500 p-4 text-center">{error}</div>
-        )}
-
-        {/* Table */}
-        {!loading && !error && (
-          <div className="bg-background rounded-xl shadow p-4 w-full overflow-x-auto">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedDate ? selectedDate.getTime() : 'all'}
-                initial={{ x: 300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <table className="min-w-full text-sm text-left border-separate border-spacing-0">
-                  <thead className="bg-primary text-white">
-                    <tr>
-                      {[
-                        "Job Title",
-                        "Date",
-                        "Description",
-                        "Hours",
-                        "Attachment",
-                        "Actions",
-                      ].map((heading) => (
-                        <th
-                          key={heading}
-                          className="p-3 font-medium border-r last:border-none border-gray-300"
-                        >
-                          {heading}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedData.length ? (
-                      paginatedData.map((item, index) => (
-                        <tr key={item._id} className="border-b hover:bg-gray-50 cursor-pointer" >
-                          <td className="p-3" onClick={() => handleViewLog(item)}>{item.job || "-"}</td>
-                          <td className="p-3" onClick={() => handleViewLog(item)}>{new Date(item.date).toLocaleDateString()}</td>
-                          <td className="p-3" onClick={() => handleViewLog(item)}>{item.description}</td>
-                          <td className="p-3" onClick={() => handleViewLog(item)}>{item.hours}</td>
-                          <td className="p-3" onClick={() => handleViewLog(item)}>{item.attachments?.[0]?.originalname || "-"}</td>
-                          <td className="p-3 flex gap-2">
-                            <button
-                              onClick={() => handleViewLog(item)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              <IoEye />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setEditingLogId(item._id);
-                                setModalMode("edit");
-                                setIsAddTimeLogModalOpen(true);
-                              }}
-                              className="text-green-600 hover:text-green-800"
-                            >
-                              <IoPencil />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item._id)}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              <IoTrash />
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={7} className="p-4 text-center text-gray-500">
-                          {selectedDate 
-                            ? `No time logs found for ${formatDate(selectedDate)}`
-                            : "No time logs found"}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
-
-      {/* Add Modal */}
-      <AddTimeLogModal
-        isOpen={modalMode === "add" && isAddTimeLogModalOpen}
-        onClose={() => setIsAddTimeLogModalOpen(false)}
-        onSave={handleSaveLogs}
-        onTimeLogAdded={fetchTimeLogs}
-      />
-
-      {/* Edit Modal */}
-      <EditTimeLogModal
-        isOpen={modalMode === "edit" && isAddTimeLogModalOpen}
-        onClose={() => {
-          setIsAddTimeLogModalOpen(false);
-          setEditingLogId(null);
-        }}
-        onTimeLogUpdated={fetchTimeLogs}
-        timeLogId={editingLogId}
-        initialData={timeLogs.find(log => log._id === editingLogId)}
-      />
-
-      {/* View Modal */}
-      {viewingLog && (
-        <ViewTimeLogModal
-          key={viewingLog._id}
-          log={viewingLog}
-          onClose={() => setViewingLog(null)}
+        {/* Add Modal */}
+        <AddTimeLogModal
+          isOpen={modalMode === "add" && isAddTimeLogModalOpen}
+          onClose={() => setIsAddTimeLogModalOpen(false)}
+          onSave={handleSaveLogs}
+          onTimeLogAdded={fetchTimeLogs}
         />
-      )}
-    </>
-  );
+
+        {/* Edit Modal */}
+        <EditTimeLogModal
+          isOpen={modalMode === "edit" && isAddTimeLogModalOpen}
+          onClose={() => {
+            setIsAddTimeLogModalOpen(false);
+            setEditingLogId(null);
+          }}
+          onTimeLogUpdated={fetchTimeLogs}
+          timeLogId={editingLogId}
+          initialData={timeLogs.find(log => log._id === editingLogId)}
+        />
+
+        {/* View Modal */}
+        {viewingLog && (
+          <ViewTimeLogModal
+            key={viewingLog._id}
+            log={viewingLog}
+            onClose={() => setViewingLog(null)}
+          />
+        )}
+      </>
+      );
 };
 
-export default TimeTracker;
+      export default TimeTracker;

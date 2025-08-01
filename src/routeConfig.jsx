@@ -66,7 +66,7 @@ export const moduleConfigs = {
       { name: "User Management", path: "/admin/userManagement" },
         { name: "File Management", path: "/admin/upload" },
       // { name: "Activity Logs", path: "/admin/logs" },
-      { name: "Approve Time Logs", path: "/admin/approve" },
+      { name: "Approve Time Sheets", path: "/admin/approve" },
 
       { name: "Assign Ticket", path: "/admin/assign-ticket/:ticketId" },
     ],

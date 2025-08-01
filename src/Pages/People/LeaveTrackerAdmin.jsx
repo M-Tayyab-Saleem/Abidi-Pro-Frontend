@@ -72,8 +72,8 @@ const LeaveTrackerAdmin = ({setIsOpen}) => {
   }, []);
 
   return (
-    <div className="">
-      <div className="">
+    <div className="px-4 py-2">
+      <div className="p-8 rounded-xl bg-primary">
         {/* Leave Records Section */}
         <div className="mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium">
           <div className="px-2 my-4 text-lg">Applied Leave</div>

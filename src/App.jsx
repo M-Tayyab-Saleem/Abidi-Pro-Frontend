@@ -97,7 +97,7 @@ function App() {
           <Route path="timetracker" element={<TimeTracker />} />
           <Route index path="summary" element={<LeaveTracker />} />
           <Route index path="shared" element={<Files />} />
-          <Route path="files" element={<Files />} />
+          {/* <Route path="files" element={<Files />} /> */}
           <Route index path="raise" element={<Ticket />} />
           <Route index path="history" element={<TimeTracker />} />
           <Route path="profile" element={<Profile />} />
@@ -156,7 +156,7 @@ function App() {
           <Route path="userManagement" element={<UserManagement />} />
           {/* <Route path="logs" element={<ActivityLogs />} /> */}
           <Route path="approve" element={<ApproveTimelogs />} />
-          <Route path="assign-ticket/:ticketId" element={<LeaveTrackerAdmin />} />
+          <Route path="assign-ticket/:ticketId" element={<AdminTickets />} />
 
         </Route>
       </Routes>

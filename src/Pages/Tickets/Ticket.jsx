@@ -89,7 +89,7 @@ const Ticket = () => {
 
       <div className="text-text rounded-lg  p-4 md:p-6 min-h-[700px] ">
         {/* Tab Bar */}
-        <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
+        {/* <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
           {tabs.map((item, index) => (
             <div key={item.title} className="flex items-center">
               <button
@@ -107,10 +107,10 @@ const Ticket = () => {
               )}
             </div>
           ))}
-        </div>
-        {
+        </div> */}
+        {/* {
           activeTab==0?
-          <>
+          <> */}
           <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3 lg:mb-0">
@@ -229,12 +229,13 @@ const Ticket = () => {
             </div>
           </div>
         </Spin>
-        </>:null
-        }
-        {
+        {/* </> */}
+        {/* :null */}
+        {/* } */}
+        {/* {
           activeTab==1?
           tabs[activeTab].component:null
-        }
+        } */}
         {/* Modals */}
         {showModal && (
           <RaiseTicketModal
