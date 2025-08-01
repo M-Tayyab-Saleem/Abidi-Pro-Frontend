@@ -2,8 +2,8 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import authReducer from "./authSlice";
-import attendanceTImerSlice from '../api/attendanceTimer'; 
+import authReducer from "../slices/authSlice";
+import attendanceTImerSlice from '../slices/attendanceTimer'; 
 import projectReducer from "./projectSlice";
 import taskReducer from "./taskSlice";
 
