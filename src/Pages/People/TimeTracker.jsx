@@ -13,31 +13,27 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import EditTimeLogModal from "./EditTimeLogModal";
 import ViewTimeLogModal from "./ViewTimeLogModal";
-import timeLogApi from "../../api/timeLogApi"; // Import the API
+import timeLogApi from "../../api/timeLogApi";
 import { toast } from "react-toastify";
 
 const TimeTracker = () => {
   const [isAddTimeLogModalOpen, setIsAddTimeLogModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
-  const [editingLogId, setEditingLogId] = useState(null); // Changed from index to ID
+  const [editingLogId, setEditingLogId] = useState(null);
   const [viewingLog, setViewingLog] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
   const [timeLogs, setTimeLogs] = useState([]);
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [startDate, endDate] = dateRange;
+  const [selectedDate, setSelectedDate] = useState(() => new Date()); // Initialize with current date
   const [showCalendar, setShowCalendar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch time logs from API
   const fetchTimeLogs = async () => {
     try {
       setLoading(true);
       const response = await timeLogApi.getEmployeeTimeLogs();
-      console.log(response, "Fetched time logs from API");
       setTimeLogs(response);
-      console.log(timeLogs, "Fetched time logs from API");
       setError(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load time logs");
@@ -49,25 +45,32 @@ const TimeTracker = () => {
 
   useEffect(() => {
     fetchTimeLogs();
-  }, []);
-
+  }, []); // Run once on mount
+  
   const parseDate = (dateStr) => {
     if (!dateStr) return new Date();
     const date = new Date(dateStr);
     return isNaN(date.getTime()) ? new Date() : date;
   };
 
-  const filteredData = timeLogs.filter((item) => {
-    const itemDate = parseDate(item.date);
-    if (startDate && endDate) {
-      return itemDate >= startDate && itemDate <= endDate;
-    }
-    return true;
-  });
+  // Filter logs by selected date
+  const filteredData = selectedDate 
+    ? timeLogs.filter(item => {
+        const itemDate = parseDate(item.date);
+        return (
+          itemDate.getDate() === selectedDate.getDate() &&
+          itemDate.getMonth() === selectedDate.getMonth() &&
+          itemDate.getFullYear() === selectedDate.getFullYear()
+        );
+      })
+    : timeLogs;
+
+  // Calculate total hours for the selected date
+  const totalHours = filteredData.reduce((sum, log) => sum + (log.hours || 0), 0);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [dateRange, timeLogs]);
+  }, [selectedDate, timeLogs]);
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
@@ -75,14 +78,13 @@ const TimeTracker = () => {
     filteredData.length <= rowsPerPage
       ? filteredData
       : filteredData.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-      );
+          (currentPage - 1) * rowsPerPage,
+          currentPage * rowsPerPage
+        );
 
   const handleSaveLogs = async (newLogs) => {
     try {
       if (modalMode === "add") {
-        // Handle multiple log creation
         for (const log of newLogs) {
           const formData = new FormData();
           formData.append('job', log.jobTitle);
@@ -107,7 +109,7 @@ const TimeTracker = () => {
         await timeLogApi.updateTimeLog(editingLogId, formData);
       }
 
-      await fetchTimeLogs(); // Wait for refresh
+      await fetchTimeLogs();
       setIsAddTimeLogModalOpen(false);
       setEditingLogId(null);
       setModalMode("add");
@@ -122,7 +124,7 @@ const TimeTracker = () => {
   const handleDelete = async (id) => {
     try {
       await timeLogApi.deleteTimeLog(id);
-      fetchTimeLogs(); // Refresh the list
+      fetchTimeLogs();
       toast.success("Time log deleted successfully");
     } catch (error) {
       console.error("Failed to delete time log:", error);
@@ -137,6 +139,28 @@ const TimeTracker = () => {
       totalHours: log.hours,
       attachmentName: log.attachments?.[0]?.filename
     });
+  };
+
+  const formatDate = (date) => {
+    return date ? new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }) : '';
+  };
+
+  // Function to navigate to previous day
+  const navigateToPreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  // Function to navigate to next day
+  const navigateToNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setSelectedDate(newDate);
   };
 
   return (
@@ -155,33 +179,30 @@ const TimeTracker = () => {
 
           <div className="flex flex-wrap items-center gap-3 mx-4">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded ${currentPage === 1
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-primary text-white"
-                }`}
+              onClick={navigateToPreviousDay}
+              className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
             >
               <FaAngleLeft size={16} />
             </button>
 
             <div className="relative">
               <button
-                className="px-2 py-1 bg-primary rounded"
+                className="px-2 py-1 bg-primary rounded flex items-center gap-2 hover:bg-primary-dark"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
                 <IoCalendarNumberOutline size={20} />
+                {selectedDate && (
+                  <span className="text-sm">{formatDate(selectedDate)}</span>
+                )}
               </button>
 
               {showCalendar && (
                 <div className="absolute z-50 mt-2 bg-white shadow-lg rounded">
                   <DatePicker
-                    selectsRange
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(update) => {
-                      setDateRange(update);
-                      if (update[1]) setShowCalendar(false);
+                    selected={selectedDate}
+                    onChange={(date) => {
+                      setSelectedDate(date);
+                      setShowCalendar(false);
                     }}
                     inline
                   />
@@ -190,20 +211,16 @@ const TimeTracker = () => {
             </div>
 
             <button
-              onClick={() =>
-                setCurrentPage((p) => (p < totalPages ? p + 1 : p))
-              }
-              disabled={currentPage >= totalPages}
-              className={`px-3 py-1 rounded ${currentPage >= totalPages
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-primary text-white"
-                }`}
+              onClick={navigateToNextDay}
+              className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
             >
               <FaAngleRight size={16} />
             </button>
           </div>
           <div className="mx-4">
-            <span className="text-sm text-text">Submitted Hours | 00:00</span>
+            <span className="text-sm text-text">
+              Submitted Hours | {totalHours.toFixed(2)}
+            </span>
           </div>
         </div>
 
@@ -220,13 +237,13 @@ const TimeTracker = () => {
           <div className="bg-background rounded-xl shadow p-4 w-full overflow-x-auto">
             <AnimatePresence mode="wait">
               <motion.div
-                key={JSON.stringify(dateRange) + currentPage}
+                key={selectedDate ? selectedDate.getTime() : 'all'}
                 initial={{ x: 300, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -300, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <table  className="min-w-full text-sm text-left border-separate border-spacing-0">
+                <table className="min-w-full text-sm text-left border-separate border-spacing-0">
                   <thead className="bg-primary text-white">
                     <tr>
                       {[
@@ -284,7 +301,9 @@ const TimeTracker = () => {
                     ) : (
                       <tr>
                         <td colSpan={7} className="p-4 text-center text-gray-500">
-                          No records found for selected range
+                          {selectedDate 
+                            ? `No time logs found for ${formatDate(selectedDate)}`
+                            : "No time logs found"}
                         </td>
                       </tr>
                     )}
@@ -311,19 +330,19 @@ const TimeTracker = () => {
           setIsAddTimeLogModalOpen(false);
           setEditingLogId(null);
         }}
-        onTimeLogUpdated={fetchTimeLogs} // Add this to refetch after update
+        onTimeLogUpdated={fetchTimeLogs}
         timeLogId={editingLogId}
         initialData={timeLogs.find(log => log._id === editingLogId)}
       />
 
       {/* View Modal */}
-     {viewingLog && (
-  <ViewTimeLogModal
-    key={viewingLog._id} // forces remount
-    log={viewingLog}
-    onClose={() => setViewingLog(null)}
-  />
-)}
+      {viewingLog && (
+        <ViewTimeLogModal
+          key={viewingLog._id}
+          log={viewingLog}
+          onClose={() => setViewingLog(null)}
+        />
+      )}
     </>
   );
 };
