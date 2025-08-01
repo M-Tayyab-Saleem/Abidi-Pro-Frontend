@@ -7,7 +7,7 @@ export const useTimeLog = () => useContext(TimeLogContext);
 
 export function TimeLogProvider({ children }) {
   const [elapsed, setElapsed] = useState(0);
-  const intervalRef = useRef(null); // ✅ store interval id
+  const intervalRef = useRef(null);
   const dispatch = useDispatch();
   const data = useSelector((state) => state);
   const { user } = data?.auth;
@@ -29,25 +29,17 @@ export function TimeLogProvider({ children }) {
 
   const checkIn = () => {
     if (!start) {
-      dispatch(checkInNow(user?.id));
+      dispatch(checkInNow());
     }
   };
 
-  // const checkOut = () => {
-  //   if (start && checkInn) {
-  //     dispatch(checkOutNow(user?.id));
-  //     clearInterval(intervalRef.current); // ✅ stop ticking
-  //     setElapsed(0); // ✅ reset timer immediately
-  //   }
-  // };
-const checkOut = () => {
-  if (start && checkInn) {
-    dispatch(checkOutNow(user?.id)); // Ensure user.id is passed correctly
-    clearInterval(intervalRef.current);
-    setElapsed(0);
-  }
-};
-
+  const checkOut = () => {
+    if (start && checkInn) {
+      dispatch(checkOutNow());  // No need to pass userId
+      clearInterval(intervalRef.current);
+      setElapsed(0);
+    }
+  };
 
   return (
     <TimeLogContext.Provider

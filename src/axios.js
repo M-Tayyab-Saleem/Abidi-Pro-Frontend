@@ -40,35 +40,36 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Handle 401 errors (token expired)
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !isRefreshingToken &&
-      !originalRequest._skipAuth &&
-      !originalRequest._silentRefresh
+      !originalRequest._skipAuth
     ) {
       originalRequest._retry = true;
+      isRefreshingToken = true;
 
       try {
-        isRefreshingToken = true;
+        // Attempt to refresh token
         const response = await api.get("/auth/refresh-token", {
           withCredentials: true,
           _silentRefresh: true,
         });
 
         isRefreshingToken = false;
+        
+        // Update store with new token
         store.dispatch({
           type: silentRefresh.fulfilled.type,
           payload: response.data,
         });
 
+        // Retry original request with new token
+        originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         isRefreshingToken = false;
-        
-        if (!originalRequest._isLogoutRequest) {
-          toast.error("Session expired. Please login again.");
-        }
         store.dispatch(logoutUser());
         if (!window.location.href.includes("/auth/login")) {
           window.location.href = "/auth/login";

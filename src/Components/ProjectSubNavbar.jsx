@@ -25,27 +25,16 @@ const SubNavbar = () => {
   const config = moduleConfigs[moduleKey];
   const links = config?.links || [];
   
-  // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.user);
   const userId = userInfo?._id || userInfo?.id;
 
-  console.log('ProjectSubNavbar - User ID:', userId);
-  console.log('ProjectSubNavbar - User Info:', userInfo);
-
   const handleCheckIn = () => {
-    if (!userId) {
-      toast.error("User ID not found. Please refresh and try again.");
-      return;
-    }
-    checkIn(userId);
+ 
+    checkIn();
   };
 
  const handleCheckOut = () => {
-  if (!userId) {
-    toast.error("User ID not found. Please refresh and try again.");
-    return;
-  }
-  checkOut(); // No need to pass userId here as it's handled in TimeLogContext
+  checkOut();
 };
 
   useEffect(() => {
