@@ -84,7 +84,7 @@ const ToDoCard = ({ onDelete }) => {
   return (
     <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 overflow-visible w-full">
       {/* Floating Icon */}
-      <div className="absolute -top-4 left-4 bg-green-200 text-green-800 w-10 h-10 flex items-center justify-center rounded-md shadow z-10">
+      <div className="absolute -top-4 left-4 bg-green-200 text-green-800 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
         <FiCheckSquare className="text-lg" />
       </div>
 

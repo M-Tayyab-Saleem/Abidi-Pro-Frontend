@@ -42,7 +42,7 @@ const RecentActivitiesCard = ({ onDelete }) => {
   return (
     <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
       {/* Floating Icon */}
-      <div className="absolute -top-4 left-4 bg-purple-100 text-purple-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-10 text-xl">
+      <div className="absolute -top-4 left-4 bg-purple-100 text-purple-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-99 text-xl">
         <FiClock />
       </div>
 

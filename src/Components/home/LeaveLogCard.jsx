@@ -1,31 +1,36 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiMoreVertical, FiTrash2, FiCalendar } from "react-icons/fi"; // React Icons
+import { FiMoreVertical, FiTrash2, FiCalendar } from "react-icons/fi";
 import { FaUmbrellaBeach } from "react-icons/fa";
-
-const leaveLogs = [
-  {
-    name: "Paul Richards",
-    date: "May 1, 2025",
-    type: "Sick Leave",
-    status: "Approved",
-  },
-  {
-    name: "Anita Gomez",
-    date: "May 3, 2025",
-    type: "Casual Leave",
-    status: "Pending",
-  },
-  {
-    name: "Liam Wong",
-    date: "May 6, 2025",
-    type: "Work From Home",
-    status: "Approved",
-  },
-];
+import api from "../../axios";
 
 const LeaveLogCard = ({ onDelete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [leaveLogs, setLeaveLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const menuRef = useRef();
+
+  useEffect(() => {
+    const fetchLeaveLogs = async () => {
+      try {
+        const response = await api.get("/leaves");
+        const formattedData = response.data.data
+          .map((item) => ({
+            name: item.employeeName,
+            date: new Date(item.startDate).toLocaleDateString(),
+            type: item.leaveType,
+            status: item.status || "Pending",
+          }))
+          .slice(0, 3); // Get only the first 3 leave requests
+        setLeaveLogs(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch leave logs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaveLogs();
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -37,9 +42,25 @@ const LeaveLogCard = ({ onDelete }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  if (loading) {
+    return (
+      <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
+        <div className="absolute -top-4 left-4 bg-blue-100 text-blue-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-90 text-lg">
+          <FaUmbrellaBeach className="text-xl" />
+        </div>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-heading">Leave Logs</h2>
+            <p className="text-sm text-cardDescription">Loading leave history...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
-      {/* Floating Icon (React Icon replacing emoji) */}
+      {/* Floating Icon */}
       <div className="absolute -top-4 left-4 bg-blue-100 text-blue-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-90 text-lg">
         <FaUmbrellaBeach className="text-xl" />
       </div>
@@ -79,30 +100,38 @@ const LeaveLogCard = ({ onDelete }) => {
 
       {/* Leave Logs */}
       <ul className="space-y-2 text-sm">
-        {leaveLogs.map((log, index) => (
-          <li
-            key={index}
-            style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
-            className={`p-3 rounded flex justify-between items-center`}
-          >
-            <div className="flex flex-col">
-              <span className="font-semibold text-text">{log.name}</span>
-              <span className="text-xs text-description">{log.date}</span>
-            </div>
-            <div className="flex flex-col text-right text-xs">
-              <span className="font-medium text-text">{log.type}</span>
-              <span
-                className={`${
-                  log.status === "Approved"
-                    ? "text-green-700"
-                    : "text-yellow-800"
-                }`}
-              >
-                {log.status}
-              </span>
-            </div>
+        {leaveLogs.length > 0 ? (
+          leaveLogs.map((log, index) => (
+            <li
+              key={index}
+              style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
+              className={`p-3 rounded flex justify-between items-center`}
+            >
+              <div className="flex flex-col">
+                <span className="font-semibold text-text">{log.name}</span>
+                <span className="text-xs text-description">{log.date}</span>
+              </div>
+              <div className="flex flex-col text-right text-xs">
+                <span className="font-medium text-text">{log.type}</span>
+                <span
+                  className={`${
+                    log.status === "Approved"
+                      ? "text-green-700"
+                      : log.status === "Rejected"
+                      ? "text-red-700"
+                      : "text-yellow-800"
+                  }`}
+                >
+                  {log.status}
+                </span>
+              </div>
+            </li>
+          ))
+        ) : (
+          <li className="p-3 text-center text-sm text-gray-500">
+            No leave records found
           </li>
-        ))}
+        )}
       </ul>
     </div>
   );

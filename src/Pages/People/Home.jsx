@@ -14,7 +14,8 @@ import TimeoffBalanceCard from "../../Components/home/TimeoffBalanceCard";
 import TasksAssignedToMeCard from "../../Components/home/TasksAssignedToMeCard";
 import { useTimeLog } from "./TimeLogContext";
 import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import api from "../../axios";
+import { toast } from "react-toastify";
 
 function format(sec) {
   const h = String(Math.floor(sec / 3600)).padStart(2, "0");
@@ -22,9 +23,11 @@ function format(sec) {
   const s = String(sec % 60).padStart(2, "0");
   return { h, m, s };
 }
+
 const Home = () => {
   const userInfo = useSelector((state) => state.auth.user);
   const firstName = userInfo?.name || "User";
+  const [loading, setLoading] = useState(true);
 
   const [time, setTime] = useState({
     hours: "00",
@@ -34,17 +37,54 @@ const Home = () => {
   const [cards, setCards] = useState([]);
 
   const { elapsed } = useTimeLog();
-  console.log(elapsed, "timer.com");
   const { h, m, s } = format(elapsed);
 
-  const addCard = (type) => {
-    if (!cards.find((c) => c.type === type)) {
-      setCards([...cards, { type, id: Date.now() }]);
+  // Fetch user's dashboard cards
+  useEffect(() => {
+    const fetchDashboardCards = async () => {
+      try {
+        if (!userInfo?._id) return;
+        
+        setLoading(true);
+        const response = await api.get(`/users/${userInfo._id}/dashboard-cards`);
+        setCards(response.data);
+      } catch (error) {
+        console.error("Failed to fetch dashboard cards:", error);
+        toast.error("Failed to load dashboard cards");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardCards();
+  }, [userInfo?._id]);
+
+  const addCard = async (type) => {
+    try {
+      // Check if card already exists locally first
+      if (cards.some(c => c.type === type)) {
+        toast.warning("This card is already added");
+        return;
+      }
+
+      const response = await api.post(`/users/${userInfo._id}/dashboard-cards/add`, { type });
+      setCards(response.data);
+      toast.success("Card added successfully");
+    } catch (error) {
+      console.error("Failed to add card:", error);
+      toast.error(error.response?.data?.message || "Failed to add card");
     }
   };
 
-  const removeCard = (id) => {
-    setCards(cards.filter((c) => c.id !== id));
+  const removeCard = async (cardId) => {
+    try {
+      await api.delete(`/users/${userInfo._id}/dashboard-cards/${cardId}`);
+      setCards(cards.filter(c => c.id !== cardId));
+      toast.success("Card removed successfully");
+    } catch (error) {
+      console.error("Failed to remove card:", error);
+      toast.error("Failed to remove card");
+    }
   };
 
   const renderCard = (card) => {
@@ -79,11 +119,11 @@ const Home = () => {
       case "leavelog":
         return <LeaveLogCard {...props} />;
       case "upcomingDeadlines":
-        return <UpcomingDeadlinesCard />;
+        return <UpcomingDeadlinesCard {...props} />;
       case "timeoffBalance":
-        return <TimeoffBalanceCard />;
+        return <TimeoffBalanceCard  {...props}/>;
       case "tasksAssignedToMe":
-        return <TasksAssignedToMeCard />;
+        return <TasksAssignedToMeCard {...props}/>;
       default:
         return null;
     }
@@ -104,6 +144,17 @@ const Home = () => {
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-3 text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Card className="relative flex flex-col bg-clip-border rounded-xl text-gray-700 overflow-hidden bg-primary p-5 border m-4 shadow-sm min-h-[700px] border-none">
@@ -146,7 +197,13 @@ const Home = () => {
 
       {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-        {cards.map(renderCard)}
+        {cards.length > 0 ? (
+          cards.map(renderCard)
+        ) : (
+          <div className="col-span-full text-center py-10">
+            <p className="text-gray-500">No cards added yet. Click "More" to add cards to your dashboard.</p>
+          </div>
+        )}
       </div>
     </Card>
   );
