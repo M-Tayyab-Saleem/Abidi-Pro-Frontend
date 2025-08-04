@@ -26,6 +26,30 @@ const UploadDocument = () => {
   const [selectedFolderId, setSelectedFolderId] = useState(null)
   const [selectedFileId, setSelectedFileId] = useState(null)
 
+const [shareModalOpen, setShareModalOpen] = useState(false);
+const [currentFile, setCurrentFile] = useState(null);
+const [accessSettings, setAccessSettings] = useState({
+  isPublic: false,
+  sharedWithRoles: [],
+  userEmails: []
+});
+const handleShareFile = (e) => {
+   console.log("uploading file", e.target.files[0])
+    const file = e.target.files[0]
+  setCurrentFile(file);
+  setAccessSettings({
+    isPublic: false,
+    sharedWithRoles: [],
+    userEmails:[],
+  })
+  setShareModalOpen(true);
+};
+const handleOpenAccessModal=()=>{
+    setShareModalOpen(true);
+}
+
+
+  
   const data = useSelector((state) => state)
   const { user } = data?.auth
   const currentFolder = folderStack[folderStack.length - 1] || { id: "root", name: "Root" }
@@ -34,11 +58,12 @@ const UploadDocument = () => {
 
   const { folders, files, loading, error, reload } = useFolderContents(folderId)
   const { create, loading: creating, error: createErr } = useFolderCreator()
-  const { upload, loading: uploading, error: uploadErr } = useFileUploader()
+  const { upload, loading: uploading, error: uploadErr,updateFileAccess } = useFileUploader()
   const { softDelete: deleteFile, loading: fileDeleteLoading, error: fileDeleteError } = useFileDeleter()
   const { softDelete: deleteFolder, loading: folderDeleteLoading, error: folderDeleteError } = useFolderDeleter()
   const { download, loading:downloadLoading, error:downloadError } = useFileDownloader()
   const toggleDrawer = (open) => () => setDrawerOpen(open)
+
 
   const handleNewFolder = async () => {
     console.log("creating folder", user._id + "fff" + folderName)
@@ -91,12 +116,13 @@ async function downloadFile(url, filename = 'file.docx') {
       toast.error("File upload failed")
     }
   }
-  const handleFileChange = async (e) => {
-    console.log("uploading file", e.target.files[0])
-    const file = e.target.files[0]
+  const handleFileChange = async (file) => {
+    // console.log("uploading file", e.target.files[0])
+    // const file = e.target.files[0]
+    console.log(file)
     if (!file) return
     try {
-      await upload({ file, folderId, folderPath })
+      await upload({ file, folderId, folderPath, accessSettings })
       reload()
     } catch (err) {
       toast.error("File upload failed")
@@ -170,6 +196,119 @@ async function downloadFile(url, filename = 'file.docx') {
 
   return (
     <>
+{shareModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg w-full max-w-md">
+      <h3 className="text-lg font-semibold mb-4">Share {currentFile?.name}</h3>
+      
+      <div className="mb-4">
+        <label className="flex items-center">
+          <input 
+            type="checkbox" 
+            checked={accessSettings.isPublic}
+            onChange={(e) => setAccessSettings({
+              ...accessSettings,
+              isPublic: e.target.checked
+            })}
+            className="mr-2"
+          />
+          Make public (anyone with link can view)
+        </label>
+      </div>
+
+      <div className="mb-4">
+        <label className="block mb-2">Share with roles:</label>
+        {['manager', 'employee', 'hr'].map(role => (
+          <label key={role} className="flex items-center mr-4">
+            <input
+              type="checkbox"
+              checked={accessSettings.sharedWithRoles.includes(role)}
+              onChange={(e) => {
+                const newRoles = e.target.checked
+                  ? [...accessSettings.sharedWithRoles, role]
+                  : accessSettings.sharedWithRoles.filter(r => r !== role);
+                setAccessSettings({
+                  ...accessSettings,
+                  sharedWithRoles: newRoles
+                });
+              }}
+              className="mr-2"
+            />
+            {role}
+          </label>
+        ))}
+      </div>
+
+      <div className="mb-4">
+        <label className="block mb-2">Share with specific people:</label>
+        <input
+          type="email"
+          placeholder="Enter email"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.value) {
+              setAccessSettings({
+                ...accessSettings,
+                userEmails: [...accessSettings.userEmails, e.target.value]
+              });
+              e.target.value = '';
+            }
+          }}
+          className="border p-2 w-full"
+        />
+        <div className="mt-2 flex flex-wrap gap-2">
+          {accessSettings.userEmails.map(email => (
+            <span key={email} className="bg-gray-100 px-2 py-1 rounded flex items-center">
+              {email}
+              <button
+                onClick={() => setAccessSettings({
+                  ...accessSettings,
+                  userEmails: accessSettings.userEmails.filter(e => e !== email)
+                })}
+                className="ml-2 text-red-500"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setShareModalOpen(false)}
+          className="px-4 py-2 border rounded"
+        >
+          Cancel
+        </button>
+        <button
+         onClick={async () => {
+    try {
+      if (currentFile) {
+        // For new file uploads
+        await handleFileChange(currentFile);
+        toast.success('File uploaded with access settings!');
+      } else if (selectedFileId) {
+        // For existing file permission updates
+        console.log("updating file access")
+        await updateFileAccess(selectedFileId, accessSettings);
+        toast.success('Access updated successfully');
+      }
+      setShareModalOpen(false);
+      reload();
+      setCurrentFile(null);
+    } catch (err) {
+      toast.error('Failed to update access');
+      console.error(err);
+    }
+  }}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
         <div className="w-full sm:w-80 md:w-96 h-full bg-white p-6 flex flex-col gap-4">
           <h2 className="text-lg font-semibold text-gray-800">Create Folder</h2>
@@ -214,7 +353,7 @@ async function downloadFile(url, filename = 'file.docx') {
               />
             </div>
             <div className="flex items-center gap-2">
-              <input type="file" onChange={handleFileChange} className="hidden" id="file-upload" />
+              <input type="file" onChange={handleShareFile} className="hidden" id="file-upload" />
               <label
                 htmlFor="file-upload"
                 className="cursor-pointer bg-[#497a71] text-white text-sm px-4 py-2 rounded-md hover:bg-[#99c7be] hover:text-black"
@@ -318,6 +457,13 @@ async function downloadFile(url, filename = 'file.docx') {
             horizontal: "right",
           }}
         >
+           <MenuItem onClick={() => {
+              handleCloseFileMenu();
+              handleOpenAccessModal()
+              // handleShareFile(files.find(f => f._id === selectedFileId));
+            }}>
+            Share
+            </MenuItem>
            <MenuItem
             onClick={() => {
               console.log("Update file:", selectedFileId)

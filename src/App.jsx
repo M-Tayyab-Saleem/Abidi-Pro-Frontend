@@ -136,7 +136,7 @@ function App() {
           <Route index element={<Navigate to="projectDashboard" replace />} />
           <Route index path="projectDashboard" element={<ProjectDashBoard />} />
           <Route path="projects" element={<Projects />} />
-            <Route path="projectDetailed" element={<Project />} />
+            <Route path="projectDetailed/:id" element={<Project />} />
             {/* <Route path="myTask" element={<MyTask />} /> */}
 
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}

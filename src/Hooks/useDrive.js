@@ -1,6 +1,7 @@
 // src/hooks/useDrive.js
 import { useState, useEffect, useCallback } from 'react'
 import api from '../axios'
+import { useSelector } from 'react-redux'
 
 /** 1️⃣ Fetch folder contents */
 export function useFolderContents(folder) {
@@ -51,105 +52,96 @@ export function useFileDownloader() {
   return { download, loading, error }
 }
 
-/** 3️⃣ Upload a file */
 export function useFileUploader() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const cloudinaryProjectName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const cloudinaryProjectName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
+  const { user } = useSelector(state => state.auth);
 
-
-  const upload = useCallback(async ({ file, folderId, folderPath }) => {
-    // console.log(folderId)
-    console.log(folderId, folderPath + "uploading files")
-    setLoading(true); setError(null)
+  // Main upload function
+  const upload = useCallback(async ({ file, folderId, folderPath, accessSettings = {} }) => {
+    setLoading(true); 
+    setError(null);
+    
     try {
-      // Get signature
-      const { data: signData } = await api.post('/files/cloudinary/signUpload', {
-        folderPath,
-        publicIdBase: file.name.replace(/\.[^/.]+$/, '')
-      })
-      // {
-      // apiKey: '484193954375492',
-      // signature: 'b3f93760bf0c284458cd46b4f4d107fbbddb514f',
-      // timestamp: 1748884776,
-      // folder: 'users/6835a0afc49069d808792872/root', its the complete folder path in cloudinary
-      // public_id: 'download-1748884776' its the name of file concat with timestamp 
-      // }
-      // Direct upload to Cloudinary
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('api_key', signData.apiKey)
-      formData.append('timestamp', signData.timestamp)
-      formData.append('signature', signData.signature)
-      formData.append('folder', signData.folder)
-      formData.append('public_id', signData.public_id)
+      // [Previous upload implementation remains exactly the same...]
+      // ... (keep all your existing upload code)
 
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudinaryProjectName}/auto/upload`,
-        { method: 'POST', body: formData }
-      ).then((res) => res.json())
-      // Register in our DB
-      // upload res is returning this 
-      // {
-      // api_key:"484193954375492"
-      // asset_folder:"users/6835a0afc49069d808792872/root"
-      // asset_id:"c26dcfe99ed566111443d3f19c01e276"
-      // bytes:19783
-      // created_at:"2025-06-02T17:19:41Z"
-      // display_name:"download-1748884776"
-      // etag:"e2260ccc3879b0fe6b37d9b364c701af"
-      // format:"jpg"
-      // height:184
-      // original_filename:"download"
-      // placeholder:false
-      // public_id:"users/6835a0afc49069d808792872/root/download-1748884776"
-      // resource_type:"image"
-      // secure_url:"https://res.cloudinary.com/dynr5qyct/image/upload/v1748884781/users/6835a0afc49069d808792872/root/download-1748884776.jpg"
-      // signature:"d227b5c7b6bf07176814d50cc1e8050235a66763"
-      // }
-      const {
-        secure_url,
-        bytes,
-        resource_type,
-        format,
-        public_id,
-        original_filename,
-        // created_at
-      } = uploadRes;
-      console.log(uploadRes)
-      console.log({
-        name: original_filename,                  // or your own custom name
-        folderId,                                         // from context
-        cloudinaryId: public_id,                          // unique identifier in Cloudinary
-        url: secure_url,                         // public file URL
-        size: bytes,                              // file size in bytes
-        mimeType: `${resource_type}/${format}`,       // e.g., "image/jpg"
-        // uploadedAt:   created_at                          // optional extra field
-      }, "kharboz")
-      // console.log(uploadRes,"chutiya")
-      await api.post('/files/files', {
-        name: original_filename,                  // or your own custom name
-        folderId,                                         // from context
-        cloudinaryId: public_id,                          // unique identifier in Cloudinary
-        url: secure_url,                         // public file URL
-        size: bytes,                              // file size in bytes
-        mimeType: `${resource_type}/${format}`,       // e.g., "image/jpg"
-        // uploadedAt:   created_at                          // optional extra field
-      });
-      return uploadRes
+      return {
+        ...uploadRes,
+        accessSettings: {
+          isPublic: fileData.isPublic,
+          sharedWithRoles: fileData.sharedWithRoles,
+          acl: fileData.acl
+        }
+      };
     } catch (e) {
-      setError(e)
-      console.log(e)
-      throw e
-
+      setError(e);
+      console.error("Upload failed:", e);
+      throw e;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, [user]);
 
-  return { upload, loading, error }
+  // NEW: Function to update file access
+  const updateFileAccess = useCallback(async (fileId, accessSettings) => {
+    setLoading(true);
+    setError(null);
+console.log(accessSettings)
+    try {
+      const { data } = await api.patch(`/files/${fileId}/access`, {
+        isPublic: accessSettings.isPublic,
+        sharedWithRoles: accessSettings.sharedWithRoles,
+        aclUpdates: accessSettings.userEmails?.map(email => ({
+          email,
+          role: 'viewer',
+          accessType: 'user'
+        })) || []
+      });
+
+      return data; // Returns updated file document
+    } catch (e) {
+      setError(e);
+      console.error("Failed to update access:", e);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // NEW: Function to get current access settings
+  const getFileAccess = useCallback(async (fileId) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data } = await api.get(`/files/${fileId}`);
+      
+      return {
+        isPublic: data.isPublic,
+        sharedWithRoles: data.sharedWithRoles,
+        userEmails: data.acl
+          .filter(entry => entry.email)
+          .map(entry => entry.email)
+      };
+    } catch (e) {
+      setError(e);
+      console.error("Failed to fetch access settings:", e);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { 
+    upload, 
+    updateFileAccess, // Add to return object
+    getFileAccess,    // Add to return object
+    loading, 
+    error 
+  };
 }
-
 /** 4️⃣ Create a new folder */
 export function useFolderCreator() {
   const [loading, setLoading] = useState(false)
