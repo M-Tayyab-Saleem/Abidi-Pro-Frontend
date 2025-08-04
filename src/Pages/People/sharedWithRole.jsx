@@ -50,7 +50,7 @@ export default function Role() {
   }
 
   return (
-    <div className="min-h-screen bg-primary p-2 sm:p-4 mx-2 my-4 sm:m-6 rounded-lg shadow-md">
+    <div >
       {/* Search and Filter Controls */}
       <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full">

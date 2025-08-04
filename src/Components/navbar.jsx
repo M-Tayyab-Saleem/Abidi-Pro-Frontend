@@ -17,6 +17,8 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { TbUserQuestion } from "react-icons/tb";
 import { logoutUser } from "../slices/authSlice";
+import projectIcon from "../assets/projects.png";
+import adminIcon from "../assets/admin.png";
 
 import { IconButton } from "@material-tailwind/react";
 const Navbar = () => {
@@ -89,15 +91,25 @@ const Navbar = () => {
   }
 };
 
-  const navLinks = [
-    { name: "Home", to: "/people", icon: IoHomeOutline },
-    { name: "Time ", to: "/time", icon: MdOutlineTimer },
-    { name: "Leave ", to: "/leave", icon: TbBeach },
-    { name: "Files", to: "/file", icon: FolderIcon },
-    { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
-    { name: "Projects", to: "/project", icon: GrProjects },
+  // const navLinks = [
+  //   { name: "Home", to: "/people", icon: IoHomeOutline },
+  //   { name: "Time ", to: "/time", icon: MdOutlineTimer },
+  //   { name: "Leave ", to: "/leave", icon: TbBeach },
+  //   { name: "Files", to: "/file", icon: FolderIcon },
+  //   { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
+  //   { name: "Projects", to: "/project", icon: GrProjects },
 
-    { name: "Admin ", to: "/admin", icon: UsersIcon },
+  //   { name: "Admin ", to: "/admin", icon: UsersIcon },
+  // ];
+   const navLinks = [
+    { name: "Peoples", to: "/people", icon: UsersIcon },
+    { name: "Project ", to: "/project", icon: projectIcon },
+    // { name: "Leave ", to: "/leave", icon: TbBeach },
+    // { name: "Files", to: "/file", icon: FolderIcon },
+    // { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
+    // { name: "Projects", to: "/project", icon: GrProjects },
+
+    { name: "Admin ", to: "/admin", icon: adminIcon },
   ];
 
   return (
@@ -127,7 +139,12 @@ const Navbar = () => {
                         : "relative group p-2 rounded-md hover:bg-teal-700"
                     }
                   >
-                    <Icon className="w-6 h-6 text-white" />
+                     {/* Check if 'Icon' is a string (image path) or a component */}
+      {typeof Icon === "string" ? (
+        <img src={Icon} alt={name} className="w-6 h-6 text-white" />
+      ) : (
+        <Icon className="w-6 h-6 text-white" />
+      )}
                     <span
                       className="absolute left-1/2 top-full mt-2 -translate-x-1/2 scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out rounded px-3 py-1 text-xs shadow-lg z-10"
                       style={{

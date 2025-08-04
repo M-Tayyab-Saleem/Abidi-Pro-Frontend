@@ -6,7 +6,7 @@ const AppLayout = () => {
   return (
     <div>
       <Navbar />
-      <SubNavbar />
+      <SubNavbar   />
       <div className="pt-[8.5rem]">
         <Outlet />
       </div>

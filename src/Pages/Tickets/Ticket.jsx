@@ -8,6 +8,7 @@ import RaiseTicketModal from "../../Pages/Tickets/RaiseTicketModal";
 import ViewTicketDetailsModal from "../../Pages/Tickets/ViewTicketDetailsModal";
 import { toast } from "react-toastify";
 import { Spin } from "antd";
+import AdminTickets from "./AdminTickets";
 
 
 const Ticket = () => {
@@ -20,7 +21,12 @@ const Ticket = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState(0);
 
+  const tabs = [
+    { title: "Raise a Ticker", component: null },
+    { title: "Ticket List", component: <AdminTickets /> }
+  ];
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
@@ -79,9 +85,33 @@ const Ticket = () => {
 
 
   return (
-    <div className="bg-primary m-5 rounded-2xl min-h-[700px] p-4 md:p-6">
+    <div className="bg-primary m-5 rounded-2xl min-h-[700px] p-4 md:p-2">
+
       <div className="text-text rounded-lg  p-4 md:p-6 min-h-[700px] ">
-        <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
+        {/* Tab Bar */}
+        {/* <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
+          {tabs.map((item, index) => (
+            <div key={item.title} className="flex items-center">
+              <button
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-200
+                ${activeTab === index
+                    ? "text-primary bg-primary/10 rounded-md"
+                    : "text-heading hover:text-primary hover:bg-gray-100 rounded-md"
+                  }`}
+                onClick={() => setActiveTab(index)}
+              >
+                {item.title}
+              </button>
+              {index !== tabs.length - 1 && (
+                <span className="w-px h-4 bg-gray-300 mx-1"></span>
+              )}
+            </div>
+          ))}
+        </div> */}
+        {/* {
+          activeTab==0?
+          <> */}
+          <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full">
             <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3 lg:mb-0">
               <div className="flex items-center space-x-2 sm:space-x-4">
@@ -199,6 +229,13 @@ const Ticket = () => {
             </div>
           </div>
         </Spin>
+        {/* </> */}
+        {/* :null */}
+        {/* } */}
+        {/* {
+          activeTab==1?
+          tabs[activeTab].component:null
+        } */}
         {/* Modals */}
         {showModal && (
           <RaiseTicketModal

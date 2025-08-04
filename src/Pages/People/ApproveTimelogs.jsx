@@ -108,7 +108,7 @@ const ApproveTimelogs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary p-4 m-6 rounded-lg shadow-md">
+    <div className="min-h-screen bg-primary p-6 m-6 rounded-lg shadow-md">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 bg-white p-4 rounded-md">
         <h2 className="text-base sm:text-lg font-semibold text-black mx-4">

@@ -16,13 +16,14 @@ const SubNavbar = ({ onAddTimeLog }) => {
   const [isAddTimeLogModalOpen, setIsAddTimeLogModalOpen] = useState(false);
   const checkedIn = Boolean(start);
   const { pathname } = useLocation();
-  const moduleKey = pathname.split("/")[1];
+  const moduleKey = pathname.split("/")[2];
+  // console.log(moduleKey)
   const dispatch = useDispatch();
   // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.user);
   const userId = userInfo?._id || userInfo?.id;
 
-  const config = moduleConfigs[moduleKey];
+  const config = moduleConfigs[pathname.split("/")[1]];
   const links = config?.links || [];
 
   useEffect(() => {
@@ -89,7 +90,7 @@ const SubNavbar = ({ onAddTimeLog }) => {
 
         {/* Right side: conditionally show Add Time Log */}
         <div className="hidden lg:flex items-center space-x-4">
-          {moduleKey === "time" ? (
+          {moduleKey === "history" ? (
             <Button
               className="bg-primary text-heading hover:bg-primary-dark text-white"
               onClick={onAddTimeLog}
@@ -155,7 +156,7 @@ const SubNavbar = ({ onAddTimeLog }) => {
         <div className="flex flex-col gap-4 mt-5">
           {navLinks}
           <div className="items-center space-x-4">
-            {moduleKey === "time" ? (
+            {moduleKey === "history" ? (
               <Button
                 className="bg-primary text-heading hover:bg-primary-dark text-white"
                 onClick={onAddTimeLog}

@@ -5,18 +5,23 @@ export const moduleConfigs = {
     links: [
       { name: "Home", path: "/people/home" },
       { name: "Profile", path: "/people/profile" },
-      {name: "FAQ", path: "/people/FAQs"},
+      { name: "Leave Tracker", path: "/people/summary" }, //from leave  { name: "Leave Summary", path: "/leave/summary" },
+         { name: "Files", path: "/people/shared" }, //from file    { name: "Shared with me", path: "/file/shared" },
+  { name: "Time Tracker", path: "/people/history" }, // from time   { name: "Time Tracker", path: "/time/history" },
+    { name: "Ticket", path: "/people/raise" },   // from tickets    { name: "Raise a Ticket", path: "/tickets/raise" },
+  
+  // {name: "FAQ", path: "/people/FAQs"},
     ],
   },
-  leave: {
-    basePath: "/leave",
-    subNavbarKey: "leave",
-    links: [
-      { name: "Leave Summary", path: "/leave/summary" },
-      { name: "Leave Request", path: "/leave/request" },
-      { name: "Leave Management", path: "/leave/leaveTrackerAdmin" },
-    ],
-  },
+  // leave: {
+  //   basePath: "/leave",
+  //   subNavbarKey: "leave",
+  //   links: [
+  //     { name: "Leave Summary", path: "/leave/summary" },
+  //     { name: "Leave Request", path: "/leave/request" },
+  //     { name: "Leave Management", path: "/leave/leaveTrackerAdmin" },
+  //   ],
+  // },
   file: {
     basePath: "/file",
     subNavbarKey: "file",
@@ -48,7 +53,7 @@ export const moduleConfigs = {
     links: [
       { name: "Project DashBoard", path: "/project/projectDashboard" },
       { name: "Projects", path: "/project/projects" },
-      // { name: "Assign Task", path: "/project/projectDetailed" },
+      // { name: "Tasks ", path: "/project/projectDetailed" },
       // { name: "My Task", path: "/project/myTask" },
     ],
   },
@@ -57,8 +62,12 @@ export const moduleConfigs = {
     subNavbarKey: "admin",
     links: [
       { name: "Admin DashBoard", path: "/admin/adminDashboard" },
+        { name: "Leave Management", path: "/admin/leaveTrackerAdmin" },
       { name: "User Management", path: "/admin/userManagement" },
-      { name: "Activity Logs", path: "/admin/logs" },
+        { name: "File Management", path: "/admin/upload" },
+      // { name: "Activity Logs", path: "/admin/logs" },
+      { name: "Approve Time Sheets", path: "/admin/approve" },
+
       { name: "Assign Ticket", path: "/admin/assign-ticket/:ticketId" },
     ],
   },

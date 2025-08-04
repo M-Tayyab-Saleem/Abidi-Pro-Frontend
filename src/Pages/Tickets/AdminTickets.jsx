@@ -70,8 +70,8 @@ const AdminTickets = () => {
   };
 
   return (
-    <div className="bg-primary p-6 min-h-screen rounded-2xl m-4">
-      <div className="p-6 overflow-auto">
+    <div className="bg-primary p-2 min-h-screen rounded-2xl m-4">
+      <div className="p-4 overflow-auto">
         {/* Header Controls */}
         <div className="flex flex-col space-y-4 mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full">

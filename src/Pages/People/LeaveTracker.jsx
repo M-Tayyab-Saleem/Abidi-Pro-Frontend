@@ -6,18 +6,25 @@ import { FaUmbrellaBeach, FaUserFriends, FaHospital } from "react-icons/fa";
 import { HiOutlineUserRemove } from "react-icons/hi";
 import HolidayTable from "../../Components/HolidayTable";
 import ApplyLeaveModal from "../../Components/LeaveModal";
+import LeaveSummary from "../../Components/tabs/LeaveSummary";
+import LeaveRequest from "./LeaveRequest";
+import AddHolidayModal from "../../Components/AddHolidayModal";
+import LeaveTrackerAdmin from "./LeaveTrackerAdmin";
 
 const LeaveTracker = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [holidayModal, setHolidayModal] = useState(false);
   const [leaves, setLeaves] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState({
     leaves: true,
     holidays: true
   });
+  const [adminRefresh, setAdminRefresh] = useState(0);
+
   const [errorMsg, setErrorMsg] = useState("");
   const user = useSelector(state => state.auth.user);
-
+  const [activeTab, setActiveTab] = useState(0)
   const fetchLeaves = async () => {
     try {
       const response = await api.get("/leaves");
@@ -29,7 +36,9 @@ const LeaveTracker = () => {
       setLoading(prev => ({ ...prev, leaves: false }));
     }
   };
-
+  const handleHolidayAdded = () => {
+   setAdminRefresh(i=>++i)
+  };
   const fetchHolidays = async () => {
     try {
       const response = await api.get("/holidays");
@@ -85,112 +94,55 @@ const LeaveTracker = () => {
       status: leave.status || "Pending",
     }));
   };
+  const tabs = [{ title: "Summary" }, { title: "Leave Tracker" }]
 
   return (
     <div className="px-4 py-2">
       <div className="p-8 rounded-xl bg-primary">
-        {/* Leave Summary */}
-        <div className="mt-3 mb-6 bg-background px-6 py-1 rounded-md text-sm font-medium">
-          <div className="flex flex-col items-center sm:flex sm:flex-row sm:justify-between sm:items-center p-4">
-            <div>
-              <div className="px-2 text-sm md:text-2xl sm:text-xl">
-                Leave Summary
-              </div>
-              <div className="">
-                <h1 className="px-2 text-xs font-light mt-3 ml-1">
-                  Available Leaves: {user?.avalaibleLeaves || 0}
-                </h1>
-                <h1 className="px-2 text-xs font-light mt-2 ml-1">
-                  Booked Leaves: {user?.bookedLeaves || 0}
-                </h1>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsOpen(true)}
-              className="bg-[#76FA9E] h-8 px-4 mt-4 rounded-lg text-xs"
-            >
-              Apply Now
-            </button>
-          </div>
-        </div>
+       <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200">
+  {tabs.map((item, index) => (
+    <div key={item.title} className="flex items-center">
+      {/* Tab Item */}
+      <button
+        className={`px-4 py-2 text-sm font-medium transition-colors duration-200
+          ${activeTab === index
+            ? "text-primary bg-primary/10 rounded-md"
+            : "text-heading hover:text-primary hover:bg-gray-100 rounded-md"
+          }`}
+        onClick={() => setActiveTab(index)}
+      >
+        {item.title}
+      </button>
 
-        {/* Leave Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {leaveData.map((item, index) => (
-            <AttendanceCard
-              key={index}
-              icon={item.icon}
-              title={item.label}
-              value={item.available}
-              badgeColor={item.badgeColor}
-            />
-          ))}
-        </div>
+      {/* Separator (not shown after last item) */}
+      {index !== tabs.length - 1 && (
+        <span className="w-px h-4 bg-gray-300 mx-1"></span>
+      )}
+    </div>
+  ))}
+</div>
+        {
+          activeTab===0?<LeaveSummary/>:null          
+        }
+        {
+          activeTab===1?<LeaveRequest/>:null          
+        }
+  {/* {
+          activeTab===2?<LeaveTrackerAdmin setIsOpen={setHolidayModal} key={adminRefresh} />:null          
+        } */}
 
-        {/* Holidays Table */}
-        <div className="p-4 bg-background px-6 pb-8 rounded-md text-sm font-semibold">
-          <h1 className="my-2 mb-6">Holidays</h1>
-          {loading.holidays ? (
-            <div className="p-4 text-center">Loading holidays...</div>
-          ) : errorMsg ? (
-            <div className="text-red-400 px-2">{errorMsg}</div>
-          ) : (
-            <HolidayTable holidays={holidays} searchTerm="" />
-          )}
-        </div>
 
-        {/* Applied Leaves Table */}
-        <div className="p-4 mb-8 bg-background px-6 pb-8 mt-4 rounded-md text-sm font-semibold">
-          <h1 className="my-2 mb-6">Applied Leaves</h1>
-          {loading.leaves ? (
-            <div className="text-white px-4">Loading...</div>
-          ) : errorMsg ? (
-            <div className="text-red-400 px-2">{errorMsg}</div>
-          ) : leaves.length === 0 ? (
-            <div className="text-white px-4">No leave records found.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-left border-separate border-spacing-0">
-                <thead className="bg-primary rounded-t-lg">
-                  <tr>
-                    {["Date", "Leave Type", "Reason", "Duration", "Status"].map((header, index) => (
-                      <th
-                        key={index}
-                        className={`p-3 font-medium text-white whitespace-nowrap border-r last:border-none border-gray-300
-                          ${index === 0 ? "rounded-tl-lg" : ""}
-                          ${index === 4 ? "rounded-tr-lg" : ""}
-                        `}
-                      >
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {formatAppliedLeaves(leaves).map((item, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-50">
-                      <td className="p-3 whitespace-nowrap">{item.date}</td>
-                      <td className="p-3 whitespace-nowrap">{item.leaveType}</td>
-                      <td className="p-3 whitespace-nowrap">{item.reason}</td>
-                      <td className="p-3 whitespace-nowrap">{item.duration}</td>
-                      <td className={`p-3 whitespace-nowrap text-center ${item.status === "Approved" ? 'bg-completed' : 'bg-slate-500 text-white'} rounded-sm`}>
-                        {item.status}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        
       </div>
       <ApplyLeaveModal
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         onLeaveAdded={fetchLeaves}
       />
+      <AddHolidayModal
+          isOpen={holidayModal} 
+          setIsOpen={setHolidayModal} 
+          onHolidayAdded={handleHolidayAdded}
+        />
     </div>
   );
 };
