@@ -64,36 +64,35 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
     logs.length > 0;
 
   const handleSubmit = async () => {
-    if (!isValid) return;
+  if (!isValid) return;
 
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('name', timesheetName);
-      formData.append('description', description);
-      
-      if (attachment) {
-        formData.append('attachments', attachment);
-      }
-      
-      // Add all log IDs to the form data
-      logs.forEach((log, index) => {
-        formData.append(`timeLogs[${index}]`, log._id);
-      });
-
-      await timesheetApi.createTimesheet(formData);
-      toast.success("Timesheet created successfully!");
-      onTimesheetCreated();
-      onClose();
-    } catch (error) {
-      console.error("Failed to create timesheet:", error);
-      setError(error.response?.data?.message || "Failed to create timesheet");
-      toast.error(error.response?.data?.message || "Failed to create timesheet");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append('name', timesheetName);
+    formData.append('description', description);
+    
+    if (attachment) {
+      formData.append('attachments', attachment); // Single file
     }
-  };
+    
+    logs.forEach(log => {
+      formData.append('timeLogs', log._id); // Simplified array format
+    });
 
+    await timesheetApi.createTimesheet(formData);
+    toast.success("Timesheet created successfully!");
+    onTimesheetCreated(); 
+    onClose(); 
+  } catch (error) {
+    console.error("Failed to create timesheet:", error);
+    const errorMsg = error.response?.data?.message || "Failed to create timesheet";
+    setError(errorMsg);
+    toast.error(errorMsg);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       {open && (

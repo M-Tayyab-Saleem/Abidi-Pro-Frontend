@@ -17,6 +17,7 @@ import timeLogApi from "../../api/timeLogApi";
 import { toast } from "react-toastify";
 import Timesheet from "./Timesheet";
 import CreateTimesheetModal from "./CreateTimesheetModal";
+import timesheetApi from "../../api/timesheetApi";
 
 const TimeTracker = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -202,7 +203,7 @@ const TimeTracker = () => {
           {tabs.map((item, index) => (
             <div key={item.title} className="flex items-center">
               <button
-                className={`px-4 py-2 text-sm font-medium transition-colors duration-200
+                className={`px-4 py-2  text-sm font-medium transition-colors duration-200
                 ${activeTab === index
                      ? "text-heading  rounded-md bg-gray-100"
                     : "text-primary hover:text-primary hover:bg-gray-100 rounded-md"
@@ -233,7 +234,7 @@ const TimeTracker = () => {
 
                 <div className="relative">
                   <button
-                    className="px-2 py-1 bg-primary rounded flex items-center gap-2 hover:bg-primary-dark"
+                    className="px-2 py-1 text-white bg-primary rounded flex items-center gap-2 hover:bg-primary-dark sm:px-3 sm:py-2"
                     onClick={() => setShowCalendar(!showCalendar)}
                   >
                     <IoCalendarNumberOutline size={20} />
@@ -369,13 +370,11 @@ const TimeTracker = () => {
         onSave={handleSaveLogs}
         onTimeLogAdded={fetchTimeLogs}
       />
-      <CreateTimesheetModal
-        open={isCreateTimesheetModalOpen}
-        onClose={() => setIsCreateTimesheetModalOpen(false)}
-        onTimesheetCreated={() => {
-          fetchTimesheets();
-        }}
-      />
+<CreateTimesheetModal
+  open={isCreateTimesheetModalOpen}
+  onClose={() => setIsCreateTimesheetModalOpen(false)}
+  onTimesheetCreated={fetchTimesheets} 
+/>
 
       <EditTimeLogModal
         isOpen={modalMode === "edit" && isAddTimeLogModalOpen}

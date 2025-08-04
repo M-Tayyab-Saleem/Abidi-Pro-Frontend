@@ -7,28 +7,27 @@ import "react-datepicker/dist/react-datepicker.css";
 import timesheetApi from "../../api/timesheetApi";
 import { toast } from "react-toastify";
 
-const Timesheet = () => {
+const Timesheet = ({ timesheets, fetchTimesheets }) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [timesheets, setTimesheets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchTimesheets = async () => {
-    try {
-      setLoading(true);
-      const month = selectedDate.getMonth() + 1;
-      const year = selectedDate.getFullYear();
-      const response = await timesheetApi.getEmployeeTimesheets(month, year);
-      setTimesheets(response);
-      setError(null);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to load timesheets");
-      toast.error("Failed to load timesheets");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchTimesheets = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const month = selectedDate.getMonth() + 1;
+  //     const year = selectedDate.getFullYear();
+  //     const response = await timesheetApi.getEmployeeTimesheets(month, year);
+  //     setTimesheets(response);
+  //     setError(null);
+  //   } catch (err) {
+  //     setError(err.response?.data?.message || "Failed to load timesheets");
+  //     toast.error("Failed to load timesheets");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     fetchTimesheets();
