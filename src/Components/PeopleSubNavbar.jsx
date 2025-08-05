@@ -10,16 +10,14 @@ import { setError } from "../slices/attendanceTimer";
 import { useDispatch, useSelector } from "react-redux";
 import AddTimeLogModal from "../Pages/People/AddTimeLogModal";
 
-const SubNavbar = ({ onAddTimeLog }) => {
+const SubNavbar = ({ onAddTimeLog, activeTab, onCreateTimesheet }) => {
   const [openNav, setOpenNav] = useState(false);
   const { start, checkIn, checkOut, loading, error } = useTimeLog();
   const [isAddTimeLogModalOpen, setIsAddTimeLogModalOpen] = useState(false);
   const checkedIn = Boolean(start);
   const { pathname } = useLocation();
   const moduleKey = pathname.split("/")[2];
-  // console.log(moduleKey)
   const dispatch = useDispatch();
-  // Get user info from Redux store
   const userInfo = useSelector((state) => state.auth.user);
   const userId = userInfo?._id || userInfo?.id;
 
@@ -30,7 +28,6 @@ const SubNavbar = ({ onAddTimeLog }) => {
     error && (() => {
       setTimeout(() => {
         dispatch(setError(null));
-        console.log("setting error to null")
       }, 1000);
     })()
   }, [error]);
@@ -74,11 +71,9 @@ const SubNavbar = ({ onAddTimeLog }) => {
       <div className="flex items-center justify-between text-blue-gray-900">
         {/* Check In/Out Button */}
         <Button
-          size="large"
-          className={`w-32 text-center font-semibold shadow transition px-5 py-3 ${checkedIn
-            ? "bg-red-400 text-red-800"
-            : "bg-green-400 text-green-800"
-            }`}
+          size="lg"
+          className={`my-2 py-2 w-full max-w-[140px] font-semibold shadow transition ${checkedIn ? "bg-red-400 text-red-800" : "bg-green-400 text-green-800"
+            } ${loading || !userId ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={checkedIn ? handleCheckOut : handleCheckIn}
           disabled={loading || !userId}
         >
@@ -88,9 +83,16 @@ const SubNavbar = ({ onAddTimeLog }) => {
         {/* Nav Links Center */}
         <div className="hidden lg:block">{navLinks}</div>
 
-        {/* Right side: conditionally show Add Time Log */}
+        {/* Right side: conditionally show Add Time Log or Create Timesheet */}
         <div className="hidden lg:flex items-center space-x-4">
-          {moduleKey === "history" ? (
+          {moduleKey === "history" && activeTab === 1 ? (
+            <Button
+              className="bg-primary text-heading hover:bg-primary-dark text-white"
+              onClick={onCreateTimesheet}
+            >
+              Create Timesheet
+            </Button>
+          ) : moduleKey === "history" ? (
             <Button
               className="bg-primary text-heading hover:bg-primary-dark text-white"
               onClick={onAddTimeLog}
@@ -156,7 +158,14 @@ const SubNavbar = ({ onAddTimeLog }) => {
         <div className="flex flex-col gap-4 mt-5">
           {navLinks}
           <div className="items-center space-x-4">
-            {moduleKey === "history" ? (
+            {moduleKey === "history" && activeTab === 1 ? (
+              <Button
+                className="bg-primary text-heading hover:bg-primary-dark text-white"
+                onClick={onCreateTimesheet}
+              >
+                Create Timesheet
+              </Button>
+            ) : moduleKey === "history" ? (
               <Button
                 className="bg-primary text-heading hover:bg-primary-dark text-white"
                 onClick={onAddTimeLog}

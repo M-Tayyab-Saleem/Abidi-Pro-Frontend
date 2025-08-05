@@ -6,6 +6,9 @@ import {
   UsersIcon,
   FolderIcon,
   CalendarDaysIcon,
+  SunIcon,
+  MoonIcon,
+  ComputerDesktopIcon
 } from "@heroicons/react/24/outline";
 import { IoHomeOutline } from "react-icons/io5";
 import { IoTicketOutline } from "react-icons/io5";
@@ -14,25 +17,30 @@ import { TbBeach } from "react-icons/tb";
 import { GrProjects } from "react-icons/gr";
 import api from "../axios";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { TbUserQuestion } from "react-icons/tb";
 import { logoutUser } from "../slices/authSlice";
 import projectIcon from "../assets/projects.png";
 import adminIcon from "../assets/admin.png";
 
 import { IconButton } from "@material-tailwind/react";
+
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const [hasNotifications] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const profileDropdownRef = useRef(null);
+  const themeDropdownRef = useRef(null);
   const dispatch = useDispatch();
   const [openNav, setOpenNav] = useState(false);
 
+  // Get user data from Redux
+  const { user } = useSelector((state) => state.auth);
+  const profileImage = user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e";
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "system";
@@ -61,56 +69,57 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close profile dropdown if clicked outside
       if (
         profileDropdownRef.current &&
         !profileDropdownRef.current.contains(event.target)
       ) {
         setProfileDropdownOpen(false);
       }
+
+      // Close theme dropdown if clicked outside
+      if (
+        themeDropdownRef.current &&
+        !themeDropdownRef.current.contains(event.target)
+      ) {
+        setThemeDropdownOpen(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
- const handleLogout = async () => {
-  try {
-    await api.post("/auth/logout", {}, { 
-      withCredentials: true, 
-      _skipAuth: true, 
-      _isLogoutRequest: true  
-    });
-    dispatch(logoutUser());
-    navigate("/auth/login");
-    toast.success("Logged out successfully");
-  } catch (err) {
-    console.warn("Logout API failed:", err.message);
-    dispatch(logoutUser());
-    navigate("/auth/login");
-  }
-};
 
-  // const navLinks = [
-  //   { name: "Home", to: "/people", icon: IoHomeOutline },
-  //   { name: "Time ", to: "/time", icon: MdOutlineTimer },
-  //   { name: "Leave ", to: "/leave", icon: TbBeach },
-  //   { name: "Files", to: "/file", icon: FolderIcon },
-  //   { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
-  //   { name: "Projects", to: "/project", icon: GrProjects },
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout", {}, {
+        withCredentials: true,
+        _skipAuth: true,
+        _isLogoutRequest: true
+      });
+      dispatch(logoutUser());
+      navigate("/auth/login");
+      toast.success("Logged out successfully");
+    } catch (err) {
+      console.warn("Logout API failed:", err.message);
+      dispatch(logoutUser());
+      navigate("/auth/login");
+    }
+  };
 
-  //   { name: "Admin ", to: "/admin", icon: UsersIcon },
-  // ];
-   const navLinks = [
+  const navLinks = [
     { name: "Peoples", to: "/people", icon: UsersIcon },
     { name: "Project ", to: "/project", icon: projectIcon },
-    // { name: "Leave ", to: "/leave", icon: TbBeach },
-    // { name: "Files", to: "/file", icon: FolderIcon },
-    // { name: "Tickets", to: "/tickets", icon: IoTicketOutline },
-    // { name: "Projects", to: "/project", icon: GrProjects },
-
     { name: "Admin ", to: "/admin", icon: adminIcon },
   ];
+
+  const handleThemeChange = (theme) => {
+    localStorage.setItem("theme", theme);
+    applyTheme(theme);
+    setThemeDropdownOpen(false);
+  };
 
   return (
     <>
@@ -139,12 +148,11 @@ const Navbar = () => {
                         : "relative group p-2 rounded-md hover:bg-teal-700"
                     }
                   >
-                     {/* Check if 'Icon' is a string (image path) or a component */}
-      {typeof Icon === "string" ? (
-        <img src={Icon} alt={name} className="w-6 h-6 text-white" />
-      ) : (
-        <Icon className="w-6 h-6 text-white" />
-      )}
+                    {typeof Icon === "string" ? (
+                      <img src={Icon} alt={name} className="w-6 h-6 text-white" />
+                    ) : (
+                      <Icon className="w-6 h-6 text-white" />
+                    )}
                     <span
                       className="absolute left-1/2 top-full mt-2 -translate-x-1/2 scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out rounded px-3 py-1 text-xs shadow-lg z-10"
                       style={{
@@ -159,15 +167,30 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Right: Notifications, Settings, Profile (20%) */}
+            {/* Right: Theme, Profile (20%) */}
             <div className="w-1/5 flex justify-end items-center space-x-4">
-              {/* Notification
-              <button className="relative p-1 text-white rounded-md hover:bg-secondary">
-                <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" />
-                <span className={`absolute -top-0 -right-0 h-2 w-2 rounded-full ${hasNotifications ? "bg-red-500" : "bg-green-500"
-                  }`}></span>
-              </button> */}
+              {/* Theme selector */}
+              <div ref={themeDropdownRef} className="relative hidden sm:block">
+                <div className="relative group p-2 rounded-md hover:bg-teal-700 cursor-pointer">
+                  <button
+                    onClick={() => navigate("/theme-selector")}
+                    className="text-white"
+                  >
+                    <ComputerDesktopIcon className="w-6 h-6" />
+                  </button>
+                  <span
+                    className="absolute left-1/2 top-full mt-2 -translate-x-1/2 scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200 ease-out rounded px-3 py-1 text-xs shadow-lg z-10"
+                    style={{
+                      backgroundColor: "var(--color-primary)",
+                      color: "var(--color-text)",
+                    }}
+                  >
+                    Theme Selector
+                  </span>
+                </div>
+
+              </div>
+
               {/* Mobile toggle */}
               <IconButton
                 variant="text"
@@ -185,30 +208,6 @@ const Navbar = () => {
                 )}
               </IconButton>
 
-              {/* Settings */}
-              <div className="relative hidden sm:block">
-                <button
-                  onClick={() => setSettingsOpen(!settingsOpen)}
-                  className="p-1 text-white rounded-md hover:bg-teal-700"
-                >
-                  <span className="sr-only">Open settings</span>
-                  <Cog6ToothIcon className="w-6 h-6" />
-                </button>
-                {settingsOpen && (
-                  <div className="absolute right-0 mt-2 w-48 z-50 rounded-md bg-white shadow-lg ring-1 ring-black/5 py-2">
-                    <button
-                      onClick={() => {
-                        navigate("/theme-selector");
-                        setSettingsOpen(false);
-                      }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Theme Selector
-                    </button>
-                  </div>
-                )}
-              </div>
-
               {/* Profile */}
               <div ref={profileDropdownRef} className="relative">
                 <button
@@ -218,17 +217,18 @@ const Navbar = () => {
                   <span className="sr-only">Open user menu</span>
                   <img
                     className="h-10 w-10 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
+                    src={profileImage}
                     alt="User"
                   />
                 </button>
                 {profileDropdownOpen && (
                   <div className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5">
-                    <Link to="/people/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <Link
+                      to="/people/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
                       Your Profile
-                    </Link>
-                    <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Settings
                     </Link>
                     <button
                       onClick={handleLogout}
@@ -236,16 +236,11 @@ const Navbar = () => {
                     >
                       Sign out
                     </button>
-
                   </div>
                 )}
               </div>
             </div>
           </div>
-
-        </div>
-        <div className="sm:hidden">
-
         </div>
 
         {/* Mobile Menu */}
@@ -259,7 +254,11 @@ const Navbar = () => {
                 className={`flex items-center space-x-2 rounded-md px-3 py-2 ${currentPath === to ? "hover:bg-[#99c7be]" : "hover:bg-[#99c7be] hover:text-black"
                   }`}
               >
-                <Icon className="w-5 h-5" />
+                {typeof Icon === "string" ? (
+                  <img src={Icon} alt={name} className="w-5 h-5" />
+                ) : (
+                  <Icon className="w-5 h-5" />
+                )}
                 <span>{name}</span>
               </Link>
             ))}
@@ -271,4 +270,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

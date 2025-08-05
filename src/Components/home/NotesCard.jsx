@@ -54,7 +54,7 @@ const NotesCard = ({ onDelete }) => {
   return (
     <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
       {/* Floating Icon (replaces emoji) */}
-      <div className="absolute -top-4 left-4 bg-yellow-100 text-yellow-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-10">
+      <div className="absolute -top-4 left-4 bg-yellow-100 text-yellow-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
         <FiEdit className="text-xl" />
       </div>
 

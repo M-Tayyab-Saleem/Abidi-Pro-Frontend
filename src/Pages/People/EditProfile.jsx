@@ -2,27 +2,28 @@ import { useEffect, useState } from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
+import { FiCamera } from "react-icons/fi";
 import api from "../../axios";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import { Spin } from "antd";
- 
+
 export default function EditProfile() {
   const navigate = useNavigate();
- 
+
   const [userId, setUserId] = useState(null);
   const [user, setUser] = useState(null);
   const [about, setAbout] = useState("");
   const [educationList, setEducationList] = useState([]);
   const [experienceList, setExperienceList] = useState([]);
   const [loading, setLoading] = useState(true);
- 
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await api.get("/auth/me", {
           withCredentials: true,
         });
- 
+
         const user = res.data.user;
         setUser(user);
         setUserId(user._id);
@@ -35,10 +36,10 @@ export default function EditProfile() {
         setLoading(false);
       }
     };
- 
+
     fetchUser();
   }, []);
- 
+
   const handleSave = async () => {
     try {
       const payload = {
@@ -57,7 +58,7 @@ export default function EditProfile() {
           endDate: null,
         })),
       };
- 
+
       await api.put(`/users/${userId}`, payload, {
         withCredentials: true,
       });
@@ -68,25 +69,51 @@ export default function EditProfile() {
       console.error("Error updating profile:", err);
     }
   };
- 
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      setLoading(true);
+      const response = await api.post(`/users/${userId}/upload-avatar`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Update the user with new avatar URL
+      setUser(prev => ({ ...prev, avatar: response.data.avatarUrl }));
+      toast.success("Profile picture updated successfully!");
+    } catch (err) {
+      toast.error("Failed to update profile picture");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addEducation = () =>
     setEducationList([...educationList, { institution: "", degree: "", date: "" }]);
- 
+
   const removeEducation = (index) =>
     setEducationList(educationList.filter((_, i) => i !== index));
- 
+
   const addExperience = () =>
     setExperienceList([...experienceList, { company: "", job: "", date: "", type: "Full-time" }]);
- 
+
   const removeExperience = (index) =>
     setExperienceList(experienceList.filter((_, i) => i !== index));
- 
+
   if (loading) {
-    return       <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
-        <Spin size="large" tip="Loading profile..." />
-      </div>
+    return <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+      <Spin size="large" tip="Loading profile..." />
+    </div>
   }
- 
+
   return (
     <div className="relative flex flex-col bg-primary text-text p-5 border m-8 rounded-xl shadow-sm min-h-[700px]">
       {/* Back Button */}
@@ -97,7 +124,7 @@ export default function EditProfile() {
         <IoArrowBack className="text-lg" />
         Back
       </button>
- 
+
       {/* Banner & Profile Pic */}
       <div className="relative h-24 rounded-lg overflow-hidden shadow-md mb-10">
         <img
@@ -106,18 +133,38 @@ export default function EditProfile() {
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="relative -mt-14 pl-6 z-10 mb-10">
-        <img
-          src={`https://randomuser.me/api/portraits/lego/${
-            user?._id ? user._id.length % 10 : 1
-          }.jpg`}
-          alt={user?.name || "User"}
-          className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
-        />
+      <div className="relative -mt-14 pl-6 z-99 mb-10">
+        <div className="relative group">
+          <img
+            src={user.avatar || `https://randomuser.me/api/portraits/lego/${user?._id ? user._id.length % 10 : 1}.jpg`}
+            alt={user?.name || "User"}
+            className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
+          />
+          <label
+            htmlFor="avatar-upload-edit"
+            className="absolute inset-0 bg-black bg-opacity-30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
+            <FiCamera className="text-white text-xl" />
+          </label>
+          <input
+            id="avatar-upload-edit"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
+            disabled={loading}
+          />
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            </div>
+          )}
+        </div>
       </div>
- 
+
+
       <h2 className="text-xl text-text font-semibold font-sans mb-4">Edit Your Profile</h2>
- 
+
       {/* About */}
       <div className="bg-background rounded-md p-4 mb-6">
         <h3 className="font-semibold mb-2">About</h3>
@@ -128,7 +175,7 @@ export default function EditProfile() {
           onChange={(e) => setAbout(e.target.value)}
         />
       </div>
- 
+
       {/* Education & Experience */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Education */}
@@ -199,7 +246,7 @@ export default function EditProfile() {
             </div>
           ))}
         </div>
- 
+
         {/* Experience */}
         <div>
           <div className="flex justify-between items-center mb-2">
@@ -287,19 +334,21 @@ export default function EditProfile() {
           ))}
         </div>
       </div>
- 
+
       {/* Save Button at Bottom */}
       <div className="flex justify-end mt-6">
         <button
-          className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition"
+          className={`bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           onClick={handleSave}
+          disabled={loading}
         >
-          Save Changes
+          {loading ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>
   );
 }
- 
- 
+
+
 

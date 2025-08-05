@@ -3,7 +3,10 @@ import api from '../axios';
 const API_URL = '/time-logs';
 
 const getEmployeeTimeLogs = async (date = null) => {
-  const params = date ? { date } : {};
+  const params = {};
+  if (date) {
+    params.date = date;
+  }
   const response = await api.get(API_URL, { params });
   return response.data;
 };

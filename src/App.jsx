@@ -15,6 +15,7 @@ import Home from "./Pages/People/Home";
 import TimeTracker from "./Pages/People/TimeTracker";
 import Files from "./Pages/People/Files";
 import Profile from "./Pages/People/profile";
+import Attendance from "./Pages/People/Attendance";
 import EditProfile from "./Pages/People/EditProfile";
 import LeaveTracker from "./Pages/People/LeaveTracker";
 import LeaveTrackerAdmin from "./Pages/People/LeaveTrackerAdmin";
@@ -101,6 +102,7 @@ function App() {
           <Route index path="raise" element={<Ticket />} />
           <Route index path="history" element={<TimeTracker />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="attendance" element={<Attendance />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="FAQs" element={<FAQs />} />
         </Route>
@@ -149,15 +151,15 @@ function App() {
 
         <Route path="/admin/*" element={<AppLayout />}>
           <Route index element={<Navigate to="adminDashboard" replace />} /> //
-          ✅ Redirect
+          Redirect
           <Route index path="adminDashboard" element={<AdminDashBoard />} />
              <Route path="leaveTrackerAdmin" element={<LeaveTrackerAdmin />} />
                 <Route path="upload" element={<UploadDocument />} />
           <Route path="userManagement" element={<UserManagement />} />
           {/* <Route path="logs" element={<ActivityLogs />} /> */}
           <Route path="approve" element={<ApproveTimelogs />} />
-          <Route path="assign-ticket/:ticketId" element={<AdminTickets />} />
-
+          <Route path="assign-ticket" element={<AdminTickets />} />
+          <Route path="assign-ticket/:ticketId" element={<AssignTicket />} />
         </Route>
       </Routes>
     </>

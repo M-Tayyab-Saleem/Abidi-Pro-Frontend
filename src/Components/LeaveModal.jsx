@@ -33,14 +33,14 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen }) => {
       setReason("");
     } catch (error) {
       console.error("Error submitting leave request:", error);
-      toast.error("Failed to submit leave request");
+      toast.error(error.response?.data?.message || "Failed to submit leave request");
     }
   };
  
   return (
     <>
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 z-[9999] flex justify-end">
+        <div className="fixed inset-0 bg-black bg-opacity-30 z-[100] flex justify-end">
           <div className="w-75 sm:w-1/2 bg-white h-full p-6 shadow-lg rounded-l-lg relative z-80">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Apply Leave</h2>

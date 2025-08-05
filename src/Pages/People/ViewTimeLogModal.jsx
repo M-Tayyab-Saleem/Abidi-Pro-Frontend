@@ -57,8 +57,7 @@ const ViewTimeLogModal = ({ log: propLog, onClose }) => {
               Date
             </label>
             <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
-              {log.date || "-"}
-            </p>
+              {log.date ? new Date(log.date).toLocaleDateString('en-GB') : "-"}            </p>
           </div>
 
           <div>
@@ -91,7 +90,7 @@ const ViewTimeLogModal = ({ log: propLog, onClose }) => {
                   download
                   className="border-l ml-4 text-sm text-green py-1 px-2 rounded"
                 >
-                    <FaDownload size={16} />
+                  <FaDownload size={16} />
                 </a>
               </div>
             ) : (

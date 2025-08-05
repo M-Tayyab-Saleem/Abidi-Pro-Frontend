@@ -9,7 +9,7 @@ import ApplyLeaveModal from "../../Components/LeaveModal";
 import api from "../../axios";
 
 const LeaveRequest = () => {
-  // const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [leaveRecord, setLeaveRecord] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
@@ -73,11 +73,7 @@ const LeaveRequest = () => {
     // MainBody
     <div >
       {/* roundercorner main Content */}
-      <div >
-
-
-
-
+      <div>
         <div className='flex flex-col mt-3 bg-background px-6 py-1 rounded-md text-sm font-medium'>
           <div className='px-2 my-4 text-lg'>Applied Leave</div>
           {loading ? (
@@ -134,9 +130,7 @@ const LeaveRequest = () => {
           )}
         </div>
       </div>
-
-
-      {/* <ApplyLeaveModal isOpen={isOpen} setIsOpen={setIsOpen} /> */}
+      <ApplyLeaveModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };

@@ -8,14 +8,18 @@ import {
   GraduationCap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import api from "../../axios"; 
+import api from "../../axios";
+import { FiCamera } from "react-icons/fi";
+import { toast } from "react-toastify";
 import { Spin } from "antd";
- 
+
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
- 
+  const [uploading, setUploading] = useState(false);
+
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -30,10 +34,10 @@ export default function Profile() {
         setLoading(false);
       }
     };
- 
+
     fetchUser();
   }, []);
- 
+
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
@@ -41,7 +45,7 @@ export default function Profile() {
       </div>
     );
   }
- 
+
   if (!user) {
     return (
       <div className="text-red-500 text-center mt-10">
@@ -49,7 +53,7 @@ export default function Profile() {
       </div>
     );
   }
- 
+
   const profileCards = [
     {
       icon: MapPin,
@@ -94,7 +98,34 @@ export default function Profile() {
       iconColor: "text-green-600",
     },
   ];
- 
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      setUploading(true);
+      console.log("Uploading avatar:", `/users/${user._id}/upload-avatar` );
+      const response = await api.post(`/users/${user._id}/upload-avatar`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Update the user with new avatar URL
+      setUser(prev => ({ ...prev, avatar: response.data.avatarUrl }));
+      toast.success("Profile picture updated successfully!");
+    } catch (err) {
+      toast.error("Failed to update profile picture");
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="overflow-hidden bg-primary p-5 border m-4 shadow-sm min-h-[700px] border-none rounded-lg">
       {/* Banner & Edit Button */}
@@ -111,18 +142,38 @@ export default function Profile() {
           Edit Profile
         </button>
       </div>
- 
+
       {/* Profile Picture */}
       <div className="relative -mt-14 pl-6 z-5">
-        <img
-          src={`https://randomuser.me/api/portraits/lego/${
-            user?._id ? user._id.length % 10 : 1
-          }.jpg`}
-          alt={user?.name || "User"}
-          className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
-        />
+        <div className="relative group">
+          <img
+            src={user.avatar || `https://randomuser.me/api/portraits/lego/${user?._id ? user._id.length % 10 : 1}.jpg`}
+            alt={user?.name || "User"}
+            className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
+          />
+          <label
+            htmlFor="avatar-upload"
+            className="absolute inset-0 bg-black bg-opacity-30 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+          >
+            <FiCamera className="text-white text-xl" />
+          </label>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarUpload}
+            disabled={uploading}
+          />
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+            </div>
+          )}
+        </div>
       </div>
- 
+
+
       {/* Info Summary */}
       <div className="card bg-secondary shadow rounded-md py-4 pr-4 pl-6 mt-4 flex flex-wrap justify-between gap-2 sm:gap-4">
         <div className="flex flex-col min-w-0">
@@ -138,7 +189,7 @@ export default function Profile() {
           </p>
         </div>
       </div>
- 
+
       {/* Profile Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 card">
         {profileCards.map((item, idx) => (
@@ -158,7 +209,7 @@ export default function Profile() {
           </div>
         ))}
       </div>
- 
+
       {/* About */}
       {user.about && (
         <div className="mb-6 card bg-secondary shadow p-2 rounded-lg">
@@ -166,7 +217,7 @@ export default function Profile() {
           <p className="text-sm text-text">{user.about}</p>
         </div>
       )}
- 
+
       {/* Work & Education */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-secondary p-4 rounded-lg shadow-md hover:shadow-lg transition">
@@ -198,7 +249,7 @@ export default function Profile() {
             )}
           </div>
         </div>
- 
+
         <div className="bg-secondary p-4 rounded-lg shadow-md hover:shadow-lg transition">
           <div className="flex items-center gap-3 mb-3">
             <GraduationCap className="text-blue-600 w-5 h-5" />
@@ -226,5 +277,4 @@ export default function Profile() {
     </div>
   );
 }
- 
- 
+

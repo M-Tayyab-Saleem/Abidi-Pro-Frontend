@@ -37,7 +37,7 @@ const LeaveTracker = () => {
     }
   };
   const handleHolidayAdded = () => {
-   setAdminRefresh(i=>++i)
+    setAdminRefresh(i => ++i)
   };
   const fetchHolidays = async () => {
     try {
@@ -99,35 +99,35 @@ const LeaveTracker = () => {
   return (
     <div className="px-4 py-2">
       <div className="p-8 rounded-xl bg-primary">
-       <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200">
-  {tabs.map((item, index) => (
-    <div key={item.title} className="flex items-center">
-      {/* Tab Item */}
-      <button
-        className={`px-4 py-2 text-sm font-medium transition-colors duration-200
+        <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200">
+          {tabs.map((item, index) => (
+            <div key={item.title} className="flex items-center">
+              {/* Tab Item */}
+              <button
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-200
           ${activeTab === index
-            ? "text-primary bg-primary/10 rounded-md"
-            : "text-heading hover:text-primary hover:bg-gray-100 rounded-md"
-          }`}
-        onClick={() => setActiveTab(index)}
-      >
-        {item.title}
-      </button>
+                    ? "text-heading  rounded-md bg-gray-100"
+                    : "text-primary hover:text-primary hover:bg-gray-100 rounded-md"
+                  }`}
+                onClick={() => setActiveTab(index)}
+              >
+                {item.title}
+              </button>
 
-      {/* Separator (not shown after last item) */}
-      {index !== tabs.length - 1 && (
-        <span className="w-px h-4 bg-gray-300 mx-1"></span>
-      )}
-    </div>
-  ))}
-</div>
+              {/* Separator (not shown after last item) */}
+              {index !== tabs.length - 1 && (
+                <span className="w-px h-4 bg-gray-300 mx-1"></span>
+              )}
+            </div>
+          ))}
+        </div>
         {
-          activeTab===0?<LeaveSummary/>:null          
+          activeTab === 0 ? <LeaveSummary /> : null
         }
         {
-          activeTab===1?<LeaveRequest/>:null          
+          activeTab === 1 ? <LeaveRequest /> : null
         }
-  {/* {
+        {/* {
           activeTab===2?<LeaveTrackerAdmin setIsOpen={setHolidayModal} key={adminRefresh} />:null          
         } */}
 
@@ -139,10 +139,10 @@ const LeaveTracker = () => {
         onLeaveAdded={fetchLeaves}
       />
       <AddHolidayModal
-          isOpen={holidayModal} 
-          setIsOpen={setHolidayModal} 
-          onHolidayAdded={handleHolidayAdded}
-        />
+        isOpen={holidayModal}
+        setIsOpen={setHolidayModal}
+        onHolidayAdded={handleHolidayAdded}
+      />
     </div>
   );
 };
