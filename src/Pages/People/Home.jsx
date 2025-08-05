@@ -88,46 +88,60 @@ const Home = () => {
   };
 
   const renderCard = (card) => {
-    const props = { key: card.id, onDelete: () => removeCard(card.id) };
-    switch (card.type) {
-      case "feeds":
-        return <FeedsCard {...props} />;
-      case "attendance": {
-        const sampleData = [
-          { day: "Mon", hours: 6 },
-          { day: "Tue", hours: 8 },
-          { day: "Wed", hours: 4 },
-          { day: "Thu", hours: 2 },
-          { day: "Fri", hours: 7 },
-          { day: "Sat", hours: 0 },
-          { day: "Sun", hours: 5 },
-        ];
-        return (
-          <AttendanceCard weeklyData={sampleData} onDelete={props.onDelete} />
-        );
-      }
-      case "holidays":
-        return <HolidaysCard {...props} />;
-      case "todo":
-        return <ToDoCard {...props} />;
-      case "notes":
-        return <NotesCard {...props} />;
-      case "recent activities":
-        return <RecentActivitiesCard {...props} />;
-      case "birthdays":
-        return <UpcomingBirthdaysCard {...props} />;
-      case "leavelog":
-        return <LeaveLogCard {...props} />;
-      case "upcomingDeadlines":
-        return <UpcomingDeadlinesCard {...props} />;
-      case "timeoffBalance":
-        return <TimeoffBalanceCard  {...props}/>;
-      case "tasksAssignedToMe":
-        return <TasksAssignedToMeCard {...props}/>;
-      default:
-        return null;
+  const { id, type } = card;
+  const onDelete = () => removeCard(id);
+
+  switch (type) {
+    case "feeds":
+      return <FeedsCard key={id} onDelete={onDelete} />;
+
+    case "attendance": {
+      const sampleData = [
+        { day: "Mon", hours: 6 },
+        { day: "Tue", hours: 8 },
+        { day: "Wed", hours: 4 },
+        { day: "Thu", hours: 2 },
+        { day: "Fri", hours: 7 },
+        { day: "Sat", hours: 0 },
+        { day: "Sun", hours: 5 },
+      ];
+      return (
+        <AttendanceCard key={id} weeklyData={sampleData} onDelete={onDelete} />
+      );
     }
-  };
+
+    case "holidays":
+      return <HolidaysCard key={id} onDelete={onDelete} />;
+
+    case "todo":
+      return <ToDoCard key={id} onDelete={onDelete} />;
+
+    case "notes":
+      return <NotesCard key={id} onDelete={onDelete} />;
+
+    case "recent activities":
+      return <RecentActivitiesCard key={id} onDelete={onDelete} />;
+
+    case "birthdays":
+      return <UpcomingBirthdaysCard key={id} onDelete={onDelete} />;
+
+    case "leavelog":
+      return <LeaveLogCard key={id} onDelete={onDelete} />;
+
+    case "upcomingDeadlines":
+      return <UpcomingDeadlinesCard key={id} onDelete={onDelete} />;
+
+    case "timeoffBalance":
+      return <TimeoffBalanceCard key={id} onDelete={onDelete} />;
+
+    case "tasksAssignedToMe":
+      return <TasksAssignedToMeCard key={id} onDelete={onDelete} />;
+
+    default:
+      return null;
+  }
+};
+
 
   useEffect(() => {
     const updateTime = () => {
