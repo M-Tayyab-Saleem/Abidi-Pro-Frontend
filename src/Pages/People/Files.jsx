@@ -7,7 +7,7 @@ import FolderGrid from './FolderGrid';
 import OpenFolderScreen from './OpenFolderScreen';
 import Role from './sharedWithRole';
 import UploadDocument from './UploadDocument';
-import { useFolderContents, useFileDownloader } from '../../Hooks/useDrive';
+import { useFolderContents, useFileDownloader, useMyFiles } from '../../Hooks/useDrive';
 import { useSelector } from 'react-redux';
 
 export default function Files() {
@@ -16,15 +16,14 @@ export default function Files() {
   const [openedFolder, setOpenedFolder] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  const data = useSelector((state) => state);
-  const { user } = data?.auth;
-  const folderId = openedFolder?.id || 'root';
-  const folderPath = `users/${user.id}/${folderId}`;
+  // const data = useSelector((state) => state);
+  // const { user } = data?.auth;
 
-  const { folders, files, loading, error, reload } = useFolderContents(folderId);
+
+  const { files, loading, error, reload } = useMyFiles();
   const { download, loading: dlLoading } = useFileDownloader();
 
-  const safeFolders = Array.isArray(folders) ? folders : [];
+  // const safeFolders = Array.isArray(folders) ? folders : [];
   const safeFiles = Array.isArray(files) ? files : [];
 
   const tabs = [
@@ -35,14 +34,14 @@ export default function Files() {
 
   if (error) return <Alert message={error.message} type="error" />;
 
-  if (openedFolder) {
-    return (
-      <OpenFolderScreen
-        folder={openedFolder}
-        onClose={() => setOpenedFolder(null)}
-      />
-    );
-  }
+  // if (openedFolder) {
+  //   return (
+  //     <OpenFolderScreen
+  //       folder={openedFolder}
+  //       onClose={() => setOpenedFolder(null)}
+  //     />
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-primary p-2 sm:p-4 mx-2 my-4 sm:m-6 rounded-lg shadow-md">

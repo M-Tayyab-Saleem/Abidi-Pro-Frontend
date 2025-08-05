@@ -32,6 +32,34 @@ export function useFolderContents(folder) {
   return { folders, files, loading, error, reload }
 }
 
+export function useMyFiles() {
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchMyFiles = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data } = await api.get('/files/files/getMyFiles');
+      console.log("Fetched my files:", data);
+      setFiles(data.files);
+    } catch (err) {
+      console.error("Error fetching my files:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMyFiles();
+  }, [fetchMyFiles]);
+
+  return { files, loading, error, reload: fetchMyFiles };
+}
+
+
 /** 2️⃣ Download a file */
 export function useFileDownloader() {
   const [loading, setLoading] = useState(false)
@@ -56,59 +84,84 @@ export function useFileUploader() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const cloudinaryProjectName = import.meta.env.VITE_REACT_APP_CLOUDINARY_CLOUD_NAME;
-  const { user } = useSelector(state => state.auth);
-
-  // Main upload function
-  const upload = useCallback(async ({ file, folderId, folderPath, accessSettings = {} }) => {
-    setLoading(true); 
-    setError(null);
-    
-    try {
-      // [Previous upload implementation remains exactly the same...]
-      // ... (keep all your existing upload code)
-
-      return {
-        ...uploadRes,
-        accessSettings: {
-          isPublic: fileData.isPublic,
-          sharedWithRoles: fileData.sharedWithRoles,
-          acl: fileData.acl
-        }
-      };
-    } catch (e) {
-      setError(e);
-      console.error("Upload failed:", e);
-      throw e;
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  // NEW: Function to update file access
-  const updateFileAccess = useCallback(async (fileId, accessSettings) => {
+  // const { user } = useSelector(state => state.auth);
+const upload = useCallback(async ({ file, folderId, accessSettings }) => {
     setLoading(true);
     setError(null);
-console.log(accessSettings)
+
     try {
-      const { data } = await api.patch(`/files/${fileId}/access`, {
-        isPublic: accessSettings.isPublic,
-        sharedWithRoles: accessSettings.sharedWithRoles,
-        aclUpdates: accessSettings.userEmails?.map(email => ({
-          email,
-          role: 'viewer',
-          accessType: 'user'
-        })) || []
+      // 1. Prepare FormData for backend (which sends to Cloudinary)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folderId', folderId); // Optional, if backend uses it
+      formData.append('isPublic', accessSettings?.isPublic || false);
+      formData.append('sharedWithEmails', JSON.stringify(accessSettings?.userEmails || []));
+
+      // 2. Upload to backend → which handles multer + cloudinary upload
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData
       });
 
-      return data; // Returns updated file document
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error || 'Upload failed');
+
+      // 3. (Optional) Save file record to DB if backend didn’t already
+      const fileData = {
+        name: result.original_filename,
+        folderId,
+        cloudinaryId: result.public_id,
+        url: result.secure_url,
+        size: result.bytes,
+        mimeType: `${result.resource_type}/${result.format}`,
+        ...(accessSettings && {
+          isPublic: accessSettings.isPublic,
+          sharedWithRoles: accessSettings.sharedWithRoles,
+          sharedWithEmails: accessSettings.userEmails
+        })
+      };
+
+      const { data } = await api.post('/files/files/upload', fileData);
+
+      return data;
+
     } catch (e) {
       setError(e);
-      console.error("Failed to update access:", e);
+      console.error('Upload error:', e);
       throw e;
     } finally {
       setLoading(false);
     }
   }, []);
+
+
+  // NEW: Function to update file access
+ const updateFileAccess = useCallback(async (fileId, accessSettings) => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    console.log(fileId, "file id not null");
+
+    const { data } = await api.patch(`/files/files/${fileId}/access`, {
+      isPublic: accessSettings.isPublic,
+      aclUpdates: accessSettings.userEmails?.map(email => ({
+        email,
+        role: 'viewer',       // or 'editor', if you plan to support editing
+        accessType: 'user'    // You might expand this in the future for 'group' or 'link'
+      })) || []
+    });
+
+    return data; // Updated file doc from server
+  } catch (e) {
+    setError(e);
+    console.error("Failed to update access:", e);
+    throw e;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   // NEW: Function to get current access settings
   const getFileAccess = useCallback(async (fileId) => {

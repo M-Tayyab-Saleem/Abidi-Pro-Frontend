@@ -3,7 +3,7 @@ import { FiEye, FiDownload } from "react-icons/fi";
 
 const FileTable = ({files,onDownload,loading, searchTerm = "" }) => {
 
-console.log(files,"from component")
+// console.log(files,"from component")
   const filtered = files.filter((f) => {
     const s = searchTerm.toLowerCase();
     return (
@@ -42,7 +42,7 @@ console.log(files,"from component")
                     <button title="View" className="hover:brightness-110">
                       <FiEye className="text-lg text-purple-600" />
                     </button>
-                    <button title="Download" className="hover:brightness-110">
+                    <button onClick={()=>onDownload(file._id)} title="Download" className="hover:brightness-110">
                       <FiDownload className="text-lg text-green-600" />
                     </button>
                   </td>

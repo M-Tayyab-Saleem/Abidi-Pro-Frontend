@@ -25,7 +25,6 @@ const UploadDocument = () => {
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
   const [selectedFolderId, setSelectedFolderId] = useState(null)
   const [selectedFileId, setSelectedFileId] = useState(null)
-
 const [shareModalOpen, setShareModalOpen] = useState(false);
 const [currentFile, setCurrentFile] = useState(null);
 const [accessSettings, setAccessSettings] = useState({
@@ -63,6 +62,7 @@ const handleOpenAccessModal=()=>{
   const { softDelete: deleteFolder, loading: folderDeleteLoading, error: folderDeleteError } = useFolderDeleter()
   const { download, loading:downloadLoading, error:downloadError } = useFileDownloader()
   const toggleDrawer = (open) => () => setDrawerOpen(open)
+console.log(selectedFileId)
 
 
   const handleNewFolder = async () => {
@@ -189,7 +189,7 @@ async function downloadFile(url, filename = 'file.docx') {
 
   const handleCloseFileMenu = () => {
     setFileMenuAnchor(null)
-    setSelectedFileId(null)
+    // setSelectedFileId(null)
   }
 
   if (error) return <Alert message={error.message} type="error" />
@@ -281,24 +281,32 @@ async function downloadFile(url, filename = 'file.docx') {
           Cancel
         </button>
         <button
-         onClick={async () => {
+        onClick={async () => {
     try {
+       console.log(currentFile,"sdfffffffff")
       if (currentFile) {
         // For new file uploads
-        await handleFileChange(currentFile);
+       console.log("uploadign sdfsdfsdfsdfm")
+        await upload({ 
+          file: currentFile, 
+          folderId, 
+          folderPath, 
+          accessSettings 
+        });
         toast.success('File uploaded with access settings!');
       } else if (selectedFileId) {
         // For existing file permission updates
-        console.log("updating file access")
         await updateFileAccess(selectedFileId, accessSettings);
         toast.success('Access updated successfully');
       }
       setShareModalOpen(false);
       reload();
-      setCurrentFile(null);
     } catch (err) {
-      toast.error('Failed to update access');
+      toast.error('Failed to process file');
+      setShareModalOpen(false);
       console.error(err);
+    } finally {
+      // setCurrentFile(null);
     }
   }}
           className="px-4 py-2 bg-blue-500 text-white rounded"
