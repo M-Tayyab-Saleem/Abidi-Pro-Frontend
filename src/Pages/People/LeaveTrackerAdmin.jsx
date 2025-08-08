@@ -5,13 +5,16 @@ import { FaPlus } from "react-icons/fa";
 import HolidayTable from "../../Components/HolidayTable";
 import AddHolidayModal from "../../Components/AddHolidayModal";
 
-const LeaveTrackerAdmin = ({setIsOpen}) => {
+const LeaveTrackerAdmin = ({}) => {
   const [departmentLeaveRecord, setDepartmentLeaveRecord] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState({
     leaves: true,
     holidays: true
   });
+  const [isOpen, setIsOpen] = useState(false);
+
+
 
   const fetchLeaves = async () => {
     try {
@@ -171,11 +174,11 @@ const LeaveTrackerAdmin = ({setIsOpen}) => {
         </div>
 
         {/* Holiday Modal */}
-        {/* <AddHolidayModal 
+        <AddHolidayModal 
           isOpen={isOpen} 
           setIsOpen={setIsOpen} 
           onHolidayAdded={handleHolidayAdded}
-        /> */}
+        />
       </div>
     </div>
   );

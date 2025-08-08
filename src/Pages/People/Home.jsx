@@ -28,6 +28,7 @@ const Home = () => {
   const userInfo = useSelector((state) => state.auth.user);
   const profileImage = userInfo?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e";
   const firstName = userInfo?.name || "User";
+  const userId = userInfo?._id || userInfo?.id;
   const [loading, setLoading] = useState(true);
 
   const [time, setTime] = useState({
@@ -44,10 +45,10 @@ const Home = () => {
   useEffect(() => {
     const fetchDashboardCards = async () => {
       try {
-        if (!userInfo?._id) return;
+        if (!userId) return;
 
         setLoading(true);
-        const response = await api.get(`/users/${userInfo._id}/dashboard-cards`);
+        const response = await api.get(`/users/${userId}/dashboard-cards`);
         setCards(response.data);
       } catch (error) {
         console.error("Failed to fetch dashboard cards:", error);
@@ -58,7 +59,7 @@ const Home = () => {
     };
 
     fetchDashboardCards();
-  }, [userInfo?._id]);
+  }, [userId]);
 
   const addCard = async (type) => {
     try {
@@ -68,7 +69,7 @@ const Home = () => {
         return;
       }
 
-      const response = await api.post(`/users/${userInfo._id}/dashboard-cards/add`, { type });
+      const response = await api.post(`/users/${userId}/dashboard-cards/add`, { type });
       setCards(response.data);
       toast.success("Card added successfully");
     } catch (error) {
@@ -79,7 +80,7 @@ const Home = () => {
 
   const removeCard = async (cardId) => {
     try {
-      await api.delete(`/users/${userInfo._id}/dashboard-cards/${cardId}`);
+      await api.delete(`/users/${userId}/dashboard-cards/${cardId}`);
       setCards(cards.filter(c => c.id !== cardId));
       toast.success("Card removed successfully");
     } catch (error) {

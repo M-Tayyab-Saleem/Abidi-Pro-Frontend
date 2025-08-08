@@ -128,7 +128,7 @@ const LeaveTracker = () => {
           activeTab === 1 ? <LeaveRequest /> : null
         }
         {/* {
-          activeTab===2?<LeaveTrackerAdmin setIsOpen={setHolidayModal} key={adminRefresh} />:null          
+          activeTab===2 ?<LeaveTrackerAdmin isOpen={isOpen} setIsOpen={setHolidayModal} key={adminRefresh} />:null          
         } */}
 
 

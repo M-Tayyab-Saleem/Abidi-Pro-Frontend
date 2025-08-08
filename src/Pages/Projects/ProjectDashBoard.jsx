@@ -2,9 +2,18 @@ import React, { useEffect } from "react";
 import { BsFileEarmarkCheckFill } from "react-icons/bs";
 import { MdPeople } from "react-icons/md";
 import ProjectCard from "../../Components/ProjectCard";
-import ProjectDashboardCards from "../../Components/ProjectDashboardCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProjectDashboard } from "../../Store/projectSlice";
+import GreetingTimerCard from "../../Components/ProjectDashboardCards/GreetingTimerCard";
+import BarCard from "../../Components/ProjectDashboardCards/BarCard";
+import LineChartCard from "../../Components/ProjectDashboardCards/LineChartCard";
+import StatCard from "../../Components/ProjectDashboardCards/StatCard";
+import ProgressCard from "../../Components/ProjectDashboardCards/ProgressCard";
+import TasksAssignedToMeCard from "../../Components/ProjectDashboardCards/TasksAssignedToMe";
+import ActiveProjectsCard from "../../Components/ProjectDashboardCards/ActiveProjectsCard";
+import UpcomingDeadlinesCard from "../../Components/ProjectDashboardCards/UpcomingDeadlinesCard";
+import MyTeamMembersCard from "../../Components/ProjectDashboardCards/MyTeamMembersCard";
+import TimeTrackingOverviewCard from "../../Components/ProjectDashboardCards/TimeTrackingOverviewCard";
 
 const ProjectDashBoard = () => {
   const dispatch = useDispatch();
@@ -48,13 +57,11 @@ const ProjectDashBoard = () => {
   return (
     <div className="px-4 py-2">
       <div className="p-4 sm:p-8 rounded-xl bg-primary">
-        <div className="bg-white px-4 py-3 mb-4 font-semibold rounded-lg">
-          Project Dashboard
-        </div>
+        <GreetingTimerCard />
 
         <div className="mt-12 flex flex-wrap gap-4 sm:gap-6">
           {leaveData.map((item, index) => (
-            <div key={index} className="w-full sm:w-[48%] lg:w-[23%]">
+            <div key={index} className="w-full sm:w-[48%] lg:w-[23%] text-text">
               <ProjectCard
                 title={item.label}
                 value={item.available}
@@ -65,11 +72,25 @@ const ProjectDashBoard = () => {
           ))}
         </div>
 
-        <div className="mt-8">
-          <ProjectDashboardCards 
-            donutData={dashboardData?.donutChart} 
-            barData={dashboardData?.barChart} 
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
+          <div className="">
+            <ActiveProjectsCard />
+          </div>
+          <div className="">
+            <BarCard />
+          </div>
+          <div className="">
+            <TasksAssignedToMeCard />
+          </div>
+          <div className="">
+            <UpcomingDeadlinesCard />
+          </div>
+          <div className="">
+            <MyTeamMembersCard /> 
+          </div>
+          <div className="">
+            <TimeTrackingOverviewCard />  
+          </div>
         </div>
       </div>
     </div>
