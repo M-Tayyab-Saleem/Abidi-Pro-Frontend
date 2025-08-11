@@ -5,14 +5,17 @@ import { FaPlus } from "react-icons/fa";
 import HolidayTable from "../../Components/HolidayTable";
 import AddHolidayModal from "../../Components/AddHolidayModal";
 
-const LeaveTrackerAdmin = ({}) => {
+const LeaveTrackerAdmin = () => {
   const [departmentLeaveRecord, setDepartmentLeaveRecord] = useState([]);
   const [holidays, setHolidays] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+
+  
   const [loading, setLoading] = useState({
     leaves: true,
     holidays: true
   });
-  const [isOpen, setIsOpen] = useState(false);
 
 
 
@@ -162,7 +165,7 @@ const LeaveTrackerAdmin = ({}) => {
               onClick={() => setIsOpen(true)}
               className="flex items-center gap-2 bg-[#86B2AA] text-white text-sm px-4 py-2 rounded-md hover:brightness-110 w-full sm:w-auto"
             >
-              <FaPlus /> Add Holiday
+              <FaPlus /> Add Holidays
             </button>
           </div>
 
