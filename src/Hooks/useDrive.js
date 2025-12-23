@@ -151,11 +151,8 @@ export function useFileUploader() {
           sharedWithEmails: accessSettings.userEmails
         })
       };
-
       const { data } = await api.post('/files/files/upload', fileData);
-
       return data;
-
     } catch (e) {
       setError(e);
       console.error('Upload error:', e);
@@ -204,7 +201,7 @@ export function useFolderCreator() {
     try {
       const { data } = await api.post('/files/folders', { 
         name, 
-        parentId: parentId === 'root' ? null : parentId, // Handle 'root' case
+        parentId: parentId === 'root' ? null : parentId,
         ownerId 
       })
       console.log("Folder creation response:", data)

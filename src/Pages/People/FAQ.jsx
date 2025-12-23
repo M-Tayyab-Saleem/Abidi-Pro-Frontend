@@ -65,7 +65,7 @@ const FAQs = () => {
                       <ChevronDown className="h-4 w-4 text-gray-600" />
                     )}
                   </button>
-
+                  
                   {expandedFAQ === faq.title && faq.content && (
                     <div className="p-4 bg-white border-t border-gray-200 text-sm text-gray-600">
                       {faq.content}

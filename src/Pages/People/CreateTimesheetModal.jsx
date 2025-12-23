@@ -13,7 +13,6 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
   const [error, setError] = useState(null);
   const [fetchingLogs, setFetchingLogs] = useState(false);
 
-  // Format date as MM-DD-YYYY
   const formatDate = (date) => {
     const d = new Date(date);
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -118,7 +117,7 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
 
         <h2 className="text-2xl font-bold mb-4">Create Timesheet</h2>
 
-                {/* Today's Logs */}
+        {/* Today's Logs */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Today's Time Logs</h3>
           {fetchingLogs ? (
@@ -151,7 +150,6 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
             </ul>
           )}
         </div>
-
         {/* Timesheet Name - Readonly */}
         <div className="mb-4">
           <label className="block text-sm font-semibold mb-1">

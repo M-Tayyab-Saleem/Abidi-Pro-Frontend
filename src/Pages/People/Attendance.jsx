@@ -88,7 +88,7 @@ const Attendance = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchAttendanceData(weekStart);
-    }, 60000); // Refresh every minute to catch check-in/check-out updates
+    }, 60000);
     
     return () => clearInterval(interval);
   }, [weekStart]);

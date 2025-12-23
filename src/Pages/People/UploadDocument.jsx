@@ -52,7 +52,6 @@ const UploadDocument = () => {
   const data = useSelector((state) => state)
   const { user } = data?.auth || {}
   
-  // Current folder logic - start with 'root'
   const currentFolder = folderStack.length > 0 
     ? folderStack[folderStack.length - 1] 
     : { id: "root", name: "Root", _id: "root" }
@@ -83,7 +82,7 @@ const UploadDocument = () => {
     try {
       await create({ 
         name: folderName, 
-        parentId: folderId, // Use current folderId instead of null check
+        parentId: folderId,
         ownerId: user?._id 
       })
       setFolderName("")
@@ -110,7 +109,7 @@ const UploadDocument = () => {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('folderId', folderId) // Always send folderId
+      formData.append('folderId', folderId) 
       
       await upload(formData)
       toast.success('File uploaded successfully')
@@ -126,7 +125,7 @@ const handleSaveAccessSettings = async () => {
     if (currentFile) {
       const formData = new FormData();
       formData.append('file', currentFile);
-      formData.append('folderId', folderId); // Always send folderId
+      formData.append('folderId', folderId); 
       formData.append('isPublic', accessSettings.isPublic);
       formData.append('sharedWithRoles', JSON.stringify(accessSettings.sharedWithRoles));
       formData.append('userEmails', JSON.stringify(accessSettings.userEmails));

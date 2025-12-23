@@ -9,7 +9,7 @@ export const useTimeLog = () => useContext(TimeLogContext);
 
 export function TimeLogProvider({ children }) {
   const [elapsed, setElapsed] = useState(0);
-  const [localStart, setLocalStart] = useState(null); // Add local state for timer
+  const [localStart, setLocalStart] = useState(null);
   const intervalRef = useRef(null);
   const dispatch = useDispatch();
   const data = useSelector((state) => state);

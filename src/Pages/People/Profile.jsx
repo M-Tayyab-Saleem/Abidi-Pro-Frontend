@@ -19,7 +19,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -183,7 +182,7 @@ export default function Profile() {
           <p className="text-text truncate">{user.designation || user.role}</p>
         </div>
         <div className="flex flex-col min-w-0">
-          <p className="text-text">Reporting to</p>
+          <p className="text-text font-bold">Reporting to</p>
           <p className="font-medium text-text text-opacity-80 break-words">
             {user.reportsTo || "—"}
           </p>
@@ -203,7 +202,7 @@ export default function Profile() {
               <item.icon className={`h-5 w-5 ${item.iconColor}`} />
             </div>
             <div>
-              <div className="text-sm font-medium text-text">{item.label}</div>
+              <div className="text-sm text-text font-bold">{item.label}</div>
               <div className="text-sm text-text">{item.value}</div>
             </div>
           </div>

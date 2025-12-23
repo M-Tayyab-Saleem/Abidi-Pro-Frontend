@@ -3,7 +3,7 @@ import { IoClose } from "react-icons/io5";
 import timeLogApi from "../../api/timeLogApi";
 import { toast } from "react-toastify";
 
-const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded  }) => {
+const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
   const [jobTitle, setJobTitle] = useState("");
   const [customJobTitle, setCustomJobTitle] = useState("");
   const [date, setDate] = useState("");
@@ -50,60 +50,60 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded  }) => {
     }
   };
 
-const handleSave = async () => {
-  setIsLoading(true);
-  try {
-    const payload = 
-      logs.length > 0
-        ? logs.map(log => ({
-            job: log.jobTitle,
-            date: log.date,
-            hours: log.hours,
-            description: log.description,
-            attachments: log.attachment ? [log.attachment] : [],
-          }))
-        : [
-            {
-              job: finalJobTitle,
-              date,
-              hours: parseFloat(hours),
-              description: description.trim(),
-              attachments: attachment ? [attachment] : [],
-            },
-          ];
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      const payload =
+        logs.length > 0
+          ? logs.map((log) => ({
+              job: log.jobTitle,
+              date: log.date,
+              hours: log.hours,
+              description: log.description,
+              attachments: log.attachment ? [log.attachment] : [],
+            }))
+          : [
+              {
+                job: finalJobTitle,
+                date,
+                hours: parseFloat(hours),
+                description: description.trim(),
+                attachments: attachment ? [attachment] : [],
+              },
+            ];
 
-    // Create each time log
-    for (const log of payload) {
-      const formData = new FormData();
-      formData.append('job', log.job);
-      formData.append('date', log.date);
-      formData.append('hours', log.hours);
-      formData.append('description', log.description);
-      if (log.attachments && log.attachments.length > 0) {
-        formData.append('attachments', log.attachments[0]);
+      // Create each time log
+      for (const log of payload) {
+        const formData = new FormData();
+        formData.append("job", log.job);
+        formData.append("date", log.date);
+        formData.append("hours", log.hours);
+        formData.append("description", log.description);
+        if (log.attachments && log.attachments.length > 0) {
+          formData.append("attachments", log.attachments[0]);
+        }
+
+        await timeLogApi.createTimeLog(formData);
       }
 
-      await timeLogApi.createTimeLog(formData);
+      // Clear form and close modal
+      setLogs([]);
+      setJobTitle("");
+      setCustomJobTitle("");
+      setDate("");
+      setHours("");
+      setDescription("");
+      setAttachment(null);
+      toast.success("Time log(s) added successfully!");
+      onTimeLogAdded(); // This should trigger a refetch in parent
+      onClose();
+    } catch (error) {
+      console.error("Failed to save time log:", error);
+      toast.error(error.response?.data?.message || "Failed to save time log");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Clear form and close modal
-    setLogs([]);
-    setJobTitle("");
-    setCustomJobTitle("");
-    setDate("");
-    setHours("");
-    setDescription("");
-    setAttachment(null);
-    toast.success("Time log(s) added successfully!");
-    onTimeLogAdded(); // This should trigger a refetch in parent
-    onClose();
-  } catch (error) {
-    console.error("Failed to save time log:", error);
-    toast.error(error.response?.data?.message || "Failed to save time log");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   return (
     <>
@@ -138,7 +138,9 @@ const handleSave = async () => {
         >
           {/* Job Title */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Job Title</label>
+            <label className="block text-sm font-semibold mb-1">
+              Job Title
+            </label>
             <select
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
@@ -202,7 +204,9 @@ const handleSave = async () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Description</label>
+            <label className="block text-sm font-semibold mb-1">
+              Description
+            </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -218,7 +222,9 @@ const handleSave = async () => {
 
           {/* Attachment */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Attachment</label>
+            <label className="block text-sm font-semibold mb-1">
+              Attachment
+            </label>
             <input
               type="file"
               onChange={(e) => setAttachment(e.target.files[0])}
@@ -285,17 +291,21 @@ const handleSave = async () => {
           >
             Cancel
           </button>
-<button
-  onClick={handleSave}
-  disabled={(!isCurrentInputValid && logs.length === 0) || isLoading}
-  className={`px-4 py-2 rounded-lg ${
-    (!isCurrentInputValid && logs.length === 0) || isLoading
-      ? "bg-blue-300 cursor-not-allowed"
-      : "bg-blue-500 hover:bg-blue-600"
-  } text-white`}
->
-  {isLoading ? "Saving..." : (logs.length > 0 ? "Save All Logs" : "Save Log")}
-</button>
+          <button
+            onClick={handleSave}
+            disabled={(!isCurrentInputValid && logs.length === 0) || isLoading}
+            className={`px-4 py-2 rounded-lg ${
+              (!isCurrentInputValid && logs.length === 0) || isLoading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            } text-white`}
+          >
+            {isLoading
+              ? "Saving..."
+              : logs.length > 0
+              ? "Save All Logs"
+              : "Save Log"}
+          </button>
         </div>
       </div>
     </>

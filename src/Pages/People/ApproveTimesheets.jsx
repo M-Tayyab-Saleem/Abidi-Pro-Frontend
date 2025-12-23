@@ -100,7 +100,6 @@ const ApproveTimesheets = () => {
   };
 
   const handleDownloadAttachment = (attachment) => {
-    // Implement download logic here
     window.open(attachment.url, '_blank');
   };
 

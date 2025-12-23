@@ -17,7 +17,6 @@ const ViewTimeLogModal = ({ log: propLog, onClose }) => {
   if (!log) return null;
 
 
-
   const getDownloadLink = (fileName) => {
     return `/uploads/${fileName}`;
   };

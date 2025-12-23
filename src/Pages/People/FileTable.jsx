@@ -7,11 +7,10 @@ const FileTable = ({files,onDownload,loading, searchTerm = "" }) => {
   const filtered = files.filter((f) => {
     const s = searchTerm.toLowerCase();
     return (
-      // f.fileName.toLowerCase().includes(s) ||
-      // f.sharedBy.toLowerCase().includes(s) ||
-      // f.category.toLowerCase().includes(s)
-      true
-    );
+      f.fileName.toLowerCase().includes(s) ||
+      f.sharedBy.toLowerCase().includes(s) ||
+      f.category.toLowerCase().includes(s)
+    )
   });
 
   return (
