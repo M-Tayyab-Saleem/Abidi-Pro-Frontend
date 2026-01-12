@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
-import { Navbar, MobileNav, IconButton, Button } from "@material-tailwind/react";
+import { Navbar, MobileNav, IconButton, Button , Collapse} from "@material-tailwind/react";
 import { CalendarDaysIcon, PhoneIcon } from "@heroicons/react/24/outline";
 import { moduleConfigs } from "../routeConfig";
 import { useTimeLog } from "../Pages/People/TimeLogContext";
@@ -154,7 +154,7 @@ const SubNavbar = ({ onAddTimeLog, activeTab, onCreateTimesheet }) => {
         }}
       />
 
-      <MobileNav open={openNav}>
+      <Collapse open={openNav}>
         <div className="flex flex-col gap-4 mt-5">
           {navLinks}
           <div className="items-center space-x-4">
@@ -180,7 +180,7 @@ const SubNavbar = ({ onAddTimeLog, activeTab, onCreateTimesheet }) => {
             )}
           </div>
         </div>
-      </MobileNav>
+      </Collapse>
     </Navbar>
   );
 };
