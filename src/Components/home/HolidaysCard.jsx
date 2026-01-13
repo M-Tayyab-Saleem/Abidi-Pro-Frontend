@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FiMoreVertical, FiTrash2, FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiTrash2 } from "react-icons/fi";
 import { LuMoonStar } from "react-icons/lu";
 import { BsStars } from "react-icons/bs";
 import { FaTree } from "react-icons/fa";
 import holidayApi from '../../api/holidayApi';
 
 const HolidaysCard = ({ onDelete }) => {
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,82 +80,43 @@ const HolidaysCard = ({ onDelete }) => {
   }
 
   return (
-    <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 overflow-visible w-full">
-      {/* Floating icon (top-left) */}
-      <div className="absolute -top-4 left-4 bg-orange-100 text-orange-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
-        <FiCalendar className="text-xl" />
-      </div>
-
+    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h2 className="text-lg text-text font-semibold">Holidays</h2>
-          <p className="text-sm text-cardDescription font-medium cursor-pointer">
-            Upcoming Holidays
-          </p>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <FiCalendar className="w-3 h-3 text-orange-600" />
+            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Holidays</h3>
+          </div>
+          <p className="text-[9px] font-medium text-slate-500">Upcoming</p>
         </div>
 
-        {/* Dropdown menu */}
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
-          >
-            <FiMoreVertical className="h-5 w-5 text-gray-600" />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
-              <button
-                onClick={() => {
-                  onDelete();
-                  setMenuOpen(false);
-                }}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-              >
-                <FiTrash2 className="w-4 h-4 mr-2" />
-                Delete Card
-              </button>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={onDelete}
+          className="text-[8px] text-slate-500 hover:text-red-500 font-medium px-1.5 py-0.5 rounded-[0.6rem] hover:bg-red-50 transition"
+        >
+          Remove
+        </button>
       </div>
 
       {/* Holiday list */}
-      <ul className="space-y-2 text-sm">
-        {upcomingHolidays.length > 0 ? (
-          upcomingHolidays.map((holiday, index) => (
-            <li
-              key={index}
-              style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
-              className="flex items-center bg-primary rounded p-2 gap-3"
-            >
-              {/* Dynamic Icon */}
-              <div
-                className={`w-10 h-10 flex items-center justify-center rounded ${getHolidayColor(holiday.holidayType)} text-lg`}
-              >
-                {getHolidayIcon(holiday.holidayType)}
+      <ul className="space-y-1.5 text-[9px]">
+        {holidays.slice(0, 3).map((holiday, index) => (
+          <li
+            key={index}
+            className="flex items-center bg-[#E0E5EA]/30 rounded-[0.6rem] p-1.5 gap-2"
+          >
+            <div className={`w-6 h-6 flex items-center justify-center rounded ${getHolidayColor(holiday.holidayType)}`}>
+              {getHolidayIcon(holiday.holidayType)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-slate-700 truncate text-[8px]">{holiday.holidayName}</div>
+              <div className="text-[7px] text-slate-500 truncate">
+                {new Date(holiday.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </div>
-
-              {/* Info */}
-              <div>
-                <div className="font-semibold text-text">{holiday.holidayName}</div>
-                <div className="text-xs text-text">
-                  {new Date(holiday.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}{' '}
-                  <span className="text-gray-400">|</span> {holiday.day}
-                </div>
-              </div>
-            </li>
-          ))
-        ) : (
-          <div className="text-center text-gray-500 py-2">
-            No upcoming holidays
-          </div>
-        )}
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );

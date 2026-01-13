@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardBody } from "@material-tailwind/react";
 import FeedsCard from "../../Components/home/FeedsCard";
 import AttendanceCard from "../../Components/home/AttendanceCard";
 import HolidaysCard from "../../Components/home/HolidaysCard";
@@ -144,7 +143,6 @@ const Home = () => {
     }
   };
 
-
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -163,74 +161,79 @@ const Home = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-3 text-gray-600">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-slate-600 mx-auto"></div>
+          <p className="mt-2 text-slate-600 text-[10px] font-medium uppercase tracking-wide">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <Card className="relative flex flex-col bg-clip-border rounded-xl text-gray-700 overflow-hidden bg-primary p-5 border m-4 shadow-sm min-h-[700px] border-none">
-      <CardBody className="bg-background rounded-lg border-0 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 sm:p-5 md:p-6">
-        {/* Greeting */}
-        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-          {profileImage ? (
-            <img
-              src={profileImage}
-              alt={firstName}
-              className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full object-cover"
-            />
-          ) : (
-            <div className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full bg-teal-500 text-white flex items-center justify-center text-sm sm:text-base md:text-xl font-bold">
-              {firstName.charAt(0).toUpperCase()}
+    <div className="w-full bg-transparent p-2">
+      {/* Header Card with consistent styling */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 mb-3 p-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+          {/* Greeting */}
+          <div className="flex items-center gap-2 min-w-0">
+            {profileImage ? (
+              <img
+                src={profileImage}
+                alt={firstName}
+                className="h-8 w-8 rounded-full object-cover border border-white shadow-sm"
+              />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-[#E0E5EA] text-slate-700 flex items-center justify-center text-xs font-bold border border-white shadow-sm">
+                {firstName.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <div className="truncate">
+              <h2 className="text-sm font-bold text-slate-800 truncate uppercase tracking-tight">
+                Hey, {firstName}!
+              </h2>
+              <p className="text-slate-500 text-[9px] font-medium uppercase tracking-wide">Have a great day</p>
             </div>
-          )}
-
-          <div className="truncate">
-            <h2 className="text-lg sm:text-xl text-heading font-semibold truncate">
-              Hey, {firstName}!
-            </h2>
-            <p className="text-description text-sm">Have a great day</p>
           </div>
-        </div>
 
-        {/* Clock */}
-        <div className="flex items-center gap-2 sm:gap-4">
+          {/* Clock with navbar colors */}
           <div className="flex items-center gap-1">
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
-              {h}
-            </div>
-            <div className="text-base sm:text-lg font-bold">:</div>
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
-              {m}
-            </div>
-            <div className="text-base sm:text-lg font-bold">:</div>
-            <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 sm:py-2 rounded font-semibold text-base sm:text-lg">
-              {s}
+            <div className="flex items-center gap-0.5">
+              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
+                {h}
+              </div>
+              <div className="text-xs font-bold text-slate-800">:</div>
+              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
+                {m}
+              </div>
+              <div className="text-xs font-bold text-slate-800">:</div>
+              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
+                {s}
+              </div>
             </div>
           </div>
         </div>
-      </CardBody>
+      </div>
 
-      {/* Menu */}
-      <div className="mt-4 text-end">
+      {/* Menu with consistent spacing */}
+      <div className="mb-3 text-end">
         <AddCardMenu onAdd={addCard} />
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
+      {/* Cards Grid with proper spacing */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {cards.length > 0 ? (
           cards.map(renderCard)
         ) : (
-          <div className="col-span-full text-center py-10">
-            <p className="text-gray-500">No cards added yet. Click "More" to add cards to your dashboard.</p>
+          <div className="col-span-full">
+            <div className="bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-4 text-center">
+              <p className="text-slate-500 text-[10px] font-medium uppercase tracking-wide">No cards added yet. Click "More" to add cards to your dashboard.</p>
+            </div>
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
 

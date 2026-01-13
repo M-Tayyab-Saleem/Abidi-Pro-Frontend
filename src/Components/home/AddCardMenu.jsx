@@ -8,10 +8,10 @@ const cardOptions = [
   { id: "todo", label: "To-Do" },
   { id: "notes", label: "Notes"},
   { id: "recent activities", label: "Recent activities"},
-  { id: "birthdays", label: "Upcoming Birthdays"},
+  { id: "birthdays", label: "Birthdays"},
   { id: "leavelog", label: "Leave Logs"},
   { id: "upcomingDeadlines", label: "Deadlines"},
-  { id: "timeoffBalance", label: "Time Off Balance"},
+  { id: "timeoffBalance", label: "Time Off"},
   { id: "tasksAssignedToMe", label: "My Tasks"},
 ];
 
@@ -32,19 +32,19 @@ const AddCardMenu = ({ onAdd }) => {
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
-      {/* Button with text + icon */}
+      {/* Button with navbar styling */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-3 py-2 rounded-md bg-white border border-gray-300 hover:bg-gray-100 transition text-sm text-gray-700 font-medium"
+        className="flex items-center gap-1 px-2 py-1.5 rounded-[0.8rem] bg-white/80 border border-white/40 hover:bg-white/90 transition text-[10px] font-bold text-slate-700 uppercase tracking-wide shadow-sm"
       >
         More
-        <EllipsisVerticalIcon className="h-5 w-5 text-gray-600" />
+        <EllipsisVerticalIcon className="h-3 w-3 text-slate-600" />
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown with navbar styling */}
       {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg ring-1 ring-black/5 z-50">
-          <ul className="py-1 text-sm text-gray-700">
+        <div className="absolute right-0 mt-1 w-32 bg-white/90 backdrop-blur-md rounded-[0.8rem] shadow-lg border border-white/40 z-50">
+          <ul className="py-1 text-[9px] text-slate-700">
             {cardOptions.map((option) => (
               <li
                 key={option.id}
@@ -52,7 +52,7 @@ const AddCardMenu = ({ onAdd }) => {
                   onAdd(option.id);
                   setOpen(false);
                 }}
-                className="px-4 py-2 cursor-pointer hover:bg-gray-100 transition"
+                className="px-3 py-1.5 cursor-pointer hover:bg-[#E0E5EA]/50 transition font-medium uppercase tracking-tight"
               >
                 {option.label}
               </li>

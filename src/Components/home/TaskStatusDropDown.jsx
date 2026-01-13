@@ -13,9 +13,9 @@ const TaskStatusDropDown = ({ status, onChange }) => {
 
   const statusColor = {
     Completed: 'bg-green-100 text-green-800',
-    InProgress: 'bg-slate-500 text-white',
-    Hold: 'bg-red-500 text-white',
-    UnderReview: 'bg-yellow-500 text-white',
+    InProgress: 'bg-slate-200 text-slate-800',
+    Hold: 'bg-red-100 text-red-800',
+    UnderReview: 'bg-amber-100 text-amber-800',
   };
 
   return (
@@ -26,15 +26,14 @@ const TaskStatusDropDown = ({ status, onChange }) => {
           e.stopPropagation();
           toggleDropdown();
         }}
-        className={`w-full h-full flex items-center justify-center whitespace-nowrap cursor-pointer px-3 py-1 rounded-sm ${statusColor[status] || 'bg-slate-500 text-white'}`}
+        className={`w-full h-full flex items-center justify-center whitespace-nowrap cursor-pointer px-2 py-1 rounded-[0.4rem] text-[9px] font-medium ${statusColor[status] || 'bg-slate-200 text-slate-800'}`}
       >
         {status}
       </div>
 
       {/* Dropdown */}
       {isOpen && (
-        
-        <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded shadow-lg z-10  overflow-visible">
+        <div className="absolute mt-1 w-full bg-white border border-slate-200 rounded-[0.6rem] shadow-md z-10 overflow-visible">
           {statuses.map((s) => (
             <div
               key={s}
@@ -42,7 +41,7 @@ const TaskStatusDropDown = ({ status, onChange }) => {
                 e.stopPropagation();
                 handleStatusChange(s);
               }}
-              className="w-full px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="w-full px-2 py-1.5 hover:bg-slate-50 cursor-pointer text-[9px] text-slate-700"
             >
               {s}
             </div>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { GoGraph } from "react-icons/go";
-import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import api from "../../axios";
 import { toast } from "react-toastify";
 
 const AttendanceCard = ({ onDelete }) => {
   const [weeklyData, setWeeklyData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const maxBarHeight = 100;
+  const maxBarHeight = 60;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -111,70 +111,49 @@ const processWeeklyData = (attendanceData, weekStart) => {
   const totalHours = weeklyData.reduce((sum, val) => sum + val.hours, 0);
 
   return (
-    <div className="w-full max-w-md mx-auto bg-background rounded-2xl shadow p-4 sm:p-6 relative">
-      {/* Top Icon */}
-      <div className="absolute -top-5 left-5 bg-blue-200 text-green-800 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
-        <GoGraph />
-      </div>
-
+    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h2 className="text-lg mt-5 text-text font-semibold">Weekly Attendance</h2>
-          <p className="text-cardDescription text-sm font-medium">{totalHours} total hours</p>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <GoGraph className="w-3 h-3 text-blue-600" />
+            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Weekly Attendance</h3>
+          </div>
+          <p className="text-[9px] font-medium text-slate-500">{totalHours} total hours</p>
         </div>
 
-        {/* Custom Dropdown Menu */}
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
-          >
-            <EllipsisVerticalIcon className="h-5 w-5 text-gray-600" />
-          </button>
-
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
-              <button
-                onClick={() => {
-                  onDelete?.();
-                  setMenuOpen(false);
-                }}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-              >
-                <TrashIcon className="w-4 h-4 mr-2" />
-                Delete Card
-              </button>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={onDelete}
+          className="text-[8px] text-slate-500 hover:text-red-500 font-medium px-1.5 py-0.5 rounded-[0.6rem] hover:bg-red-50 transition"
+        >
+          Remove
+        </button>
       </div>
 
       {/* Bar Chart */}
-      <div className="bg-primary to-indigo-100 rounded-xl px-2 py-4 sm:px-4"
-      style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}>
-        <div className="flex items-end justify-between h-36 sm:h-44 gap-2 sm:gap-3">
+      <div className="bg-[#E0E5EA]/30 rounded-[0.8rem] p-1.5">
+        <div className="flex items-end justify-between h-16 gap-1">
           {weeklyData.map(({ day, hours, status }, i) => {
-            let color = "bg-gray-300";
+            let color = "bg-slate-300";
             if (status === 'Absent') color = "bg-red-500";
-            else if (status === 'Present' && hours >= 7) color = "bg-green-600";
+            else if (status === 'Present' && hours >= 7) color = "bg-green-500";
             else if (status === 'Half Day') color = "bg-yellow-500";
-            else if (status === 'Present') color = "bg-indigo-400";
-            else if (status === 'Upcoming') color = "bg-gray-300";
+            else if (status === 'Present') color = "bg-blue-400";
+            else if (status === 'Upcoming') color = "bg-slate-300";
 
             const barHeight = Math.min((hours / 10) * maxBarHeight, maxBarHeight);
 
             return (
               <div key={i} className="flex flex-col items-center justify-end flex-1">
                 <div
-                  className={`w-2 sm:w-3 ${color} rounded transition-all duration-300`}
+                  className={`w-1.5 ${color} rounded transition-all duration-300`}
                   style={{ height: `${barHeight}px` }}
                 ></div>
-                <div className="mt-1 text-center leading-tight">
-                  <span className="block text-[10px] sm:text-xs font-semibold text-text">
+                <div className="mt-0.5 text-center leading-tight">
+                  <span className="block text-[7px] font-semibold text-slate-700">
                     {day}
                   </span>
-                  <span className="block text-[10px] sm:text-xs text-heading">
+                  <span className="block text-[6px] text-slate-600">
                     {status === 'Upcoming' ? '-' : `${hours}h`}
                   </span>
                 </div>

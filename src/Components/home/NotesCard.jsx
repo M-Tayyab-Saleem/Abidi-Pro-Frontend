@@ -5,6 +5,7 @@ import {
   FiCheck,
   FiMoreVertical,
   FiEdit,
+  FiPlus,
 } from "react-icons/fi";
 
 const NotesCard = ({ onDelete }) => {
@@ -15,7 +16,6 @@ const NotesCard = ({ onDelete }) => {
   const [newNote, setNewNote] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editingText, setEditingText] = useState("");
-
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -52,40 +52,38 @@ const NotesCard = ({ onDelete }) => {
   };
 
   return (
-    <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
-      {/* Floating Icon (replaces emoji) */}
-      <div className="absolute -top-4 left-4 bg-yellow-100 text-yellow-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
-        <FiEdit className="text-xl" />
-      </div>
-
+    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3 w-full">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h2 className="text-heading font-semibold">Notes</h2>
-          <p className="text-sm text-cardDescription">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <FiEdit className="w-3 h-3 text-amber-600" />
+            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Notes</h3>
+          </div>
+          <p className="text-[9px] font-medium text-slate-500">
             Write and edit personal notes
           </p>
         </div>
 
-        {/* Dropdown menu */}
+        {/* 3-dot Menu */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
+            className="p-1 rounded-[0.4rem] hover:bg-slate-100 transition"
           >
-            <FiMoreVertical className="h-5 w-5 text-gray-600" />
+            <FiMoreVertical className="h-3 w-3 text-slate-600" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
+            <div className="absolute right-0 mt-1 w-28 bg-white shadow-md border border-slate-200 rounded-[0.6rem] z-50">
               <button
                 onClick={() => {
                   onDelete();
                   setMenuOpen(false);
                 }}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                className="flex items-center w-full px-3 py-1.5 text-[9px] text-red-500 hover:bg-red-50 font-medium"
               >
-                <FiTrash2 className="w-4 h-4 mr-2" />
+                <FiTrash2 className="w-2.5 h-2.5 mr-1.5" />
                 Delete Card
               </button>
             </div>
@@ -94,10 +92,10 @@ const NotesCard = ({ onDelete }) => {
       </div>
 
       {/* Add Note Input */}
-      <div className="flex flex-col sm:flex-row mb-4 gap-2">
+      <div className="flex flex-col mb-2 gap-1.5">
         <input
           type="text"
-          className="flex-1 border px-3 py-2 rounded text-sm"
+          className="flex-1 border border-slate-300 px-2 py-1.5 rounded-[0.6rem] text-[9px] bg-white"
           placeholder="Write a note..."
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
@@ -105,25 +103,25 @@ const NotesCard = ({ onDelete }) => {
         />
         <button
           onClick={addNote}
-          className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-200 transition mt-2 sm:mt-0 sm:ml-2"
+          className="bg-blue-100 text-blue-700 px-2 py-1 rounded-[0.6rem] text-[9px] font-medium hover:bg-blue-200 transition flex items-center justify-center gap-1"
         >
+          <FiPlus className="w-2.5 h-2.5" />
           Add
         </button>
       </div>
 
       {/* Notes List */}
-      <ul className="space-y-3 text-sm">
+      <ul className="space-y-1.5 text-[9px]">
         {notes.map((note) => (
           <li
             key={note.id}
-            style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
-            className="bg-primary p-3 rounded flex justify-between items-start gap-3"
+            className="bg-[#E0E5EA]/30 p-2 rounded-[0.6rem] flex justify-between items-start gap-2"
           >
             <div className="flex-1">
               {editingId === note.id ? (
                 <input
                   type="text"
-                  className="w-full border rounded px-2 py-1 text-sm"
+                  className="w-full border border-slate-300 rounded-[0.4rem] px-2 py-1 text-[9px] bg-white"
                   value={editingText}
                   autoFocus
                   onChange={(e) => setEditingText(e.target.value)}
@@ -132,7 +130,7 @@ const NotesCard = ({ onDelete }) => {
                 />
               ) : (
                 <p
-                  className="text-text cursor-pointer"
+                  className="text-slate-700 cursor-pointer"
                   onClick={() => startEditing(note)}
                 >
                   {note.text}
@@ -140,30 +138,30 @@ const NotesCard = ({ onDelete }) => {
               )}
             </div>
 
-            <div className="flex flex-col gap-2 items-end">
+            <div className="flex gap-1 items-end">
               {editingId !== note.id ? (
                 <button
                   onClick={() => startEditing(note)}
-                  className="bg-green-100 text-green-700 p-1 rounded hover:bg-green-200"
+                  className="bg-green-100 text-green-700 p-1 rounded-[0.4rem] hover:bg-green-200"
                   title="Edit"
                 >
-                  <FiEdit2 className="h-4 w-4" />
+                  <FiEdit2 className="h-2.5 w-2.5" />
                 </button>
               ) : (
                 <button
                   onClick={() => saveEdit(note.id)}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-blue-600 hover:text-blue-800 p-1"
                   title="Save"
                 >
-                  <FiCheck className="h-4 w-4" />
+                  <FiCheck className="h-2.5 w-2.5" />
                 </button>
               )}
               <button
                 onClick={() => removeNote(note.id)}
-                className="bg-red-100 text-red-600 p-1 rounded hover:bg-red-200"
+                className="bg-red-100 text-red-600 p-1 rounded-[0.4rem] hover:bg-red-200"
                 title="Delete"
               >
-                <FiTrash2 className="h-4 w-4" />
+                <FiTrash2 className="h-2.5 w-2.5" />
               </button>
             </div>
           </li>

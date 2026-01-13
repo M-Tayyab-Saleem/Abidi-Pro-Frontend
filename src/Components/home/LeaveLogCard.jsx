@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiMoreVertical, FiTrash2, FiCalendar } from "react-icons/fi";
-import { FaUmbrellaBeach } from "react-icons/fa";
+import { FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FaUmbrellaBeach as BeachIcon } from "react-icons/fa";
 import api from "../../axios";
 
 const LeaveLogCard = ({ onDelete }) => {
@@ -20,7 +20,7 @@ const LeaveLogCard = ({ onDelete }) => {
             type: item.leaveType,
             status: item.status || "Pending",
           }))
-          .slice(0, 3); // Get only the first 3 leave requests
+          .slice(0, 3);
         setLeaveLogs(formattedData);
       } catch (error) {
         console.error("Failed to fetch leave logs:", error);
@@ -44,53 +44,47 @@ const LeaveLogCard = ({ onDelete }) => {
 
   if (loading) {
     return (
-      <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
-        <div className="absolute -top-4 left-4 bg-blue-100 text-blue-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-90 text-lg">
-          <FaUmbrellaBeach className="text-xl" />
+      <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3 w-full">
+        <div className="flex items-center gap-1.5 mb-2">
+          <BeachIcon className="w-3 h-3 text-blue-600" />
+          <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Leave Logs</h3>
         </div>
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-lg font-semibold text-heading">Leave Logs</h2>
-            <p className="text-sm text-cardDescription">Loading leave history...</p>
-          </div>
-        </div>
+        <p className="text-[9px] font-medium text-slate-500">Loading leave history...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 w-full">
-      {/* Floating Icon */}
-      <div className="absolute -top-4 left-4 bg-blue-100 text-blue-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-90 text-lg">
-        <FaUmbrellaBeach className="text-xl" />
-      </div>
-
+    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3 w-full">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h2 className="text-lg font-semibold text-heading">Leave Logs</h2>
-          <p className="text-sm text-cardDescription">Track your leave history</p>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <BeachIcon className="w-3 h-3 text-blue-600" />
+            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Leave Logs</h3>
+          </div>
+          <p className="text-[9px] font-medium text-slate-500">Track your leave history</p>
         </div>
 
-        {/* Dropdown */}
+        {/* 3-dot Menu */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
+            className="p-1 rounded-[0.4rem] hover:bg-slate-100 transition"
           >
-            <FiMoreVertical className="h-5 w-5 text-gray-600" />
+            <FiMoreVertical className="h-3 w-3 text-slate-600" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
+            <div className="absolute right-0 mt-1 w-28 bg-white shadow-md border border-slate-200 rounded-[0.6rem] z-50">
               <button
                 onClick={() => {
                   onDelete();
                   setMenuOpen(false);
                 }}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                className="flex items-center w-full px-3 py-1.5 text-[9px] text-red-500 hover:bg-red-50 font-medium"
               >
-                <FiTrash2 className="w-4 h-4 mr-2" />
+                <FiTrash2 className="w-2.5 h-2.5 mr-1.5" />
                 Delete Card
               </button>
             </div>
@@ -99,28 +93,27 @@ const LeaveLogCard = ({ onDelete }) => {
       </div>
 
       {/* Leave Logs */}
-      <ul className="space-y-2 text-sm">
+      <ul className="space-y-1.5 text-[9px]">
         {leaveLogs.length > 0 ? (
           leaveLogs.map((log, index) => (
             <li
               key={index}
-              style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
-              className={`p-3 rounded flex justify-between items-center`}
+              className="bg-[#E0E5EA]/30 rounded-[0.6rem] p-2 flex justify-between items-center"
             >
               <div className="flex flex-col">
-                <span className="font-semibold text-text">{log.name}</span>
-                <span className="text-xs text-description">{log.date}</span>
+                <span className="font-semibold text-slate-700">{log.name}</span>
+                <span className="text-[8px] text-slate-500">{log.date}</span>
               </div>
-              <div className="flex flex-col text-right text-xs">
-                <span className="font-medium text-text">{log.type}</span>
+              <div className="flex flex-col text-right text-[8px]">
+                <span className="font-medium text-slate-700">{log.type}</span>
                 <span
                   className={`${
                     log.status === "Approved"
-                      ? "text-green-700"
+                      ? "text-green-600"
                       : log.status === "Rejected"
-                      ? "text-red-700"
-                      : "text-yellow-800"
-                  }`}
+                      ? "text-red-600"
+                      : "text-amber-600"
+                  } font-medium`}
                 >
                   {log.status}
                 </span>
@@ -128,7 +121,7 @@ const LeaveLogCard = ({ onDelete }) => {
             </li>
           ))
         ) : (
-          <li className="p-3 text-center text-sm text-gray-500">
+          <li className="p-2 text-center text-[9px] text-slate-500">
             No leave records found
           </li>
         )}

@@ -14,7 +14,6 @@ const TimeoffBalanceCard = ({ onDelete, userId }) => {
         const response = await axios.get(`/users/${userId}/leaves`);
         const leaves = response.data;
         
-        // Create the data structure with fallback values for each leave type
         const leaveTypes = [
           {
             type: "Paid Leave",
@@ -33,7 +32,6 @@ const TimeoffBalanceCard = ({ onDelete, userId }) => {
         setTimeOffData(leaveTypes);
       } catch (error) {
         console.error("Error fetching leaves:", error);
-        // Fallback data if API fails
         setTimeOffData([
           {
             type: "Paid Leave",
@@ -67,44 +65,50 @@ const TimeoffBalanceCard = ({ onDelete, userId }) => {
   }, []);
 
   if (loading) {
-    return <div className="bg-background rounded-xl shadow-md p-5 pt-10">Loading...</div>;
+    return (
+      <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
+        <div className="flex items-center gap-1.5 mb-2">
+          <FiCalendar className="w-3 h-3 text-blue-600" />
+          <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Available Leaves</h3>
+        </div>
+        <p className="text-[9px] font-medium text-slate-500">Loading...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 overflow-visible">
-      {/* Icon top left */}
-      <div className="absolute -top-4 left-4 bg-blue-200 text-blue-800 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
-        <FiCalendar className="text-xl" />
-      </div>
-
+    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h2 className="text-lg text-text font-semibold">Available Leaves</h2>
-          <p className="text-cardDescription text-sm font-medium">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <FiCalendar className="w-3 h-3 text-blue-600" />
+            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Available Leaves</h3>
+          </div>
+          <p className="text-[9px] font-medium text-slate-500">
             Updated leave availability
           </p>
         </div>
 
-        {/* Dropdown */}
+        {/* 3-dot Menu */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 transition"
+            className="p-1 rounded-[0.4rem] hover:bg-slate-100 transition"
           >
-            <FiMoreVertical className="h-5 w-5 text-gray-600" />
+            <FiMoreVertical className="h-3 w-3 text-slate-600" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-md z-50">
+            <div className="absolute right-0 mt-1 w-28 bg-white shadow-md border border-slate-200 rounded-[0.6rem] z-50">
               <button
                 onClick={() => {
                   onDelete();
                   setMenuOpen(false);
                 }}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                className="flex items-center w-full px-3 py-1.5 text-[9px] text-red-500 hover:bg-red-50 font-medium"
               >
-                <FiTrash2 className="w-4 h-4 mr-2" />
+                <FiTrash2 className="w-2.5 h-2.5 mr-1.5" />
                 Delete Card
               </button>
             </div>
@@ -113,23 +117,16 @@ const TimeoffBalanceCard = ({ onDelete, userId }) => {
       </div>
 
       {/* Leave types list */}
-      <ul className="space-y-2 text-sm">
+      <ul className="space-y-1.5 text-[9px]">
         {timeOffData.map((item, index) => (
           <li
             key={index}
-            style={{ backgroundColor: "rgba(var(--color-primary-rgb), 0.3)" }}
-            className="bg-primary rounded px-4 py-3 flex items-center justify-between gap-3"
+            className="bg-[#E0E5EA]/30 rounded-[0.6rem] px-2 py-1.5 flex items-center justify-between gap-2"
           >
-            <div className="min-w-0">
-              <span className="font-medium text-text">{item.type}</span>
-              <div className="text-description text-sm">{item.remaining}</div>
+            <div className="min-w-0 flex-1">
+              <span className="font-medium text-slate-700">{item.type}</span>
+              <div className="text-[8px] text-slate-500">{item.remaining}</div>
             </div>
-
-            {item.action && (
-              <button className="text-xs px-3 py-1 rounded font-medium shrink-0 bg-blue-100 text-blue-700">
-                {item.action}
-              </button>
-            )}
           </li>
         ))}
       </ul>
