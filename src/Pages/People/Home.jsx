@@ -62,7 +62,6 @@ const Home = () => {
 
   const addCard = async (type) => {
     try {
-      // Check if card already exists locally first
       if (cards.some(c => c.type === type)) {
         toast.warning("This card is already added");
         return;
@@ -163,8 +162,8 @@ const Home = () => {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-slate-600 mx-auto"></div>
-          <p className="mt-2 text-slate-600 text-[10px] font-medium uppercase tracking-wide">Loading your dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-slate-600 mx-auto"></div>
+          <p className="mt-3 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -172,63 +171,61 @@ const Home = () => {
 
   return (
     <div className="w-full bg-transparent p-2">
-      {/* Header Card with consistent styling */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 mb-3 p-3">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          {/* Greeting */}
-          <div className="flex items-center gap-2 min-w-0">
+      {/* Header Card */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          {/* Greeting Section */}
+          <div className="flex items-center gap-3 min-w-0">
             {profileImage ? (
               <img
                 src={profileImage}
                 alt={firstName}
-                className="h-8 w-8 rounded-full object-cover border border-white shadow-sm"
+                className="h-11 w-11 rounded-full object-cover border-2 border-white shadow-md"
               />
             ) : (
-              <div className="h-8 w-8 rounded-full bg-[#E0E5EA] text-slate-700 flex items-center justify-center text-xs font-bold border border-white shadow-sm">
+              <div className="h-11 w-11 rounded-full bg-[#E0E5EA] text-slate-700 flex items-center justify-center text-sm font-bold border-2 border-white shadow-md">
                 {firstName.charAt(0).toUpperCase()}
               </div>
             )}
 
             <div className="truncate">
-              <h2 className="text-sm font-bold text-slate-800 truncate uppercase tracking-tight">
+              <h2 className="text-base font-bold text-slate-800 truncate uppercase tracking-tight">
                 Hey, {firstName}!
               </h2>
-              <p className="text-slate-500 text-[9px] font-medium uppercase tracking-wide">Have a great day</p>
+              <p className="text-slate-500 text-xs font-medium uppercase tracking-wide">Have a great day</p>
             </div>
           </div>
 
-          {/* Clock with navbar colors */}
-          <div className="flex items-center gap-1">
-            <div className="flex items-center gap-0.5">
-              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
-                {h}
-              </div>
-              <div className="text-xs font-bold text-slate-800">:</div>
-              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
-                {m}
-              </div>
-              <div className="text-xs font-bold text-slate-800">:</div>
-              <div className="bg-[#E0E5EA] text-slate-800 px-1.5 py-1 rounded-[0.6rem] font-bold text-xs shadow-inner min-w-[2rem] text-center">
-                {s}
-              </div>
+          {/* Timer Display */}
+          <div className="flex items-center gap-1.5">
+            <div className="bg-[#E0E5EA] text-slate-800 px-3 py-2 rounded-xl font-bold text-sm shadow-inner min-w-[2.5rem] text-center">
+              {h}
+            </div>
+            <div className="text-sm font-bold text-slate-800">:</div>
+            <div className="bg-[#E0E5EA] text-slate-800 px-3 py-2 rounded-xl font-bold text-sm shadow-inner min-w-[2.5rem] text-center">
+              {m}
+            </div>
+            <div className="text-sm font-bold text-slate-800">:</div>
+            <div className="bg-[#E0E5EA] text-slate-800 px-3 py-2 rounded-xl font-bold text-sm shadow-inner min-w-[2.5rem] text-center">
+              {s}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Menu with consistent spacing */}
-      <div className="mb-3 text-end">
+      {/* Add Card Menu */}
+      <div className="mb-4 text-end">
         <AddCardMenu onAdd={addCard} />
       </div>
 
-      {/* Cards Grid with proper spacing */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {cards.length > 0 ? (
           cards.map(renderCard)
         ) : (
           <div className="col-span-full">
-            <div className="bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-4 text-center">
-              <p className="text-slate-500 text-[10px] font-medium uppercase tracking-wide">No cards added yet. Click "More" to add cards to your dashboard.</p>
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-6 text-center">
+              <p className="text-slate-500 text-sm font-medium">No cards added yet. Click "More" to add cards to your dashboard.</p>
             </div>
           </div>
         )}

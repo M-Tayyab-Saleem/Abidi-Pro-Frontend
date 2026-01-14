@@ -6,7 +6,6 @@ import { FaTree } from "react-icons/fa";
 import holidayApi from '../../api/holidayApi';
 
 const HolidaysCard = ({ onDelete }) => {
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +39,7 @@ const HolidaysCard = ({ onDelete }) => {
   const upcomingHolidays = holidays
     .filter(h => new Date(h.date) >= today)
     .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .slice(0, 3); // Only show the next 3 upcoming holidays
+    .slice(0, 3);
 
   const getHolidayIcon = (holidayType) => {
     switch (holidayType.toLowerCase()) {
@@ -70,48 +69,49 @@ const HolidaysCard = ({ onDelete }) => {
 
   if (loading) {
     return (
-      <div className="relative bg-background rounded-xl shadow-md p-5 pt-10 overflow-visible w-full">
-        <div className="absolute -top-4 left-4 bg-orange-100 text-orange-700 w-10 h-10 flex items-center justify-center rounded-md shadow z-99">
-          <FiCalendar className="text-xl" />
+      <div className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <FiCalendar className="w-4 h-4 text-orange-600" />
+          <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight">Holidays</h3>
         </div>
-        <div className="text-center py-4">Loading holidays...</div>
+        <div className="text-center py-4 text-xs">Loading holidays...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
+    <div className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
       {/* Header */}
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <FiCalendar className="w-3 h-3 text-orange-600" />
-            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Holidays</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <FiCalendar className="w-4 h-4 text-orange-600" />
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight">Holidays</h3>
           </div>
-          <p className="text-[9px] font-medium text-slate-500">Upcoming</p>
+          <p className="text-[10px] font-medium text-slate-500">Upcoming</p>
         </div>
 
         <button
           onClick={onDelete}
-          className="text-[8px] text-slate-500 hover:text-red-500 font-medium px-1.5 py-0.5 rounded-[0.6rem] hover:bg-red-50 transition"
+          className="text-[10px] text-slate-500 hover:text-red-500 font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition"
         >
           Remove
         </button>
       </div>
 
       {/* Holiday list */}
-      <ul className="space-y-1.5 text-[9px]">
+      <ul className="space-y-2 text-[10px]">
         {holidays.slice(0, 3).map((holiday, index) => (
           <li
             key={index}
-            className="flex items-center bg-[#E0E5EA]/30 rounded-[0.6rem] p-1.5 gap-2"
+            className="flex items-center bg-[#E0E5EA]/30 rounded-lg p-2 gap-2.5"
           >
-            <div className={`w-6 h-6 flex items-center justify-center rounded ${getHolidayColor(holiday.holidayType)}`}>
+            <div className={`w-8 h-8 flex items-center justify-center rounded-lg ${getHolidayColor(holiday.holidayType)}`}>
               {getHolidayIcon(holiday.holidayType)}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-slate-700 truncate text-[8px]">{holiday.holidayName}</div>
-              <div className="text-[7px] text-slate-500 truncate">
+              <div className="font-semibold text-slate-700 truncate text-[10px]">{holiday.holidayName}</div>
+              <div className="text-[9px] text-slate-500 truncate">
                 {new Date(holiday.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </div>
             </div>

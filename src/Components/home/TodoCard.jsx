@@ -82,15 +82,15 @@ const ToDoCard = ({ onDelete }) => {
   const handleBlur = () => setEditing(null);
 
   return (
-    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3 w-full">
+    <div className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4 w-full">
       {/* Header */}
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <FiCheckSquare className="w-3 h-3 text-green-600" />
-            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">To-Do</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <FiCheckSquare className="w-4 h-4 text-green-600" />
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight">To-Do</h3>
           </div>
-          <p className="text-[9px] font-medium text-slate-500 cursor-pointer">
+          <p className="text-[10px] font-medium text-slate-500">
             Enter Your to do list here
           </p>
         </div>
@@ -99,21 +99,21 @@ const ToDoCard = ({ onDelete }) => {
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1 rounded-[0.4rem] hover:bg-slate-100 transition"
+            className="p-1.5 rounded-lg hover:bg-slate-100 transition"
           >
-            <FiMoreVertical className="h-3 w-3 text-slate-600" />
+            <FiMoreVertical className="h-4 w-4 text-slate-600" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-28 bg-white shadow-md border border-slate-200 rounded-[0.6rem] z-50">
+            <div className="absolute right-0 mt-1 w-32 bg-white shadow-lg border border-slate-200 rounded-xl z-50">
               <button
                 onClick={() => {
                   onDelete();
                   setMenuOpen(false);
                 }}
-                className="flex items-center w-full px-3 py-1.5 text-[9px] text-red-500 hover:bg-red-50 font-medium"
+                className="flex items-center w-full px-3 py-2 text-[10px] text-red-500 hover:bg-red-50 font-medium"
               >
-                <FiTrash2 className="w-2.5 h-2.5 mr-1.5" />
+                <FiTrash2 className="w-3 h-3 mr-2" />
                 Delete Card
               </button>
             </div>
@@ -125,36 +125,36 @@ const ToDoCard = ({ onDelete }) => {
       {!showAddForm ? (
         <button
           onClick={() => setShowAddForm(true)}
-          className="mb-2 text-[9px] text-green-600 hover:text-green-800 flex items-center gap-1 font-medium"
+          className="mb-3 text-xs text-green-600 hover:text-green-800 flex items-center gap-1.5 font-medium"
         >
-          <FiPlus className="h-2.5 w-2.5" />
+          <FiPlus className="h-3.5 w-3.5" />
           Add Task
         </button>
       ) : (
-        <div className="flex flex-col gap-1.5 mb-3">
+        <div className="flex flex-col gap-2 mb-4">
           <input
             type="text"
             placeholder="Task name"
-            className="border border-slate-300 px-2 py-1.5 rounded-[0.6rem] text-[9px] w-full bg-white"
+            className="border border-slate-300 px-3 py-2 rounded-lg text-xs w-full bg-white"
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
           />
           <input
             type="text"
             placeholder="Task description"
-            className="border border-slate-300 px-2 py-1.5 rounded-[0.6rem] text-[9px] w-full bg-white"
+            className="border border-slate-300 px-3 py-2 rounded-lg text-xs w-full bg-white"
             value={newDesc}
             onChange={(e) => setNewDesc(e.target.value)}
           />
           <input
             type="date"
-            className="border border-slate-300 px-2 py-1.5 rounded-[0.6rem] text-[9px] w-full bg-white"
+            className="border border-slate-300 px-3 py-2 rounded-lg text-xs w-full bg-white"
             value={newDueDate}
             onChange={(e) => setNewDueDate(e.target.value)}
           />
           <button
             onClick={addTask}
-            className="bg-green-500 text-white px-3 py-1.5 rounded-[0.6rem] text-[9px] font-medium self-end"
+            className="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-medium self-end hover:bg-green-600 transition"
           >
             Save Task
           </button>
@@ -162,26 +162,26 @@ const ToDoCard = ({ onDelete }) => {
       )}
 
       {/* Task List */}
-      <ul className="space-y-1.5 text-[9px]">
+      <ul className="space-y-2 text-[10px]">
         {tasks.map((task) => (
           <li
             key={task.id}
-            className={`rounded-[0.6rem] p-2 flex justify-between items-start gap-2 ${
+            className={`rounded-lg p-3 flex justify-between items-start gap-2 ${
               task.completed ? "bg-emerald-50 border border-emerald-100" : "bg-[#E0E5EA]/30"
             }`}
           >
-            <div className="flex items-start gap-2 flex-1 min-w-0">
+            <div className="flex items-start gap-2.5 flex-1 min-w-0">
               <input
                 type="checkbox"
                 checked={task.completed}
                 onChange={() => toggleComplete(task.id)}
-                className="mt-0.5 shrink-0"
+                className="mt-0.5 shrink-0 w-4 h-4"
               />
               <div className="min-w-0">
                 {editing === task.id ? (
                   <>
                     <input
-                      className="font-semibold bg-white px-1.5 py-1 rounded-[0.4rem] border border-slate-300 w-full text-[9px] mb-1"
+                      className="font-semibold bg-white px-2 py-1.5 rounded-lg border border-slate-300 w-full text-xs mb-1.5"
                       value={task.title}
                       onChange={(e) =>
                         handleFieldChange(task.id, "title", e.target.value)
@@ -189,7 +189,7 @@ const ToDoCard = ({ onDelete }) => {
                       onBlur={handleBlur}
                     />
                     <input
-                      className="text-[8px] text-slate-600 bg-white px-1.5 py-1 rounded-[0.4rem] border border-slate-300 w-full mb-1"
+                      className="text-[10px] text-slate-600 bg-white px-2 py-1.5 rounded-lg border border-slate-300 w-full mb-1.5"
                       value={task.description}
                       onChange={(e) =>
                         handleFieldChange(task.id, "description", e.target.value)
@@ -198,7 +198,7 @@ const ToDoCard = ({ onDelete }) => {
                     />
                     <input
                       type="date"
-                      className="text-[8px] text-slate-600 bg-white px-1.5 py-1 rounded-[0.4rem] border border-slate-300 w-full"
+                      className="text-[10px] text-slate-600 bg-white px-2 py-1.5 rounded-lg border border-slate-300 w-full"
                       value={task.dueDate || ""}
                       onChange={(e) =>
                         handleFieldChange(task.id, "dueDate", e.target.value)
@@ -217,13 +217,13 @@ const ToDoCard = ({ onDelete }) => {
                       {task.title}
                     </div>
                     <div
-                      className="text-[8px] text-slate-600 cursor-pointer"
+                      className="text-[9px] text-slate-600 cursor-pointer"
                       onClick={() => setEditing(task.id)}
                     >
                       {task.description}
                     </div>
                     {task.dueDate && (
-                      <div className="text-[8px] text-slate-500 mt-0.5">
+                      <div className="text-[9px] text-slate-500 mt-1">
                         Due: {task.dueDate}
                       </div>
                     )}
@@ -233,22 +233,22 @@ const ToDoCard = ({ onDelete }) => {
             </div>
 
             {/* Edit + Delete Buttons */}
-            <div className="flex flex-col gap-1 items-end">
+            <div className="flex flex-col gap-1.5 items-end">
               {!task.completed && (
                 <button
                   onClick={() => setEditing(task.id)}
-                  className="bg-green-100 text-green-700 p-1 rounded-[0.4rem] hover:bg-green-200"
+                  className="bg-green-100 text-green-700 p-1.5 rounded-md hover:bg-green-200"
                   title="Edit"
                 >
-                  <FiEdit2 className="h-2.5 w-2.5" />
+                  <FiEdit2 className="h-3 w-3" />
                 </button>
               )}
               <button
                 onClick={() => removeTask(task.id)}
-                className="bg-red-100 text-red-600 p-1 rounded-[0.4rem] hover:bg-red-200"
+                className="bg-red-100 text-red-600 p-1.5 rounded-md hover:bg-red-200"
                 title="Delete"
               >
-                <FiTrash2 className="h-2.5 w-2.5" />
+                <FiTrash2 className="h-3 w-3" />
               </button>
             </div>
           </li>

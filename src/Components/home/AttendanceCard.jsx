@@ -7,11 +7,10 @@ import { toast } from "react-toastify";
 const AttendanceCard = ({ onDelete }) => {
   const [weeklyData, setWeeklyData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const maxBarHeight = 60;
+  const maxBarHeight = 70;
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
-  // Get current week start date (Monday)
   const getWeekStartDate = () => {
     const today = new Date();
     const start = new Date(today);
@@ -22,7 +21,6 @@ const AttendanceCard = ({ onDelete }) => {
     return start;
   };
 
-  // Fetch weekly attendance data
   const fetchWeeklyData = async () => {
     try {
       setLoading(true);
@@ -41,63 +39,58 @@ const AttendanceCard = ({ onDelete }) => {
     }
   };
 
-  // Process the data to match the weekly structure
-const processWeeklyData = (attendanceData, weekStart) => {
-  const days = [];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const processWeeklyData = (attendanceData, weekStart) => {
+    const days = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < 7; i++) {
-    const currentDay = new Date(weekStart);
-    currentDay.setDate(weekStart.getDate() + i);
-    currentDay.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 7; i++) {
+      const currentDay = new Date(weekStart);
+      currentDay.setDate(weekStart.getDate() + i);
+      currentDay.setHours(0, 0, 0, 0);
 
-    // Find matching attendance record
-    const dayData = attendanceData.find(d => {
-      const recordDate = new Date(d.date);
-      recordDate.setHours(0, 0, 0, 0);
-      return recordDate.getTime() === currentDay.getTime();
-    });
+      const dayData = attendanceData.find(d => {
+        const recordDate = new Date(d.date);
+        recordDate.setHours(0, 0, 0, 0);
+        return recordDate.getTime() === currentDay.getTime();
+      });
 
-    // Calculate hours worked
-    let hours = 0;
-    let status = currentDay > today ? 'Upcoming' : 'Absent';
-    
-    if (dayData) {
-      status = dayData.status || status;
+      let hours = 0;
+      let status = currentDay > today ? 'Upcoming' : 'Absent';
       
-      if (dayData.totalHours) {
-        hours = dayData.totalHours;
-      } else if (dayData.checkInTime && dayData.checkOutTime) {
-        // Calculate hours from check-in/check-out times
-        const checkIn = new Date(dayData.checkInTime);
-        const checkOut = new Date(dayData.checkOutTime);
-        const diffMs = checkOut - checkIn;
-        hours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
-      } else if (dayData.status === 'Present') {
-        hours = 8; // Default full day
-      } else if (dayData.status === 'Half Day') {
-        hours = 4; // Default half day
+      if (dayData) {
+        status = dayData.status || status;
+        
+        if (dayData.totalHours) {
+          hours = dayData.totalHours;
+        } else if (dayData.checkInTime && dayData.checkOutTime) {
+          const checkIn = new Date(dayData.checkInTime);
+          const checkOut = new Date(dayData.checkOutTime);
+          const diffMs = checkOut - checkIn;
+          hours = parseFloat((diffMs / (1000 * 60 * 60)).toFixed(2));
+        } else if (dayData.status === 'Present') {
+          hours = 8;
+        } else if (dayData.status === 'Half Day') {
+          hours = 4;
+        }
       }
+
+      days.push({
+        day: currentDay.toLocaleDateString("en-US", { weekday: "short" }),
+        hours: hours,
+        date: currentDay.getDate(),
+        status: status
+      });
     }
 
-    days.push({
-      day: currentDay.toLocaleDateString("en-US", { weekday: "short" }),
-      hours: hours,
-      date: currentDay.getDate(),
-      status: status
-    });
-  }
-
-  console.log("Processed Weekly Data:", days); // Debug log
-  setWeeklyData(days);
-};
+    console.log("Processed Weekly Data:", days);
+    setWeeklyData(days);
+  };
 
   useEffect(() => {
     fetchWeeklyData();
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -111,28 +104,28 @@ const processWeeklyData = (attendanceData, weekStart) => {
   const totalHours = weeklyData.reduce((sum, val) => sum + val.hours, 0);
 
   return (
-    <div className="relative bg-white/80 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/40 p-3">
+    <div className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
       {/* Header */}
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <GoGraph className="w-3 h-3 text-blue-600" />
-            <h3 className="text-[10px] font-bold text-slate-800 uppercase tracking-tight">Weekly Attendance</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <GoGraph className="w-4 h-4 text-blue-600" />
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight">Weekly Attendance</h3>
           </div>
-          <p className="text-[9px] font-medium text-slate-500">{totalHours} total hours</p>
+          <p className="text-[10px] font-medium text-slate-500">{totalHours} total hours</p>
         </div>
 
         <button
           onClick={onDelete}
-          className="text-[8px] text-slate-500 hover:text-red-500 font-medium px-1.5 py-0.5 rounded-[0.6rem] hover:bg-red-50 transition"
+          className="text-[10px] text-slate-500 hover:text-red-500 font-medium px-2 py-1 rounded-lg hover:bg-red-50 transition"
         >
           Remove
         </button>
       </div>
 
       {/* Bar Chart */}
-      <div className="bg-[#E0E5EA]/30 rounded-[0.8rem] p-1.5">
-        <div className="flex items-end justify-between h-16 gap-1">
+      <div className="bg-[#E0E5EA]/30 rounded-xl p-3">
+        <div className="flex items-end justify-between h-20 gap-1.5">
           {weeklyData.map(({ day, hours, status }, i) => {
             let color = "bg-slate-300";
             if (status === 'Absent') color = "bg-red-500";
@@ -146,14 +139,14 @@ const processWeeklyData = (attendanceData, weekStart) => {
             return (
               <div key={i} className="flex flex-col items-center justify-end flex-1">
                 <div
-                  className={`w-1.5 ${color} rounded transition-all duration-300`}
+                  className={`w-2 ${color} rounded transition-all duration-300`}
                   style={{ height: `${barHeight}px` }}
                 ></div>
-                <div className="mt-0.5 text-center leading-tight">
-                  <span className="block text-[7px] font-semibold text-slate-700">
+                <div className="mt-1 text-center leading-tight">
+                  <span className="block text-[9px] font-semibold text-slate-700">
                     {day}
                   </span>
-                  <span className="block text-[6px] text-slate-600">
+                  <span className="block text-[8px] text-slate-600">
                     {status === 'Upcoming' ? '-' : `${hours}h`}
                   </span>
                 </div>

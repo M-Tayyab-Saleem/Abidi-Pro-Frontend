@@ -19,7 +19,6 @@ const AddCardMenu = ({ onAdd }) => {
   const [open, setOpen] = useState(false);
   const menuRef = useRef();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -32,19 +31,19 @@ const AddCardMenu = ({ onAdd }) => {
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
-      {/* Button with navbar styling */}
+      {/* Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 px-2 py-1.5 rounded-[0.8rem] bg-white/80 border border-white/40 hover:bg-white/90 transition text-[10px] font-bold text-slate-700 uppercase tracking-wide shadow-sm"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/90 backdrop-blur-sm border border-white/50 hover:bg-white transition-all shadow-sm text-xs font-bold text-slate-700 uppercase tracking-wide"
       >
         More
-        <EllipsisVerticalIcon className="h-3 w-3 text-slate-600" />
+        <EllipsisVerticalIcon className="h-4 w-4 text-slate-600" />
       </button>
 
-      {/* Dropdown with navbar styling */}
+      {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 mt-1 w-32 bg-white/90 backdrop-blur-md rounded-[0.8rem] shadow-lg border border-white/40 z-50">
-          <ul className="py-1 text-[9px] text-slate-700">
+        <div className="absolute right-0 mt-2 w-40 bg-white/95 backdrop-blur-md rounded-xl shadow-lg border border-white/50 z-50 py-1">
+          <ul className="text-xs text-slate-700">
             {cardOptions.map((option) => (
               <li
                 key={option.id}
@@ -52,7 +51,7 @@ const AddCardMenu = ({ onAdd }) => {
                   onAdd(option.id);
                   setOpen(false);
                 }}
-                className="px-3 py-1.5 cursor-pointer hover:bg-[#E0E5EA]/50 transition font-medium uppercase tracking-tight"
+                className="px-4 py-2 cursor-pointer hover:bg-[#E0E5EA]/50 transition font-medium uppercase tracking-tight"
               >
                 {option.label}
               </li>

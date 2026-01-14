@@ -187,16 +187,6 @@ const TimeTracker = () => {
 
   return (
     <>
-      <SubNavbar
-        onAddTimeLog={() => {
-          setModalMode("add");
-          setEditingLogId(null);
-          setIsAddTimeLogModalOpen(true);
-        }}
-        activeTab={activeTab}
-        onCreateTimesheet={() => setIsCreateTimesheetModalOpen(true)}
-      />
-
       <div className="min-h-screen bg-primary p-4 m-6 rounded-lg shadow-md">
         {/* Tab Bar */}
         <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
