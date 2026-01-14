@@ -140,30 +140,30 @@ export default function EditProfile() {
   }
 
   return (
-    <div className="relative flex flex-col bg-primary text-text p-5 border m-8 rounded-xl shadow-sm min-h-[700px]">
+    <div className="relative flex flex-col bg-transparent text-text p-4 rounded-[1.2rem] min-h-[700px]">
       {/* Back Button */}
-      <button
-        onClick={() => navigate("/people/profile")}
-        className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-800 rounded-md shadow-sm hover:bg-blue-200 transition"
-      >
-        <IoArrowBack className="text-lg" />
-        Back
-      </button>
+        <button
+          onClick={() => navigate("/people/profile")}
+          className="absolute top-10 right-10 bg-white/30 backdrop-blur-lg text-slate-800 font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 hover:scale-105 text-sm ring-1 ring-white/20 z-50 flex items-center gap-2"
+        >
+          <IoArrowBack className="text-base" />
+          Back
+        </button>
 
       {/* Banner & Profile Pic */}
-      <div className="relative h-24 rounded-lg overflow-hidden shadow-md mb-10">
+      <div className="relative h-28 rounded-lg overflow-hidden shadow-md mb-8">
         <img
           src={`https://picsum.photos/1200/200?random=${user._id}`}
           alt="Banner"
           className="w-full h-full object-cover"
         />
       </div>
-      <div className="relative -mt-14 pl-6 z-99 mb-10">
+      <div className="relative -mt-14 pl-6 z-10 mb-8">
         <div className="relative group">
           <img
             src={user.avatar || `https://randomuser.me/api/portraits/lego/${user?._id ? user._id.length % 10 : 1}.jpg`}
             alt={user?.name || "User"}
-            className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
+            className="w-28 h-28 rounded-full object-cover shadow-lg border-2 border-white"
           />
           <label
             htmlFor="avatar-upload-edit"
@@ -187,52 +187,51 @@ export default function EditProfile() {
         </div>
       </div>
 
-
-      <h2 className="text-xl text-text font-semibold font-sans mb-4">Edit Your Profile</h2>
+      <h2 className="text-lg font-bold text-slate-800 mb-6 uppercase tracking-tight">Edit Your Profile</h2>
 
       {/* About */}
-      <div className="bg-background rounded-md p-4 mb-6">
-        <h3 className="font-semibold mb-2">About</h3>
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] p-4 mb-6 shadow-md border border-white/50">
+        <h3 className="font-semibold mb-3 text-sm text-slate-800 uppercase tracking-wide">About</h3>
         <textarea
-          className="w-full p-2 border rounded-md text-sm bg-background"
-          rows={4}
+          className="w-full p-3 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
+          rows={5}
           value={about}
           onChange={(e) => setAbout(e.target.value)}
         />
       </div>
 
       {/* Education & Experience */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Education */}
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-lg">Education</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-base text-slate-800 uppercase tracking-tight">Education</h3>
             <button
               onClick={addEducation}
-              className="rounded-md p-2 bg-blue-100 hover:bg-blue-200 transition"
+              className="p-2 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
               title="Add Education"
             >
-              <FiPlus className="text-blue-800 text-xl" />
+              <FiPlus className="text-lg" />
             </button>
           </div>
           {educationList.map((edu, idx) => (
             <div
               key={idx}
-              className="relative bg-background rounded-md p-4 mb-4 shadow-sm"
+              className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] p-4 mb-4 shadow-md border border-white/50"
             >
               {idx > 0 && (
                 <button
                   onClick={() => removeEducation(idx)}
-                  className="absolute top-2 right-3 text-red-500 hover:text-red-700"
+                  className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors p-1"
                   title="Remove"
                 >
-                  <FiX className="text-xl" />
+                  <FiX className="text-lg" />
                 </button>
               )}
               <input
                 type="text"
                 placeholder="Institution"
-                className="w-full mb-2 p-2 mt-4 border rounded-md text-sm bg-background"
+                className="w-full mb-3 p-3 mt-1 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                 value={edu.institution || edu.institute}
                 onChange={(e) =>
                   setEducationList((prev) =>
@@ -245,7 +244,7 @@ export default function EditProfile() {
               <input
                 type="text"
                 placeholder="Degree / Program"
-                className="w-full mb-2 p-2 border rounded-md text-sm bg-background"
+                className="w-full mb-3 p-3 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                 value={edu.degree || edu.program}
                 onChange={(e) =>
                   setEducationList((prev) =>
@@ -258,7 +257,7 @@ export default function EditProfile() {
               <input
                 type="text"
                 placeholder="Year Range (e.g. 2018–2022)"
-                className="w-full p-2 border rounded-md text-sm bg-background"
+                className="w-full p-3 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                 value={edu.date || `${edu.startYear}–${edu.endYear}`}
                 onChange={(e) =>
                   setEducationList((prev) =>
@@ -274,34 +273,34 @@ export default function EditProfile() {
 
         {/* Experience */}
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold text-lg">Work Experience</h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-base text-slate-800 uppercase tracking-tight">Work Experience</h3>
             <button
               onClick={addExperience}
-              className="rounded-md p-2 bg-blue-100 hover:bg-blue-200 transition"
+              className="p-2 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
               title="Add Experience"
             >
-              <FiPlus className="text-blue-800 text-xl" />
+              <FiPlus className="text-lg" />
             </button>
           </div>
           {experienceList.map((exp, idx) => (
             <div
               key={idx}
-              className="relative bg-background rounded-md p-4 mb-4 shadow-sm"
+              className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] p-4 mb-4 shadow-md border border-white/50"
             >
               {idx > 0 && (
                 <button
                   onClick={() => removeExperience(idx)}
-                  className="absolute top-2 right-3 text-red-500 hover:text-red-700"
+                  className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors p-1"
                   title="Remove"
                 >
-                  <FiX className="text-xl" />
+                  <FiX className="text-lg" />
                 </button>
               )}
               <input
                 type="text"
                 placeholder="Company Name"
-                className="w-full mb-2 p-2 mt-4 border rounded-md text-sm bg-background"
+                className="w-full mb-3 p-3 mt-1 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                 value={exp.company}
                 onChange={(e) =>
                   setExperienceList((prev) =>
@@ -314,7 +313,7 @@ export default function EditProfile() {
               <input
                 type="text"
                 placeholder="Role or Description"
-                className="w-full mb-2 p-2 border rounded-md text-sm bg-background"
+                className="w-full mb-3 p-3 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                 value={exp.job || exp.description}
                 onChange={(e) =>
                   setExperienceList((prev) =>
@@ -324,11 +323,11 @@ export default function EditProfile() {
                   )
                 }
               />
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input
                   type="text"
                   placeholder="Date (optional)"
-                  className="w-full p-2 border rounded-md text-sm bg-background"
+                  className="w-full p-3 border border-slate-200 rounded-lg text-sm bg-white/80 backdrop-blur-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                   value={exp.date}
                   onChange={(e) =>
                     setExperienceList((prev) =>
@@ -339,7 +338,7 @@ export default function EditProfile() {
                   }
                 />
                 <select
-                  className="w-40 p-2 bg-background text-text border rounded-md text-sm"
+                  className="w-40 p-3 bg-white/80 backdrop-blur-sm text-slate-700 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition-all"
                   value={exp.type}
                   onChange={(e) =>
                     setExperienceList((prev) =>
@@ -361,19 +360,21 @@ export default function EditProfile() {
       </div>
 
       {/* Save Button at Bottom */}
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-end mt-6 pt-6 border-t border-slate-200">
         <button
-          className={`bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''
+          className={`bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-2.5 rounded-lg transition-all text-sm font-medium shadow-sm hover:shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           onClick={handleSave}
           disabled={loading}
         >
-          {loading ? 'Saving...' : 'Save Changes'}
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Saving...
+            </span>
+          ) : 'Save Changes'}
         </button>
       </div>
     </div>
   );
 }
-
-
-

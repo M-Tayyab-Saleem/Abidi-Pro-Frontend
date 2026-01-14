@@ -75,7 +75,7 @@ const AppLayout = () => {
         </aside>
 
         {/* Main Content Container */}
-     <main className="flex-1 m-3 ml-2 rounded-[2rem] bg-[#F7FAFC] shadow-lg text-slate-800 h-[calc(100vh-5rem)] transition-all duration-500 ease-in-out overflow-hidden">
+     <main className="flex-1 m-3 ml-2 rounded-[2rem] bg-[#ECF0F3] shadow-lg text-slate-800 h-[calc(100vh-5rem)] transition-all duration-500 ease-in-out overflow-hidden">
           <div className="p-5 h-full overflow-auto no-scrollbar">
             <Outlet />
           </div>
@@ -100,7 +100,7 @@ const AppLayout = () => {
             </button>
 
             {/* Sidebar Content */}
-            <div className={`h-full w-full bg-white/90 backdrop-blur-sm rounded-[2rem] shadow-lg border border-white/50 flex flex-col items-center py-5 px-4 overflow-hidden transition-all duration-500 ease-in-out ${
+            <div className={`h-full w-full bg-[#ECF0F3] backdrop-blur-sm rounded-[2rem] shadow-lg border border-white/50 flex flex-col items-center py-5 px-4 overflow-hidden transition-all duration-500 ease-in-out ${
               isRightBarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
             }`}>
               

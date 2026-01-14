@@ -47,7 +47,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="text-red-500 text-center mt-10">
+      <div className="text-red-500 text-center mt-10 text-sm">
         No user data available.
       </div>
     );
@@ -126,9 +126,9 @@ export default function Profile() {
   };
 
   return (
-    <div className="overflow-hidden bg-primary p-5 border m-4 shadow-sm min-h-[700px] border-none rounded-lg">
+    <div className="overflow-hidden bg-transparent p-2 m-4 min-h-[700px]">
       {/* Banner & Edit Button */}
-      <div className="relative h-24 rounded-lg overflow-hidden shadow-md mb-10">
+      <div className="relative h-28 rounded-[1.2rem] overflow-hidden shadow-md mb-8">
         <img
           src={`https://picsum.photos/1200/200?random=${user._id}`}
           alt="Banner"
@@ -136,7 +136,7 @@ export default function Profile() {
         />
         <button
           onClick={() => navigate("/people/edit-profile")}
-          className="absolute top-3 right-4 bg-white/30 backdrop-blur-lg text-text font-medium px-4 py-1.5 rounded-md shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 hover:scale-105 text-sm ring-1 ring-white/20"
+          className="absolute top-4 right-4 bg-white/30 backdrop-blur-lg text-slate-800 font-medium px-4 py-2 rounded-lg shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 hover:scale-105 text-sm ring-1 ring-white/20"
         >
           Edit Profile
         </button>
@@ -148,7 +148,7 @@ export default function Profile() {
           <img
             src={user.avatar || `https://randomuser.me/api/portraits/lego/${user?._id ? user._id.length % 10 : 1}.jpg`}
             alt={user?.name || "User"}
-            className="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white"
+            className="w-28 h-28 rounded-full object-cover shadow-lg border-2 border-white"
           />
           <label
             htmlFor="avatar-upload"
@@ -174,36 +174,36 @@ export default function Profile() {
 
 
       {/* Info Summary */}
-      <div className="card bg-secondary shadow rounded-md py-4 pr-4 pl-6 mt-4 flex flex-wrap justify-between gap-2 sm:gap-4">
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] py-4 pr-4 pl-6 mt-4 flex flex-wrap justify-between gap-4 shadow-sm border border-white/50 mb-6">
         <div className="flex flex-col min-w-0">
-          <p className="font-semibold text-text truncate sm:max-w-[250px]">
+          <p className="font-bold text-slate-800 truncate text-sm uppercase tracking-tight">
             {user.empID || "ID"} - {user.name}
           </p>
-          <p className="text-text truncate">{user.designation || user.role}</p>
+          <p className="text-slate-600 truncate text-sm">{user.designation || user.role}</p>
         </div>
         <div className="flex flex-col min-w-0">
-          <p className="text-text font-bold">Reporting to</p>
-          <p className="font-medium text-text text-opacity-80 break-words">
+          <p className="text-slate-800 font-bold text-sm uppercase tracking-wide">Reporting to</p>
+          <p className="font-medium text-slate-600 text-sm break-words">
             {user.reportsTo || "—"}
           </p>
         </div>
       </div>
 
       {/* Profile Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 card">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
         {profileCards.map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center gap-3 p-2 bg-secondary rounded-md shadow-sm"
+            className="flex items-center gap-3 p-3 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-sm border border-white/50"
           >
             <div
-              className={`w-10 h-10 flex items-center justify-center rounded-md shadow-md ${item.bg}`}
+              className={`w-11 h-11 flex items-center justify-center rounded-lg shadow-md ${item.bg}`}
             >
               <item.icon className={`h-5 w-5 ${item.iconColor}`} />
             </div>
             <div>
-              <div className="text-sm text-text font-bold">{item.label}</div>
-              <div className="text-sm text-text">{item.value}</div>
+              <div className="text-xs text-slate-800 font-bold uppercase tracking-wide">{item.label}</div>
+              <div className="text-sm text-slate-700">{item.value}</div>
             </div>
           </div>
         ))}
@@ -211,64 +211,64 @@ export default function Profile() {
 
       {/* About */}
       {user.about && (
-        <div className="mb-6 card bg-secondary shadow p-2 rounded-lg">
-          <h3 className="font-semibold mb-2 text-heading">About</h3>
-          <p className="text-sm text-text">{user.about}</p>
+        <div className="mb-6 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-sm p-4 border border-white/50">
+          <h3 className="font-bold mb-3 text-slate-800 text-sm uppercase tracking-wide">About</h3>
+          <p className="text-sm text-slate-700">{user.about}</p>
         </div>
       )}
 
       {/* Work & Education */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-secondary p-4 rounded-lg shadow-md hover:shadow-lg transition">
-          <div className="flex items-center gap-3 mb-3">
+        <div className="bg-white/90 backdrop-blur-sm p-4 rounded-[1.2rem] shadow-sm border border-white/50 hover:shadow-md transition">
+          <div className="flex items-center gap-3 mb-4">
             <Briefcase className="text-purple-600 w-5 h-5" />
-            <h3 className="text-lg font-semibold text-heading">
+            <h3 className="text-base font-bold text-slate-800 uppercase tracking-tight">
               Work Experience
             </h3>
           </div>
-          <div className="text-sm text-text space-y-4">
+          <div className="text-sm text-slate-700 space-y-4">
             {user.experience && user.experience.length > 0 ? (
               user.experience.map((exp, idx) => (
-                <div key={idx} className="border-b border-muted pb-2">
-                  <div className="font-medium text-base text-text">
+                <div key={idx} className="border-b border-slate-200 pb-3">
+                  <div className="font-bold text-sm text-slate-800">
                     {exp.company}
                   </div>
-                  <div className="italic text-sm text-muted">{exp.jobType}</div>
-                  <div className="text-xs text-muted">
+                  <div className="italic text-xs text-slate-600 mt-1">{exp.jobType}</div>
+                  <div className="text-xs text-slate-500 mt-1">
                     {new Date(exp.startDate).toLocaleDateString()} –{" "}
                     {exp.endDate
                       ? new Date(exp.endDate).toLocaleDateString()
                       : "Present"}
                   </div>
-                  <div className="text-sm mt-1">{exp.description}</div>
+                  <div className="text-xs mt-2 text-slate-700">{exp.description}</div>
                 </div>
               ))
             ) : (
-              <p className="text-muted">No work experience available.</p>
+              <p className="text-slate-500 text-sm">No work experience available.</p>
             )}
           </div>
         </div>
 
-        <div className="bg-secondary p-4 rounded-lg shadow-md hover:shadow-lg transition">
-          <div className="flex items-center gap-3 mb-3">
+        <div className="bg-white/90 backdrop-blur-sm p-4 rounded-[1.2rem] shadow-sm border border-white/50 hover:shadow-md transition">
+          <div className="flex items-center gap-3 mb-4">
             <GraduationCap className="text-blue-600 w-5 h-5" />
-            <h3 className="text-lg font-semibold text-heading">Education</h3>
+            <h3 className="text-base font-bold text-slate-800 uppercase tracking-tight">Education</h3>
           </div>
-          <div className="text-sm text-text space-y-4">
+          <div className="text-sm text-slate-700 space-y-4">
             {user.education && user.education.length > 0 ? (
               user.education.map((edu, idx) => (
-                <div key={idx} className="border-b border-muted pb-2">
-                  <div className="font-medium text-base text-text">
+                <div key={idx} className="border-b border-slate-200 pb-3">
+                  <div className="font-bold text-sm text-slate-800">
                     {edu.degree}
                   </div>
-                  <div>{edu.institution}</div>
-                  <div className="text-xs text-muted">
+                  <div className="text-sm text-slate-700 mt-1">{edu.institution}</div>
+                  <div className="text-xs text-slate-500 mt-1">
                     {edu.startYear} – {edu.endYear}
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-muted">No education history available.</p>
+              <p className="text-slate-500 text-sm">No education history available.</p>
             )}
           </div>
         </div>
@@ -276,4 +276,3 @@ export default function Profile() {
     </div>
   );
 }
-

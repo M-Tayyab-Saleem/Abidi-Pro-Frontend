@@ -35,7 +35,6 @@ const TimeTracker = () => {
   const [isCreateTimesheetModalOpen, setIsCreateTimesheetModalOpen] = useState(false);
   const [timesheets, setTimesheets] = useState([]);
 
-
   const tabs = [
     { title: "Time Logs" },
     { title: "Timesheets" },
@@ -73,8 +72,6 @@ const TimeTracker = () => {
       fetchTimeLogs();
     }
   }, [activeTab]);
-
-
 
   const parseDate = (dateStr) => {
     if (!dateStr) return new Date();
@@ -187,23 +184,23 @@ const TimeTracker = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-primary p-4 m-6 rounded-lg shadow-md">
+      <div className="min-h-screen bg-transparent p-2">
         {/* Tab Bar */}
-        <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 mb-4">
+        <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white/90 backdrop-blur-sm p-1.5 rounded-[1.2rem] shadow-sm border border-white/50 mb-4">
           {tabs.map((item, index) => (
             <div key={item.title} className="flex items-center">
               <button
-                className={`px-4 py-2  text-sm font-medium transition-colors duration-200
+                className={`px-5 py-2.5 text-sm font-medium transition-all duration-200 rounded-xl
                 ${activeTab === index
-                     ? "text-heading  rounded-md bg-gray-100"
-                    : "text-primary hover:text-primary hover:bg-gray-100 rounded-md"
+                    ? "text-slate-800 bg-white shadow-sm font-bold"
+                    : "text-slate-600 hover:text-slate-800 hover:bg-slate-50/80"
                   }`}
                 onClick={() => setActiveTab(index)}
               >
                 {item.title}
               </button>
               {index !== tabs.length - 1 && (
-                <span className="w-px h-4 bg-gray-300 mx-1"></span>
+                <span className="w-px h-5 bg-slate-200 mx-1.5"></span>
               )}
             </div>
           ))}
@@ -211,65 +208,84 @@ const TimeTracker = () => {
 
         {activeTab === 0 && (
           <>
-            <div className="flex flex-col bg-background w-full sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 bg-white p-4 rounded-md">
-              <h2 className="text-text sm:text-lg text-black mx-4">Time Logs</h2>
+            {/* Header Card */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Time Logs</h2>
 
-              <div className="flex flex-wrap items-center gap-3 mx-4">
-                <button
-                  onClick={navigateToPreviousDay}
-                  className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
-                >
-                  <FaAngleLeft size={16} />
-                </button>
-
-                <div className="relative">
+                <div className="flex flex-wrap items-center gap-3">
                   <button
-                    className="px-2 py-1 text-white bg-primary rounded flex items-center gap-2 hover:bg-primary-dark sm:px-3 sm:py-2"
-                    onClick={() => setShowCalendar(!showCalendar)}
+                    onClick={navigateToPreviousDay}
+                    className="p-2.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
                   >
-                    <IoCalendarNumberOutline size={20} />
-                    {selectedDate && (
-                      <span className="text-sm">{formatDate(selectedDate)}</span>
-                    )}
+                    <FaAngleLeft size={18} />
                   </button>
 
-                  {showCalendar && (
-                    <div className="absolute z-50 mt-2 bg-white shadow-lg rounded">
-                      <DatePicker
-                        selected={selectedDate}
-                        onChange={(date) => {
-                          setSelectedDate(date);
-                          setShowCalendar(false);
-                        }}
-                        inline
-                      />
-                    </div>
-                  )}
-                </div>
+                  <div className="relative">
+                    <button
+                      className="px-3 py-2 text-blue-800 bg-blue-100 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition shadow-sm text-sm font-medium"
+                      onClick={() => setShowCalendar(!showCalendar)}
+                    >
+                      <IoCalendarNumberOutline size={18} />
+                      {selectedDate && (
+                        <span className="text-sm font-medium">{formatDate(selectedDate)}</span>
+                      )}
+                    </button>
 
-                <button
-                  onClick={navigateToNextDay}
-                  className="px-3 py-1 rounded bg-primary text-white hover:bg-primary-dark"
-                >
-                  <FaAngleRight size={16} />
-                </button>
-              </div>
-              <div className="mx-4">
-                <span className="text-sm text-text">
-                  Submitted Hours | {totalHours.toFixed(2)}
-                </span>
+                    <AnimatePresence>
+                      {showCalendar && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute z-50 mt-2 bg-white/95 backdrop-blur-sm shadow-lg rounded-xl border border-white/50"
+                        >
+                          <DatePicker
+                            selected={selectedDate}
+                            onChange={(date) => {
+                              setSelectedDate(date);
+                              setShowCalendar(false);
+                            }}
+                            inline
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  <button
+                    onClick={navigateToNextDay}
+                    className="p-2.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
+                  >
+                    <FaAngleRight size={18} />
+                  </button>
+                </div>
+                <div className="bg-blue-50 px-3 py-2 rounded-lg shadow-sm">
+                  <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+                    Submitted Hours: <span className="font-bold text-slate-800">{totalHours.toFixed(2)}</span>
+                  </span>
+                </div>
               </div>
             </div>
 
+            {/* Loading State */}
             {loading && (
-              <div className="text-center p-4">Loading time logs...</div>
-            )}
-            {error && (
-              <div className="text-red-500 p-4 text-center">{error}</div>
+              <div className="text-center p-6 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+                <p className="mt-3 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading time logs...</p>
+              </div>
             )}
 
+            {/* Error State */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-[1.2rem] p-4 text-center text-red-700 text-sm mb-4">
+                {error}
+              </div>
+            )}
+
+            {/* Time Logs Table */}
             {!loading && !error && (
-              <div className="bg-background rounded-xl shadow p-4 w-full overflow-x-auto">
+              <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4 overflow-x-auto">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={selectedDate ? selectedDate.getTime() : 'all'}
@@ -278,9 +294,9 @@ const TimeTracker = () => {
                     exit={{ x: -300, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <table className="min-w-full text-sm text-left border-separate border-spacing-0">
-                      <thead className="bg-primary text-white">
-                        <tr>
+                    <table className="min-w-full text-sm border-separate border-spacing-0">
+                      <thead>
+                        <tr className="bg-slate-100/80 backdrop-blur-sm text-slate-800">
                           {[
                             "Job Title",
                             "Date",
@@ -291,7 +307,7 @@ const TimeTracker = () => {
                           ].map((heading) => (
                             <th
                               key={heading}
-                              className="p-3 font-medium border-r last:border-none border-gray-300"
+                              className="p-4 font-semibold text-xs uppercase tracking-wide border-b border-slate-200 text-left"
                             >
                               {heading}
                             </th>
@@ -301,44 +317,66 @@ const TimeTracker = () => {
                       <tbody>
                         {paginatedData.length ? (
                           paginatedData.map((item, index) => (
-                            <tr key={item._id} className="border-b hover:bg-gray-50 cursor-pointer" >
-                              <td className="p-3" onClick={() => handleViewLog(item)}>{item.job || "-"}</td>
-                              <td className="p-3" onClick={() => handleViewLog(item)}>{new Date(item.date).toLocaleDateString()}</td>
-                              <td className="p-3" onClick={() => handleViewLog(item)}>{item.description}</td>
-                              <td className="p-3" onClick={() => handleViewLog(item)}>{item.hours}</td>
-                              <td className="p-3" onClick={() => handleViewLog(item)}>{item.attachments?.[0]?.originalname || "-"}</td>
-                              <td className="p-3 flex gap-2">
-                                <button
-                                  onClick={() => handleViewLog(item)}
-                                  className="text-blue-600 hover:text-blue-800"
-                                >
-                                  <IoEye />
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setEditingLogId(item._id);
-                                    setModalMode("edit");
-                                    setIsAddTimeLogModalOpen(true);
-                                  }}
-                                  className="text-green-600 hover:text-green-800"
-                                >
-                                  <IoPencil />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(item._id)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <IoTrash />
-                                </button>
+                            <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                              <td className="p-4 text-slate-700 font-medium cursor-pointer" onClick={() => handleViewLog(item)}>{item.job || "-"}</td>
+                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>{new Date(item.date).toLocaleDateString()}</td>
+                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>{item.description}</td>
+                              <td className="p-4 text-slate-700 font-medium cursor-pointer" onClick={() => handleViewLog(item)}>{item.hours}</td>
+                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>
+                                {item.attachments?.[0]?.originalname ? (
+                                  <span className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    {item.attachments[0].originalname}
+                                  </span>
+                                ) : "-"}
+                              </td>
+                              <td className="p-4">
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleViewLog(item)}
+                                    className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                    title="View"
+                                  >
+                                    <IoEye size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setEditingLogId(item._id);
+                                      setModalMode("edit");
+                                      setIsAddTimeLogModalOpen(true);
+                                    }}
+                                    className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition"
+                                    title="Edit"
+                                  >
+                                    <IoPencil size={16} />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                                    title="Delete"
+                                  >
+                                    <IoTrash size={16} />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={7} className="p-4 text-center text-gray-500">
-                              {selectedDate
-                                ? `No time logs found for ${formatDate(selectedDate)}`
-                                : "No time logs found"}
+                            <td colSpan={7} className="p-8 text-center text-slate-500 text-sm">
+                              <div className="flex flex-col items-center gap-2">
+                                <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p className="text-sm font-medium text-slate-500">
+                                  {selectedDate
+                                    ? `No time logs found for ${formatDate(selectedDate)}`
+                                    : "No time logs found"}
+                                </p>
+                                <p className="text-xs text-slate-400">Try selecting a different date or add a new time log</p>
+                              </div>
                             </td>
                           </tr>
                         )}
@@ -350,8 +388,7 @@ const TimeTracker = () => {
             )}
           </>
         )}
-        {activeTab === 1 && <Timesheet timesheets={timesheets} fetchTimesheets={fetchTimesheets} />
-        }
+        {activeTab === 1 && <Timesheet timesheets={timesheets} fetchTimesheets={fetchTimesheets} />}
       </div>
 
       <AddTimeLogModal
@@ -360,11 +397,11 @@ const TimeTracker = () => {
         onSave={handleSaveLogs}
         onTimeLogAdded={fetchTimeLogs}
       />
-<CreateTimesheetModal
-  open={isCreateTimesheetModalOpen}
-  onClose={() => setIsCreateTimesheetModalOpen(false)}
-  onTimesheetCreated={fetchTimesheets} 
-/>
+      <CreateTimesheetModal
+        open={isCreateTimesheetModalOpen}
+        onClose={() => setIsCreateTimesheetModalOpen(false)}
+        onTimesheetCreated={fetchTimesheets}
+      />
 
       <EditTimeLogModal
         isOpen={modalMode === "edit" && isAddTimeLogModalOpen}

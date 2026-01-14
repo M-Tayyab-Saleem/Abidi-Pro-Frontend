@@ -26,7 +26,7 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig[status]?.color || "bg-gray-100 text-gray-800"}`}>
+    <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wide ${statusConfig[status]?.color || "bg-slate-100 text-slate-800"}`}>
       {statusConfig[status]?.icon || <FaRegClock className="mr-1" />}
       {status}
     </span>
@@ -191,228 +191,237 @@ const Attendance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary p-4 m-6 rounded-lg shadow-md">
+    <div className="min-h-screen bg-transparent p-2">
       {/* Header card with updated calendar navigation */}
-      <div className="flex flex-col bg-background w-full sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 p-4 rounded-md shadow-sm">
-        <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-text">Attendance</h2>
-          <button 
-            onClick={() => setExpandedView(!expandedView)}
-            className="text-sm text-text flex items-center gap-1 hover:underline"
-          >
-            <FaInfoCircle size={14} />
-            {expandedView ? "Compact view" : "Detailed view"}
-          </button>
-        </div>
-
-        <div className="flex flex-row items-center gap-3 mx-4 whitespace-nowrap">
-          <button
-            onClick={navigateToPreviousPeriod}
-            className="p-2 rounded-full bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-          >
-            <FaAngleLeft size={16} />
-          </button>
-
-          <div className="relative">
-            <button
-              className="px-3 py-2 text-white bg-primary rounded flex items-center gap-2 hover:bg-primary-dark"
-              onClick={() => setShowCalendar(!showCalendar)}
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Attendance</h2>
+            <button 
+              onClick={() => setExpandedView(!expandedView)}
+              className="text-xs text-slate-600 flex items-center gap-1 hover:text-slate-800 transition-colors font-medium"
             >
-              <IoCalendarNumberOutline size={18} />
-              <span className="text-sm">{formatWeekRange()}</span>
-              <FaRegCalendarAlt size={14} />
+              <FaInfoCircle size={14} />
+              {expandedView ? "Compact view" : "Detailed view"}
             </button>
-
-            {showCalendar && (
-              <div className="absolute z-50 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={handleDateChange}
-                  inline
-                  calendarClassName="border-0"
-                  renderCustomHeader={({
-                    date,
-                    decreaseMonth,
-                    increaseMonth,
-                    prevMonthButtonDisabled,
-                    nextMonthButtonDisabled,
-                  }) => (
-                    <div className="flex items-center justify-between px-2 py-2">
-                      <button
-                        onClick={decreaseMonth}
-                        disabled={prevMonthButtonDisabled}
-                        className="p-1 rounded hover:bg-gray-100"
-                      >
-                        <FaAngleLeft className="text-gray-600" />
-                      </button>
-                      <span className="text-sm font-semibold text-gray-700">
-                        {date.toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                        })}
-                      </span>
-                      <button
-                        onClick={increaseMonth}
-                        disabled={nextMonthButtonDisabled}
-                        className="p-1 rounded hover:bg-gray-100"
-                      >
-                        <FaAngleRight className="text-gray-600" />
-                      </button>
-                    </div>
-                  )}
-                />
-              </div>
-            )}
           </div>
 
-          <button
-            onClick={navigateToNextPeriod}
-            className="p-2 rounded-full bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-          >
-            <FaAngleRight size={16} />
-          </button>
+          <div className="flex flex-row items-center gap-3">
+            <button
+              onClick={navigateToPreviousPeriod}
+              className="p-2.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
+            >
+              <FaAngleLeft size={18} />
+            </button>
+
+            <div className="relative">
+              <button
+                className="px-3 py-2 text-blue-800 bg-blue-100 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition shadow-sm text-sm font-medium"
+                onClick={() => setShowCalendar(!showCalendar)}
+              >
+                <IoCalendarNumberOutline size={18} />
+                <span className="text-sm font-medium">{formatWeekRange()}</span>
+                <FaRegCalendarAlt size={14} />
+              </button>
+
+              {showCalendar && (
+                <div className="absolute z-50 mt-2 bg-white/95 backdrop-blur-sm shadow-lg rounded-xl border border-white/50">
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={handleDateChange}
+                    inline
+                    calendarClassName="border-0"
+                    renderCustomHeader={({
+                      date,
+                      decreaseMonth,
+                      increaseMonth,
+                      prevMonthButtonDisabled,
+                      nextMonthButtonDisabled,
+                    }) => (
+                      <div className="flex items-center justify-between px-2 py-2">
+                        <button
+                          onClick={decreaseMonth}
+                          disabled={prevMonthButtonDisabled}
+                          className="p-1 rounded hover:bg-gray-100"
+                        >
+                          <FaAngleLeft className="text-gray-600" />
+                        </button>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {date.toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                          })}
+                        </span>
+                        <button
+                          onClick={increaseMonth}
+                          disabled={nextMonthButtonDisabled}
+                          className="p-1 rounded hover:bg-gray-100"
+                        >
+                          <FaAngleRight className="text-gray-600" />
+                        </button>
+                      </div>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={navigateToNextPeriod}
+              className="p-2.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
+            >
+              <FaAngleRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Timeline-style Attendance View */}
-      <div className="bg-background rounded-xl shadow p-6 w-full overflow-x-auto">
-        <div className="relative">
-          {/* Timeline connector */}
-          <div className="absolute left-16 top-0 h-full w-0.5 bg-gray-200 transform translate-x-1/2"></div>
-          
-          <div className="space-y-4">
-            {weeklyData.map((day, index) => (
-              <div 
-                key={index} 
-                className="relative flex items-start group transition-all duration-150"
-              >
-                {/* Timeline dot with pulse animation for today */}
-                <div className={`absolute left-12 top-5 h-3 w-5 rounded-full transform translate-x-1/2 z-99 ${
-                  day.status === "Present" ? "bg-green-500" :
-                  day.status === "Absent" ? "bg-red-500" :
-                  day.status === "Half Day" ? "bg-yellow-500" :
-                  day.status === "Leave" ? "bg-blue-500" : "bg-purple-500"
-                } ${new Date(day.fullDate).toDateString() === today.toDateString() ? "animate-pulse" : ""}`}></div>
-                
-                {/* Date/Day badge */}
-                <div className="flex-shrink-0 w-16 text-center pt-1">
-                  <div className={`text-sm text-text font-medium ${
-                    day.dayName === 'Sat' || day.dayName === 'Sun' ? 'text-blue-600' : 'text-gray-600'
-                  }`}>
-                    {day.dayName}
-                  </div>
-                  <div className={`text-xl font-bold text-text ${
-                    day.dayName === 'Sat' || day.dayName === 'Sun' ? 'text-blue-800' : 'text-gray-800'
-                  } ${
-                    new Date(day.fullDate).toDateString() === today.toDateString() ? 
-                    "text-primary" : ""
-                  }`}>
-                    {day.date}
-                  </div>
-                </div>
-                
-                {/* Attendance card */}
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-2 w-full overflow-x-auto">
+        {loading ? (
+          <div className="text-center p-6">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+            <p className="mt-3 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading attendance data...</p>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Timeline connector */}
+            <div className="absolute left-20 top-0 h-full w-0.5 bg-slate-200 transform translate-x-1/2"></div>
+            
+            <div className="space-y-4">
+              {weeklyData.map((day, index) => (
                 <div 
-                  className={`flex-grow ml-6 p-4 bg-primary rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 cursor-pointer ${
-                    selectedDay === index ? 
-                      "border-primary shadow-md bg-blue-50" : 
-                      "border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                  }`}
-                  onClick={() => toggleDayDetails(index)}
+                  key={index} 
+                  className="relative flex items-start group transition-all duration-150"
                 >
-                  <div className="flex justify-between items-start">
-                    <StatusBadge status={day.status} />
+                  {/* Timeline dot with pulse animation for today */}
+                  <div className={`absolute left-16 top-6 h-4 w-4 rounded-full transform translate-x-1/2 z-10 border-2 border-white ${
+                    day.status === "Present" ? "bg-green-500" :
+                    day.status === "Absent" ? "bg-red-500" :
+                    day.status === "Half Day" ? "bg-yellow-500" :
+                    day.status === "Leave" ? "bg-blue-500" : "bg-purple-500"
+                  } ${new Date(day.fullDate).toDateString() === today.toDateString() ? "animate-pulse shadow-lg" : ""}`}></div>
+                  
+                  {/* Date/Day badge */}
+                  <div className="flex-shrink-0 w-20 text-center pt-1">
+                    <div className={`text-xs text-slate-600 font-medium uppercase tracking-wide ${
+                      day.dayName === 'Sat' || day.dayName === 'Sun' ? 'text-blue-600' : ''
+                    }`}>
+                      {day.dayName}
+                    </div>
+                    <div className={`text-xl font-bold mt-1 ${
+                      day.dayName === 'Sat' || day.dayName === 'Sun' ? 'text-blue-800' : 'text-slate-800'
+                    } ${
+                      new Date(day.fullDate).toDateString() === today.toDateString() ? 
+                      "text-blue-600" : ""
+                    }`}>
+                      {day.date}
+                    </div>
+                  </div>
+                  
+                  {/* Attendance card */}
+                  <div 
+                    className={`flex-grow ml-8 p-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${
+                      selectedDay === index ? 
+                        "border-blue-300 shadow-md bg-blue-50/80" : 
+                        "border-slate-100 hover:border-slate-200"
+                    } border`}
+                    onClick={() => toggleDayDetails(index)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <StatusBadge status={day.status} />
+                      
+                      {day.totalHours > 0 && (
+                        <div className="text-base font-bold text-slate-800 flex items-center">
+                          <span className="text-xs font-normal text-slate-600 mr-1">Total:</span>
+                          {day.totalHours} <span className="text-xs font-normal text-slate-600 ml-1">hrs</span>
+                        </div>
+                      )}
+                    </div>
                     
-                    {day.totalHours > 0 && (
-                      <div className="text-lg font-bold text-gray-800 flex items-center">
-                        <span className="text-sm font-normal text-text mr-1">Total:</span>
-                        {day.totalHours} <span className="text-sm font-normal text-text ml-1">hrs</span>
+                    {(day.checkIn || day.checkOut) && (
+                      <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-700">
+                        {day.checkIn && (
+                          <div className="flex items-center">
+                            <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                            <span className="font-medium">In:</span> <span className="font-mono ml-1">{day.checkIn}</span>
+                            {day.late && (
+                              <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-medium">
+                                {day.late}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {day.checkOut && (
+                          <div className="flex items-center">
+                            <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                            <span className="font-medium">Out:</span> <span className="font-mono ml-1">{day.checkOut}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {expandedView && (
+                      <div className="mt-3 text-sm text-slate-600">
+                        {day.notes && (
+                          <div className="flex items-start">
+                            <span className="text-slate-400 mr-2">•</span>
+                            <span>{day.notes}</span>
+                          </div>
+                        )}
+                        {day.status === "Present" && (
+                          <div className="flex items-start mt-1">
+                            <span className="text-slate-400 mr-2">•</span>
+                            <span>Regular working day</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {selectedDay === index && !expandedView && day.notes && (
+                      <div className="mt-3 p-3 bg-slate-50/80 rounded text-sm text-slate-700 border-t border-slate-200">
+                        {day.notes}
                       </div>
                     )}
                   </div>
-                  
-                  {(day.checkIn || day.checkOut) && (
-                    <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-text">
-                      {day.checkIn && (
-                        <div className="flex items-center">
-                          <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                          <span className="font-medium">In:</span> {day.checkIn}
-                          {day.late && (
-                            <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
-                              {day.late}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                      {day.checkOut && (
-                        <div className="flex items-center">
-                          <span className="inline-block w-2 h-2 rounded-full bg-red-500 mr-2"></span>
-                          <span className="font-medium">Out:</span> {day.checkOut}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {expandedView && (
-                    <div className="mt-3 text-sm text-gray-600">
-                      {day.notes && (
-                        <div className="flex items-start">
-                          <span className="text-text mr-2">•</span>
-                          <span>{day.notes}</span>
-                        </div>
-                      )}
-                      {day.status === "Present" && (
-                        <div className="flex items-start mt-1">
-                          <span className="text-text mr-2">•</span>
-                          <span>Regular working day</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {selectedDay === index && !expandedView && day.notes && (
-                    <div className="mt-3 p-3 bg-gray-50 rounded text-sm text-text border-t border-gray-200">
-                      {day.notes}
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Summary Card */}
-      <div className="mt-6 bg-background rounded-xl shadow p-4">
+      <div className="mt-6 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
         <div className="flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-            <span className="text-sm text-text">
-              Present: {weeklyData.filter(d => d.status === "Present").length} days
+            <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+              Present: <span className="font-bold text-slate-800">{weeklyData.filter(d => d.status === "Present").length} days</span>
             </span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-            <span className="text-sm text-gray-600">
-              Half Day: {weeklyData.filter(d => d.status === "Half Day").length} days
+            <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+              Half Day: <span className="font-bold text-slate-800">{weeklyData.filter(d => d.status === "Half Day").length} days</span>
             </span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-            <span className="text-sm text-gray-600">
-              Leave: {weeklyData.filter(d => d.status === "Leave").length} days
+            <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+              Leave: <span className="font-bold text-slate-800">{weeklyData.filter(d => d.status === "Leave").length} days</span>
             </span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-            <span className="text-sm text-gray-600">
-              Absent: {weeklyData.filter(d => d.status === "Absent").length} days
+            <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+              Absent: <span className="font-bold text-slate-800">{weeklyData.filter(d => d.status === "Absent").length} days</span>
             </span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
-            <span className="text-sm text-gray-600">
-              Holiday: {weeklyData.filter(d => d.status === "Holiday").length} days
+            <span className="text-xs font-medium text-slate-800 uppercase tracking-wide">
+              Holiday: <span className="font-bold text-slate-800">{weeklyData.filter(d => d.status === "Holiday").length} days</span>
             </span>
           </div>
         </div>

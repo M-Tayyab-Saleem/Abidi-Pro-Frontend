@@ -79,13 +79,13 @@ const LeaveSummary = () => {
             icon: <FaMoneyBillWave />,
             label: "PTO (Paid Time Off)",
             available: leaveBalances.pto || 0,
-            badgeColor: "bg-green-500",
+            badgeColor: "bg-gradient-to-r from-green-500 to-green-600",
         },
         {
             icon: <FaHospital />,
             label: "Sick Leave",
             available: leaveBalances.sick || 0,
-            badgeColor: "bg-blue-500",
+            badgeColor: "bg-gradient-to-r from-blue-500 to-blue-600",
         }
     ];
 
@@ -102,26 +102,32 @@ const LeaveSummary = () => {
     };
 
     return (
-        <div>
-            {/* Leave Summary */}
-            <div className="mt-3 mb-6 bg-background px-6 py-1 rounded-md text-sm font-medium">
-                <div className="flex flex-col items-center sm:flex sm:flex-row sm:justify-between sm:items-center p-4">
+        <div className="min-h-screen bg-transparent p-4">
+            {/* Leave Summary Header */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-6 p-4">
+                <div className="flex flex-col items-center sm:flex-row sm:justify-between sm:items-center">
                     <div>
-                        <div className="px-2 text-sm md:text-2xl sm:text-xl">
+                        <div className="text-base font-bold text-slate-800 uppercase tracking-tight mb-2">
                             Leave Summary
                         </div>
-                        <div className="">
-                            <h1 className="px-2 text-xs font-light mt-3 ml-1">
-                                Available Leaves: {userProfile?.avalaibleLeaves || 0}
-                            </h1>
-                            <h1 className="px-2 text-xs font-light mt-2 ml-1">
-                                Booked Leaves: {userProfile?.bookedLeaves || 0}
-                            </h1>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div className="flex items-center">
+                                <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                <span className="text-xs text-slate-700 font-medium">
+                                    Available Leaves: <span className="font-bold text-slate-800">{userProfile?.avalaibleLeaves || 0}</span>
+                                </span>
+                            </div>
+                            <div className="flex items-center">
+                                <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
+                                <span className="text-xs text-slate-700 font-medium">
+                                    Booked Leaves: <span className="font-bold text-slate-800">{userProfile?.bookedLeaves || 0}</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="bg-[#76FA9E] h-8 px-4 mt-4 rounded-lg text-xs"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all mt-4 sm:mt-0"
                     >
                         Apply Now
                     </button>
@@ -129,59 +135,81 @@ const LeaveSummary = () => {
             </div>
 
             {/* Leave Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 {/* Total Leaves Card */}
-                <AttendanceCard
-                    icon={<MdEventAvailable />}
-                    title="Total Leaves"
-                    value={totalLeaves}
-                    badgeColor="bg-gradient-to-r from-teal-500 to-teal-600"
-                />
+                <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="text-slate-700 text-sm font-medium uppercase tracking-wide">Total Leaves</div>
+                        <div className="text-blue-600">
+                            <MdEventAvailable size={20} />
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-slate-800">{totalLeaves}</div>
+                    <div className="h-1 w-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full mt-2"></div>
+                </div>
+                
                 {/* Individual Leave Type Cards */}
                 {leaveData.map((item, index) => (
-                    <AttendanceCard
-                        key={index}
-                        icon={item.icon}
-                        title={item.label}
-                        value={item.available}
-                        badgeColor={item.badgeColor}
-                    />
+                    <div key={index} className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="text-slate-700 text-sm font-medium uppercase tracking-wide">{item.label}</div>
+                            <div className="text-slate-600">
+                                {item.icon}
+                            </div>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-800">{item.available}</div>
+                        <div className={`h-1 w-full ${item.badgeColor} rounded-full mt-2`}></div>
+                    </div>
                 ))}
             </div>
 
             {/* Holidays Table */}
-            <div className="p-4 bg-background px-6 pb-8 rounded-md text-sm font-semibold">
-                <h1 className="my-2 mb-6">Holidays</h1>
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4 mb-6">
+                <h1 className="text-base font-bold text-slate-800 uppercase tracking-tight mb-4">Holidays</h1>
                 {loading.holidays ? (
-                    <div className="p-4 text-center">Loading holidays...</div>
+                    <div className="p-4 text-center">
+                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-slate-600"></div>
+                        <p className="mt-2 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading holidays...</p>
+                    </div>
                 ) : errorMsg ? (
-                    <div className="text-red-400 px-2">{errorMsg}</div>
+                    <div className="text-red-600 bg-red-50 px-4 py-3 rounded-lg text-sm font-medium">{errorMsg}</div>
                 ) : (
                     <HolidayTable holidays={holidays} searchTerm="" />
                 )}
             </div>
 
             {/* Applied Leaves Table */}
-            <div className="p-4 mb-8 bg-background px-6 pb-8 mt-4 rounded-md text-sm font-semibold">
-                <h1 className="my-2 mb-6">Applied Leaves</h1>
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
+                <h1 className="text-base font-bold text-slate-800 uppercase tracking-tight mb-4">Applied Leaves</h1>
                 {loading.leaves ? (
-                    <div className="text-white px-4">Loading...</div>
+                    <div className="p-4 text-center">
+                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-slate-600"></div>
+                        <p className="mt-2 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading leaves...</p>
+                    </div>
                 ) : errorMsg ? (
-                    <div className="text-red-400 px-2">{errorMsg}</div>
+                    <div className="text-red-600 bg-red-50 px-4 py-3 rounded-lg text-sm font-medium">{errorMsg}</div>
                 ) : leaves.length === 0 ? (
-                    <div className="text-gray-500 px-4">No leave records found.</div>
+                    <div className="p-6 text-center text-slate-500 text-sm bg-slate-50/80 rounded-lg">
+                        <div className="flex flex-col items-center gap-2">
+                            <svg className="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                            <p className="font-medium text-slate-500">No leave records found</p>
+                        </div>
+                    </div>
                 ) : (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full text-sm text-left border-separate border-spacing-0">
-                            <thead className="bg-primary rounded-t-lg">
-                                <tr>
+                        <table className="min-w-full text-sm border-separate border-spacing-0">
+                            <thead>
+                                <tr className="bg-slate-100/80 backdrop-blur-sm text-slate-800">
                                     {["Date", "Leave Type", "Reason", "Duration", "Status"].map((header, index) => (
                                         <th
                                             key={index}
-                                            className={`p-3 font-medium text-white whitespace-nowrap border-r last:border-none border-gray-300
-                          ${index === 0 ? "rounded-tl-lg" : ""}
-                          ${index === 4 ? "rounded-tr-lg" : ""}
-                        `}
+                                            className={`p-4 font-semibold text-xs uppercase tracking-wide border-b border-slate-200 text-left ${
+                                                index === 0 ? "rounded-tl-lg" : ""
+                                            } ${
+                                                index === 4 ? "rounded-tr-lg" : ""
+                                            }`}
                                         >
                                             {header}
                                         </th>
@@ -190,13 +218,21 @@ const LeaveSummary = () => {
                             </thead>
                             <tbody>
                                 {formatAppliedLeaves(leaves).map((item, index) => (
-                                    <tr key={index} className="border-b hover:bg-gray-50">
-                                        <td className="p-3 whitespace-nowrap">{item.date}</td>
-                                        <td className="p-3 whitespace-nowrap">{item.leaveType}</td>
-                                        <td className="p-3 whitespace-nowrap">{item.reason}</td>
-                                        <td className="p-3 whitespace-nowrap">{item.duration}</td>
-                                        <td className={`p-3 whitespace-nowrap text-center ${item.status === "Approved" ? 'bg-completed' : 'bg-slate-500 text-white'} rounded-sm`}>
-                                            {item.status}
+                                    <tr key={index} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                        <td className="p-4 text-slate-700 font-medium">{item.date}</td>
+                                        <td className="p-4 text-slate-600">{item.leaveType}</td>
+                                        <td className="p-4 text-slate-600">{item.reason}</td>
+                                        <td className="p-4 text-slate-700 font-medium">{item.duration}</td>
+                                        <td className="p-4">
+                                            <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wide ${
+                                                item.status === "Approved" 
+                                                    ? "bg-green-100 text-green-800" 
+                                                    : item.status === "Rejected"
+                                                    ? "bg-red-100 text-red-800"
+                                                    : "bg-yellow-100 text-yellow-800"
+                                            }`}>
+                                                {item.status}
+                                            </span>
                                         </td>
                                     </tr>
                                 ))}
@@ -205,6 +241,7 @@ const LeaveSummary = () => {
                     </div>
                 )}
             </div>
+            
             <ApplyLeaveModal 
                 isOpen={isOpen} 
                 setIsOpen={setIsOpen}
@@ -214,9 +251,7 @@ const LeaveSummary = () => {
                 }}
                 userLeaves={leaveBalances}
             />
-
         </div>
-
     );
 };
 
