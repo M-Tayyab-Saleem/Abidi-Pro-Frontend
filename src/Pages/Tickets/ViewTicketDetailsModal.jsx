@@ -1,80 +1,108 @@
-import React from "react";
+import React, { useRef } from "react";
 import { FiPaperclip } from "react-icons/fi";
 
 const ViewTicketDetailsModal = ({ ticket, onClose }) => {
+  const modalRef = useRef(null);
+
   if (!ticket) return null;
 
-  const statusColor =
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
+
+  const statusStyles =
     ticket.status === "opened"
-      ? "bg-green-100 text-green-700"
-      : "bg-red-100 text-red-700";
+      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+      : "bg-rose-50 text-rose-600 border-rose-100";
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end transition-opacity duration-300">
-      <div className="bg-white w-full sm:max-w-[90%] md:max-w-[500px] h-full p-6 shadow-2xl transform transition-all duration-500 translate-x-0 rounded-tl-3xl rounded-bl-3xl overflow-y-auto flex flex-col">
+    <div
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6"
+      onClick={handleBackdropClick}
+    >
+      <div
+        ref={modalRef}
+        className="w-full max-w-md bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] animate-fadeIn overflow-hidden"
+      >
+        {/* Close Cross Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
+        >
+          &times;
+        </button>
+
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 pb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Ticket Overview</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 text-3xl font-light hover:text-red-500 transition"
-          >
-            ×
-          </button>
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-b border-slate-50 text-center flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-black text-slate-800 tracking-widest uppercase">
+            TICKET OVERVIEW
+          </h2>
         </div>
 
-        {/* Ticket Details */}
-        <div className="space-y-6 text-base text-gray-700">
-          <DetailItem label="Ticket ID" value={ticket.ticketID} />
-          <DetailItem
-            label="Created On"
-            value={new Date(ticket.createdAt).toLocaleDateString()}
-          />
-          <DetailItem
-            label="Requester Email"
-            value={ticket.emailAddress || "Not provided"}
-          />
-          <DetailItem label="Subject" value={ticket.subject} />
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-500 mb-1">Status</label>
-            <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${statusColor}`}>
-              {ticket.status}
-            </span>
+        {/* Scrollable Content Body */}
+        <div className="p-6 sm:p-10 space-y-6 overflow-y-auto custom-scrollbar">
+          <DetailItem label="TICKET ID" value={ticket.ticketID} />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <DetailItem 
+              label="CREATED ON" 
+              value={new Date(ticket.createdAt).toLocaleDateString()} 
+            />
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">
+                STATUS
+              </label>
+              <span className={`inline-block px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg border ${statusStyles}`}>
+                {ticket.status}
+              </span>
+            </div>
           </div>
 
+          <DetailItem 
+            label="REQUESTER EMAIL" 
+            value={ticket.emailAddress || "Not provided"} 
+          />
+          
+          <DetailItem label="SUBJECT" value={ticket.subject} />
+
           <div>
-            <label className="block text-sm font-semibold text-gray-500 mb-1">Description</label>
-            <p className="bg-gray-100 p-3 rounded-lg text-gray-800 shadow-sm leading-relaxed">
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              DESCRIPTION
+            </label>
+            <p className="bg-slate-50 border border-slate-100 p-4 rounded-xl text-sm text-slate-600 font-medium leading-relaxed">
               {ticket.description}
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-500 mb-1">Attachment</label>
+          <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              ATTACHMENT
+            </label>
             {ticket.attachments && ticket.attachments.length > 0 ? (
               <a
                 href={ticket.attachments[0].url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-blue-600 hover:underline"
+                className="flex items-center gap-2 text-blue-500 hover:text-blue-600 font-bold text-xs transition-colors"
               >
-                <FiPaperclip className="w-4 h-4" />
-                <span>{ticket.attachments[0].name || "View File"}</span>
+                <FiPaperclip className="w-3 h-3" />
+                <span className="truncate">{ticket.attachments[0].name || "VIEW FILE"}</span>
               </a>
             ) : (
-              <span className="text-sm text-gray-400 italic">No attachment provided</span>
+              <span className="text-[10px] text-slate-300 font-bold uppercase">No file attached</span>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-auto pt-6">
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 bg-white flex-shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-red-300 text-red-800 rounded hover:bg-red-400"
+            className="w-full py-3 sm:py-4 bg-[#64748b] text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all"
           >
-            Close
+            CLOSE OVERVIEW
           </button>
         </div>
       </div>
@@ -82,12 +110,16 @@ const ViewTicketDetailsModal = ({ ticket, onClose }) => {
   );
 };
 
-// Reusable label/value pair
+// Internal Helper for Detail Items
 const DetailItem = ({ label, value }) => (
-  <div>
-    <label className="block text-sm font-semibold text-gray-500 mb-1">{label}</label>
-    <div className="text-gray-800">{value}</div>
+  <div className="space-y-1">
+    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">
+      {label}
+    </label>
+    <div className="text-sm sm:text-base text-slate-700 font-bold truncate">
+      {value}
+    </div>
   </div>
 );
 
-export default ViewTicketDetailsModal;
+export default ViewTicketDetailsModal;  

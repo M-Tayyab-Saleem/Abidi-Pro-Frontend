@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { IoClose } from "react-icons/io5";
+import React, { useState, useEffect, useRef } from "react";
 import timesheetApi from "../../api/timesheetApi";
 import timeLogApi from "../../api/timeLogApi";
 import { toast } from "react-toastify";
@@ -10,8 +9,8 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
   const [attachment, setAttachment] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [fetchingLogs, setFetchingLogs] = useState(false);
+  const modalRef = useRef(null);
 
   const formatDate = (date) => {
     const d = new Date(date);
@@ -24,14 +23,10 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
   useEffect(() => {
     if (open) {
       const today = new Date();
-      const formattedDate = formatDate(today);
-      setTimesheetName(`Timesheet (${formattedDate})`);
+      setTimesheetName(`Timesheet (${formatDate(today)})`);
       setDescription("");
       setAttachment(null);
       setLogs([]);
-      setError(null);
-      
-      // Fetch today's logs
       fetchTodaysLogs();
     }
   }, [open]);
@@ -41,177 +36,162 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
       setFetchingLogs(true);
       const today = new Date();
       const response = await timeLogApi.getEmployeeTimeLogs(today.toISOString().split('T')[0]);
-      
-      // Filter logs that haven't been added to a timesheet yet
       const availableLogs = response.filter(log => !log.isAddedToTimesheet);
       setLogs(availableLogs);
-      
-      if (availableLogs.length === 0) {
-        toast.warning("No available time logs found for today");
-      }
+      if (availableLogs.length === 0) toast.warning("No available time logs for today");
     } catch (err) {
-      console.error("Failed to fetch today's logs:", err);
-      toast.error("Failed to load today's time logs");
+      toast.error("Failed to load today's logs");
     } finally {
       setFetchingLogs(false);
     }
   };
 
-  const isValid =
-    timesheetName.trim().length >= 3 &&
-    description.trim().length >= 5 &&
-    logs.length > 0;
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) onClose();
+  };
 
-  const handleSubmit = async () => {
-  if (!isValid) return;
+  const isValid = timesheetName.trim().length >= 3 && description.trim().length >= 5 && logs.length > 0;
 
-  setLoading(true);
-  try {
-    const formData = new FormData();
-    formData.append('name', timesheetName);
-    formData.append('description', description);
-    
-    if (attachment) {
-      formData.append('attachments', attachment); // Single file
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isValid) return;
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', timesheetName);
+      formData.append('description', description);
+      if (attachment) formData.append('attachments', attachment);
+      logs.forEach(log => formData.append('timeLogs', log._id));
+
+      await timesheetApi.createTimesheet(formData);
+      toast.success("Timesheet created successfully!");
+      onTimesheetCreated();
+      onClose();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to create timesheet");
+    } finally {
+      setLoading(false);
     }
-    
-    logs.forEach(log => {
-      formData.append('timeLogs', log._id); // Simplified array format
-    });
+  };
 
-    await timesheetApi.createTimesheet(formData);
-    toast.success("Timesheet created successfully!");
-    onTimesheetCreated(); 
-    onClose(); 
-  } catch (error) {
-    console.error("Failed to create timesheet:", error);
-    const errorMsg = error.response?.data?.message || "Failed to create timesheet";
-    setError(errorMsg);
-    toast.error(errorMsg);
-  } finally {
-    setLoading(false);
-  }
-};
+  if (!open) return null;
+
   return (
-    <>
-      {open && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-40"
-          onClick={onClose}
-        ></div>
-      )}
-
+    <div
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6"
+      onClick={handleBackdropClick}
+    >
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-lg bg-white text-black p-6 shadow-xl z-50 overflow-y-auto transition-transform duration-300 ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-        onClick={(e) => e.stopPropagation()}
+        ref={modalRef}
+        className="w-full max-w-lg bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] animate-fadeIn overflow-hidden"
       >
-        {/* Close Icon */}
+        {/* Close Cross */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
         >
-          <IoClose size={24} />
+          &times;
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Create Timesheet</h2>
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-b border-slate-50 text-center flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-black text-slate-800 tracking-widest uppercase">
+            CREATE TIMESHEET
+          </h2>
+        </div>
 
-        {/* Today's Logs */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Today's Time Logs</h3>
-          {fetchingLogs ? (
-            <div className="text-center p-4">Loading today's logs...</div>
-          ) : logs.length === 0 ? (
-            <p className="text-gray-500 text-sm">No time logs found for today.</p>
-          ) : (
-            <ul className="space-y-3">
-              {logs.map((log) => (
-                <li
-                  key={log._id}
-                  className="border border-gray-200 p-4 rounded-lg bg-gray-50"
-                >
-                  <div>
-                    <p className="text-sm">
-                      <strong>Job:</strong> {log.job || log.jobTitle}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Time:</strong> {new Date(log.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Hours:</strong> {log.hours}
-                    </p>
-                    <p className="text-sm">
-                      <strong>Description:</strong> {log.description}
-                    </p>
+        <form
+          className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar"
+          onSubmit={handleSubmit}
+        >
+          {/* Logs Section */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">
+              TODAY'S TIME LOGS
+            </label>
+            {fetchingLogs ? (
+              <div className="text-center p-4 text-xs font-bold text-slate-400 animate-pulse">FETCHING...</div>
+            ) : logs.length === 0 ? (
+              <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400 italic">
+                No time logs found for today.
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                {logs.map((log) => (
+                  <div key={log._id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-black text-slate-700 uppercase tracking-tighter">{log.job || log.jobTitle}</span>
+                      <span className="font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">{log.hours} HRS</span>
+                    </div>
+                    <p className="text-slate-400 line-clamp-1">{log.description}</p>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        {/* Timesheet Name - Readonly */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">
-            Timesheet Name
-          </label>
-          <input
-            type="text"
-            value={timesheetName}
-            readOnly
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100"
-          />
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Description */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-            rows="3"
-            placeholder="Describe the timesheet summary..."
-            required
-          />
-        </div>
+          {/* Timesheet Name */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              TIMESHEET NAME
+            </label>
+            <input
+              type="text"
+              value={timesheetName}
+              readOnly
+              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-500 font-bold outline-none cursor-default"
+            />
+          </div>
 
-        {/* Attachment */}
-        <div className="mb-6">
-          <label className="block text-sm font-semibold mb-1">Attachment</label>
-          <input
-            type="file"
-            onChange={(e) => setAttachment(e.target.files[0])}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2"
-          />
-        </div>
+          {/* Description */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              SUMMARY DESCRIPTION*
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all placeholder:text-slate-300 min-h-[100px]"
+              placeholder="e.g. today's progress summary"
+              required
+            />
+          </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2">
+          {/* Attachment */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              ATTACHMENT
+            </label>
+            <div className="relative group">
+              <input
+                type="file"
+                onChange={(e) => setAttachment(e.target.files[0])}
+                className="w-full opacity-0 absolute inset-0 cursor-pointer z-10"
+              />
+              <div className="w-full bg-white border border-slate-200 border-dashed rounded-xl px-4 py-3 text-sm text-slate-400 flex items-center justify-between group-hover:bg-slate-50 transition-all">
+                <span className="truncate">{attachment ? attachment.name : "Choose a file..."}</span>
+                <span className="text-[10px] font-black text-slate-300">UPLOAD</span>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 flex gap-3 sm:gap-4 bg-white flex-shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+            className="flex-1 py-3 sm:py-4 font-black text-[10px] text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
           >
-            Cancel
+            CANCEL
           </button>
           <button
             onClick={handleSubmit}
             disabled={!isValid || loading || fetchingLogs}
-            className={`px-4 py-2 rounded-lg ${
-              isValid && !loading && !fetchingLogs
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-blue-300 cursor-not-allowed"
-            } text-white`}
+            className="flex-[2] py-3 sm:py-4 bg-[#64748b] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Sending..." : "Send for Approval"}
+            {loading ? "SENDING..." : "SEND FOR APPROVAL"}
           </button>
         </div>
-
-        
       </div>
-    </>
+    </div>
   );
 }

@@ -1,115 +1,121 @@
-import React, { useState, useEffect } from "react";
-import { IoClose } from "react-icons/io5";
+import React, { useRef } from "react";
 import { FaDownload } from 'react-icons/fa';
 
-import timeLogApi from "../../api/timeLogApi";
+const ViewTimeLogModal = ({ log, onClose }) => {
+  const modalRef = useRef(null);
 
-const ViewTimeLogModal = ({ log: propLog, onClose }) => {
-  const [log, setLog] = useState(propLog || null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  console.log("ViewTimeLogModal log:", log);
-
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
   if (!log) return null;
 
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
 
   const getDownloadLink = (fileName) => {
     return `/uploads/${fileName}`;
   };
 
   return (
-    <>
+    <div
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6"
+      onClick={handleBackdropClick}
+    >
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
-        onClick={onClose}
-      ></div>
-
-      <div className="fixed top-0 right-0 h-full w-full max-w-lg bg-white text-black p-6 shadow-xl z-50 overflow-y-auto">
-        {/* Close Icon */}
+        ref={modalRef}
+        className="w-full max-w-md bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] animate-fadeIn overflow-hidden"
+      >
+        {/* Close Cross */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
         >
-          <IoClose size={24} />
+          &times;
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 pb-2">
-          View Time Log
-        </h2>
+        {/* Header */}
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-b border-slate-50 text-center flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-black text-slate-800 tracking-widest uppercase">
+            VIEW TIME LOG
+          </h2>
+        </div>
 
-        <div className="space-y-5">
+        {/* Content Body */}
+        <div className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar">
+          {/* Job Title */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Job Title
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              JOB TITLE
             </label>
-            <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
+            <p className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium">
               {log.jobTitle || "-"}
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Date
-            </label>
-            <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
-              {log.date ? new Date(log.date).toLocaleDateString('en-GB') : "-"}            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Description
-            </label>
-            <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 whitespace-pre-line">
-              {log.description || "-"}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Hours
-            </label>
-            <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
-              {log.totalHours || "-"}
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Attachment
-            </label>
-            {log.attachments ? (
-              <div className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 flex items-center justify-between">
-                <span>{log.attachments?.[0]?.originalname}</span>
-                <a
-                  href={getDownloadLink(log.attachments?.[0]?.originalname)}
-                  download
-                  className="border-l ml-4 text-sm text-green py-1 px-2 rounded"
-                >
-                  <FaDownload size={16} />
-                </a>
-              </div>
-            ) : (
-              <p className="px-4 py-2 border border-gray-200 rounded-lg bg-gray-50">
-                -
+          <div className="grid grid-cols-2 gap-4">
+            {/* Date */}
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+                DATE
+              </label>
+              <p className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium">
+                {log.date ? new Date(log.date).toLocaleDateString('en-GB') : "-"}
               </p>
-            )}
+            </div>
+            {/* Hours */}
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+                HOURS
+              </label>
+              <p className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium">
+                {log.totalHours || "-"}
+              </p>
+            </div>
           </div>
 
-          <div className="flex justify-end pt-4">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-            >
-              Close
-            </button>
+          {/* Description */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              DESCRIPTION
+            </label>
+            <div className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium whitespace-pre-line min-h-[100px]">
+              {log.description || "-"}
+            </div>
+          </div>
+
+          {/* Attachment */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              ATTACHMENT
+            </label>
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <span className="text-[11px] font-bold text-slate-500 truncate mr-4">
+                {log.attachments?.[0]?.originalname || "No attachment"}
+              </span>
+              {log.attachments?.[0] && (
+                <a
+                  href={getDownloadLink(log.attachments[0].originalname)}
+                  download
+                  className="w-8 h-8 flex items-center justify-center bg-white rounded-lg text-slate-400 hover:text-[#64748b] shadow-sm transition-colors"
+                >
+                  <FaDownload size={14} />
+                </a>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 flex bg-white flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="w-full py-3 sm:py-4 bg-[#64748b] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all"
+          >
+            CLOSE VIEW
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

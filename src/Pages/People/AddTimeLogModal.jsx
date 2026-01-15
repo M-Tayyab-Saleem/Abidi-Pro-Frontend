@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { IoClose } from "react-icons/io5";
+import React, { useState, useRef } from "react";
 import timeLogApi from "../../api/timeLogApi";
 import { toast } from "react-toastify";
 
@@ -12,24 +11,26 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
   const [attachment, setAttachment] = useState(null);
   const [logs, setLogs] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const modalRef = useRef(null);
 
-  const jobOptions = [
-    "Frontend Development",
-    "Backend Development",
-    "Design",
-    "Testing",
-    "Other",
-  ];
-
+  const jobOptions = ["Frontend Development", "Backend Development", "Design", "Testing", "Other"];
   const finalJobTitle = jobTitle === "Other" ? customJobTitle.trim() : jobTitle;
 
+  // Validation
   const isJobTitleValid = finalJobTitle.length >= 3;
   const isDateValid = Boolean(date);
   const isHoursValid = Number(hours) > 0;
   const isDescriptionValid = description.trim().length >= 5;
+  const isCurrentInputValid = isJobTitleValid && isDateValid && isHoursValid && isDescriptionValid;
 
-  const isCurrentInputValid =
-    isJobTitleValid && isDateValid && isHoursValid && isDescriptionValid;
+  if (!isOpen) return null;
+
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
 
   const handleAddAnother = () => {
     if (isCurrentInputValid) {
@@ -39,8 +40,10 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
         hours: parseFloat(hours),
         description: description.trim(),
         attachmentName: attachment ? attachment.name : null,
+        attachmentFile: attachment,
       };
       setLogs([...logs, newLog]);
+      // Reset form fields
       setJobTitle("");
       setCustomJobTitle("");
       setDate("");
@@ -53,262 +56,194 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      const payload =
-        logs.length > 0
-          ? logs.map((log) => ({
-              job: log.jobTitle,
-              date: log.date,
-              hours: log.hours,
-              description: log.description,
-              attachments: log.attachment ? [log.attachment] : [],
-            }))
-          : [
-              {
-                job: finalJobTitle,
-                date,
-                hours: parseFloat(hours),
-                description: description.trim(),
-                attachments: attachment ? [attachment] : [],
-              },
-            ];
+      // Use current input if logs array is empty, otherwise use logs array
+      const logsToSubmit = logs.length > 0 ? logs : [{
+        jobTitle: finalJobTitle,
+        date,
+        hours: parseFloat(hours),
+        description: description.trim(),
+        attachmentFile: attachment
+      }];
 
-      // Create each time log
-      for (const log of payload) {
+      for (const log of logsToSubmit) {
         const formData = new FormData();
-        formData.append("job", log.job);
+        formData.append("job", log.jobTitle);
         formData.append("date", log.date);
         formData.append("hours", log.hours);
         formData.append("description", log.description);
-        if (log.attachments && log.attachments.length > 0) {
-          formData.append("attachments", log.attachments[0]);
+        if (log.attachmentFile) {
+          formData.append("attachments", log.attachmentFile);
         }
-
         await timeLogApi.createTimeLog(formData);
       }
 
-      // Clear form and close modal
       setLogs([]);
-      setJobTitle("");
-      setCustomJobTitle("");
-      setDate("");
-      setHours("");
-      setDescription("");
-      setAttachment(null);
-      toast.success("Time log(s) added successfully!");
-      onTimeLogAdded(); // This should trigger a refetch in parent
+      toast.success("TIME LOG(S) SAVED");
+      onTimeLogAdded();
       onClose();
     } catch (error) {
-      console.error("Failed to save time log:", error);
-      toast.error(error.response?.data?.message || "Failed to save time log");
+      toast.error(error.response?.data?.message || "FAILED TO SAVE");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-40 z-40"
-          onClick={onClose}
-        ></div>
-      )}
-
-      <div
-        className={`fixed top-0 right-0 h-full w-full max-w-lg bg-white text-black p-6 shadow-xl z-50 overflow-y-auto transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+    <div 
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6"
+      onClick={handleBackdropClick}
+    >
+      <div 
+        ref={modalRef}
+        className="w-full max-w-lg bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] animate-fadeIn overflow-hidden"
       >
-        {/* Close Icon */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+        {/* CLOSE CROSS */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
         >
-          <IoClose size={24} />
+          &times;
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 pb-2">Add Time Log</h2>
+        {/* HEADER */}
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-b border-slate-50 text-center flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-black text-slate-800 tracking-widest uppercase">
+            ADD TIME LOG
+          </h2>
+        </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleAddAnother();
-          }}
-          className="space-y-5"
-        >
-          {/* Job Title */}
+        {/* FORM BODY */}
+        <div className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar">
+          
+          {/* JOB TITLE */}
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Job Title
-            </label>
-            <select
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
-              required
-            >
-              <option value="">Select Job Title</option>
-              {jobOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            {jobTitle === "Other" && (
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">JOB TITLE*</label>
+            <div className="space-y-3">
+              <div className="relative">
+                <select
+                  value={jobTitle}
+                  onChange={(e) => setJobTitle(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-100 transition-all"
+                  required
+                >
+                  <option value="">SELECT JOB</option>
+                  {jobOptions.map((opt) => (
+                    <option key={opt} value={opt}>{opt.toUpperCase()}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
+              {jobTitle === "Other" && (
+                <input
+                  type="text"
+                  placeholder="enter custom title"
+                  value={customJobTitle}
+                  onChange={(e) => setCustomJobTitle(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300"
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* DATE */}
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">DATE*</label>
               <input
-                type="text"
-                placeholder="Enter custom job title"
-                value={customJobTitle}
-                onChange={(e) => setCustomJobTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-2 text-black"
-                required
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
               />
-            )}
-            {!isJobTitleValid && jobTitle && (
-              <p className="text-xs text-red-600 mt-1">
-                Job Title must be at least 3 characters
-              </p>
-            )}
+            </div>
+            {/* HOURS */}
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">HOURS*</label>
+              <input
+                type="number"
+                step="0.5"
+                placeholder="0.0"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300"
+              />
+            </div>
           </div>
 
-          {/* Date */}
+          {/* DESCRIPTION */}
           <div>
-            <label className="block text-sm font-semibold mb-1">Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
-              required
-            />
-          </div>
-
-          {/* Hours */}
-          <div>
-            <label className="block text-sm font-semibold mb-1">Hours</label>
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={hours}
-              onChange={(e) => setHours(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
-              required
-            />
-            {!isHoursValid && hours && (
-              <p className="text-xs text-red-600 mt-1">
-                Hours must be greater than 0
-              </p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Description
-            </label>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">DESCRIPTION*</label>
             <textarea
+              placeholder="describe your work..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
-              required
-            />
-            {!isDescriptionValid && description && (
-              <p className="text-xs text-red-600 mt-1">
-                Description must be at least 5 characters
-              </p>
-            )}
-          </div>
-
-          {/* Attachment */}
-          <div>
-            <label className="block text-sm font-semibold mb-1">
-              Attachment
-            </label>
-            <input
-              type="file"
-              onChange={(e) => setAttachment(e.target.files[0])}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300 resize-none"
+              rows={3}
             />
           </div>
 
-          {/* Add Another */}
-          <div className="flex justify-start gap-2 pt-4">
-            <button
-              type="button"
-              onClick={handleAddAnother}
-              disabled={!isCurrentInputValid}
-              className={`px-4 py-2 rounded-lg ${
-                isCurrentInputValid
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-green-300 cursor-not-allowed"
-              } text-white`}
+          {/* ATTACHMENT */}
+          <div className="flex flex-col gap-2">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">ATTACHMENT</label>
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
+                    {attachment ? attachment.name : "click to upload file"}
+                  </p>
+                </div>
+                <input type="file" className="hidden" onChange={(e) => setAttachment(e.target.files[0])} />
+              </label>
+            </div>
+          </div>
+
+          {/* PREVIEW OF QUEUED LOGS */}
+          {logs.length > 0 && (
+            <div className="space-y-3">
+               <label className="block text-[10px] font-black text-blue-500 uppercase tracking-widest">QUEUED LOGS ({logs.length})</label>
+               <div className="space-y-2">
+                 {logs.map((log, idx) => (
+                   <div key={idx} className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-[11px] font-medium text-blue-700 flex justify-between items-center">
+                     <span>{log.jobTitle} • {log.hours}h</span>
+                     <span className="text-blue-300 uppercase">{log.date}</span>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER */}
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 flex flex-col sm:flex-row gap-3 bg-white flex-shrink-0">
+          <button 
+            type="button"
+            onClick={handleAddAnother}
+            disabled={!isCurrentInputValid}
+            className="flex-1 py-3 bg-emerald-50 text-emerald-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            + Add Another
+          </button>
+          
+          <div className="flex gap-3 flex-[2]">
+            <button 
+              onClick={onClose} 
+              className="flex-1 py-3 font-black text-[10px] text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
             >
-              Add & Preview
+              CANCEL
+            </button>
+            <button 
+              onClick={handleSave}
+              disabled={(!isCurrentInputValid && logs.length === 0) || isLoading}
+              className="flex-[2] py-3 bg-[#64748b] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
+            >
+              {isLoading ? "SAVING..." : logs.length > 0 ? `SAVE ALL (${logs.length + (isCurrentInputValid ? 1 : 0)})` : "SAVE LOG"}
             </button>
           </div>
-        </form>
-
-        {/* Preview */}
-        {logs.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-lg font-bold mb-3 border-b pb-1">Preview</h3>
-            <ul className="space-y-3">
-              {logs.map((log, idx) => (
-                <li
-                  key={idx}
-                  className="border border-gray-200 p-4 rounded-lg bg-gray-50"
-                >
-                  <p className="text-sm">
-                    <strong>Job Title:</strong> {log.jobTitle}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Date:</strong> {log.date}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Hours:</strong> {log.hours}
-                  </p>
-                  <p className="text-sm">
-                    <strong>Description:</strong> {log.description}
-                  </p>
-                  {log.attachmentName && (
-                    <p className="text-sm">
-                      <strong>Attachment:</strong> {log.attachmentName}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Footer Actions */}
-        <div className="flex gap-2 justify-end pt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={(!isCurrentInputValid && logs.length === 0) || isLoading}
-            className={`px-4 py-2 rounded-lg ${
-              (!isCurrentInputValid && logs.length === 0) || isLoading
-                ? "bg-blue-300 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white`}
-          >
-            {isLoading
-              ? "Saving..."
-              : logs.length > 0
-              ? "Save All Logs"
-              : "Save Log"}
-          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

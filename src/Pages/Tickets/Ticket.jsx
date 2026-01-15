@@ -120,7 +120,7 @@ const Ticket = () => {
 
             <button
               onClick={() => setShowModal(true)}
-              className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-sm font-medium text-white  rounded-full shadow-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+              className="px-4 py-2.5 bg-[#64748b] text-sm font-medium text-white  rounded-full shadow-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
             >
               <FiPlus className="h-4 w-4" />
               Raise Ticket

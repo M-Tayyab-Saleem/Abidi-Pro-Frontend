@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 
 const users = [
@@ -9,17 +9,23 @@ const users = [
   "Syed Munawar Ali Tirmizi",
 ];
 
-const AddTaskDrawer = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
+const AddTaskModal = ({ isOpen, onClose }) => {
   const [assignTo, setAssignTo] = useState(null);
   const [assignBy, setAssignBy] = useState(null);
-
   const [queryTo, setQueryTo] = useState("");
   const [queryBy, setQueryBy] = useState("");
-
   const [showDropdownTo, setShowDropdownTo] = useState(false);
   const [showDropdownBy, setShowDropdownBy] = useState(false);
+  
+  const modalRef = useRef(null);
+
+  if (!isOpen) return null;
+
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
 
   const filteredUsersTo = users.filter((user) =>
     user.toLowerCase().includes(queryTo.toLowerCase())
@@ -28,106 +34,102 @@ const AddTaskDrawer = ({ isOpen, onClose }) => {
     user.toLowerCase().includes(queryBy.toLowerCase())
   );
 
-  const handleSelectTo = (user) => {
-    setAssignTo(user);
-    setShowDropdownTo(false);
-  };
-
-  const handleSelectBy = (user) => {
-    setAssignBy(user);
-    setShowDropdownBy(false);
-  };
-
-  const handleClearTo = () => {
-    setAssignTo(null);
-    setQueryTo("");
-  };
-
-  const handleClearBy = () => {
-    setAssignBy(null);
-    setQueryBy("");
-  };
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-end z-50">
-      <div className="w-full sm:w-1/2 bg-white h-full shadow-lg flex flex-col p-6 relative">
+    <div 
+      className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6"
+      onClick={handleBackdropClick}
+    >
+      <div 
+        ref={modalRef}
+        className="w-full max-w-2xl bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] animate-fadeIn overflow-hidden"
+      >
+        {/* Close Button */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
+        >
+          &times;
+        </button>
+
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold">Add Task</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-black text-xl"
-          >
-            &times;
-          </button>
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-b border-slate-50 text-center flex-shrink-0">
+          <h2 className="text-base sm:text-lg font-black text-slate-800 tracking-widest uppercase">
+            ADD NEW TASK
+          </h2>
         </div>
 
-        {/* Form */}
-        <form className="space-y-4 overflow-y-auto flex-1">
-          <input
-            type="text"
-            placeholder="Task Name"
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
-          />
+        {/* Form Body */}
+        <form 
+          id="taskForm"
+          className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar"
+          onSubmit={(e) => { e.preventDefault(); /* Add submit logic */ }}
+        >
+          {/* Task Name */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">TASK NAME*</label>
+            <input
+              type="text"
+              placeholder="Task name"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-300"
+              required
+            />
+          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              <input
-                type="date"
-                placeholder="Start Date"
-                className="w-full border rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring focus:ring-blue-200"
-              />
-              <FaCalendarAlt className="absolute top-3 right-3 text-gray-400" />
+          {/* Dates Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">START DATE</label>
+              <div className="relative">
+                <input
+                  type="date"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
             </div>
-            <div className="relative">
-              <input
-                type="date"
-                placeholder="End Date"
-                className="w-full border rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring focus:ring-blue-200"
-              />
-              <FaCalendarAlt className="absolute top-3 right-3 text-gray-400" />
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">END DATE</label>
+              <div className="relative">
+                <input
+                  type="date"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
             </div>
           </div>
 
-          <textarea
-            placeholder="Description"
-            rows="3"
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
-          ></textarea>
+          {/* Description */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">DESCRIPTION</label>
+            <textarea
+              placeholder="Brief description"
+              rows="3"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300"
+            ></textarea>
+          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Assign To Field */}
-            <div className="relative w-full max-w-sm">
+          {/* Assignment Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Assign To */}
+            <div className="relative">
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">ASSIGN TO</label>
               {!assignTo ? (
                 <input
                   type="text"
                   value={queryTo}
-                  onChange={(e) => {
-                    setQueryTo(e.target.value);
-                    setShowDropdownTo(true);
-                  }}
-                  placeholder="Assign to"
-                  className="w-full border rounded px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
+                  onChange={(e) => { setQueryTo(e.target.value); setShowDropdownTo(true); }}
+                  placeholder="Find user"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
                 />
               ) : (
-                <div className="flex items-center justify-between border rounded px-4 py-2 bg-gray-100">
-                  <span className="text-gray-800">{assignTo}</span>
-                  <button
-                    onClick={handleClearTo}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Change
-                  </button>
+                <div className="flex items-center justify-between border border-blue-100 rounded-xl px-4 py-3 bg-blue-50/50">
+                  <span className="text-sm font-bold text-slate-700">{assignTo}</span>
+                  <button type="button" onClick={() => {setAssignTo(null); setQueryTo("");}} className="text-[10px] font-black text-blue-500 uppercase">Change</button>
                 </div>
               )}
-
               {showDropdownTo && filteredUsersTo.length > 0 && !assignTo && (
-                <ul className="absolute left-0 right-0 mt-1 bg-white border rounded shadow z-10 max-h-40 overflow-y-auto">
-                  {filteredUsersTo.map((user, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleSelectTo(user)}
-                      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                    >
+                <ul className="absolute left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-xl z-20 max-h-40 overflow-y-auto">
+                  {filteredUsersTo.map((user, i) => (
+                    <li key={i} onClick={() => {setAssignTo(user); setShowDropdownTo(false);}} className="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer text-slate-600 font-medium border-b border-slate-50 last:border-0">
                       {user}
                     </li>
                   ))}
@@ -135,39 +137,27 @@ const AddTaskDrawer = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Assign By Field */}
-            <div className="relative w-full max-w-sm">
+            {/* Assign By */}
+            <div className="relative">
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">ASSIGN BY</label>
               {!assignBy ? (
                 <input
                   type="text"
                   value={queryBy}
-                  onChange={(e) => {
-                    setQueryBy(e.target.value);
-                    setShowDropdownBy(true);
-                  }}
-                  placeholder="Assign by"
-                  className="w-full border rounded px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
+                  onChange={(e) => { setQueryBy(e.target.value); setShowDropdownBy(true); }}
+                  placeholder="Find user"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
                 />
               ) : (
-                <div className="flex items-center justify-between border rounded px-4 py-2 bg-gray-100">
-                  <span className="text-gray-800">{assignBy}</span>
-                  <button
-                    onClick={handleClearBy}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Change
-                  </button>
+                <div className="flex items-center justify-between border border-blue-100 rounded-xl px-4 py-3 bg-blue-50/50">
+                  <span className="text-sm font-bold text-slate-700">{assignBy}</span>
+                  <button type="button" onClick={() => {setAssignBy(null); setQueryBy("");}} className="text-[10px] font-black text-blue-500 uppercase">Change</button>
                 </div>
               )}
-
               {showDropdownBy && filteredUsersBy.length > 0 && !assignBy && (
-                <ul className="absolute left-0 right-0 mt-1 bg-white border rounded shadow z-10 max-h-40 overflow-y-auto">
-                  {filteredUsersBy.map((user, index) => (
-                    <li
-                      key={index}
-                      onClick={() => handleSelectBy(user)}
-                      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                    >
+                <ul className="absolute left-0 right-0 mt-2 bg-white border border-slate-100 rounded-xl shadow-xl z-20 max-h-40 overflow-y-auto">
+                  {filteredUsersBy.map((user, i) => (
+                    <li key={i} onClick={() => {setAssignBy(user); setShowDropdownBy(false);}} className="px-4 py-3 text-sm hover:bg-slate-50 cursor-pointer text-slate-600 font-medium border-b border-slate-50 last:border-0">
                       {user}
                     </li>
                   ))}
@@ -176,32 +166,47 @@ const AddTaskDrawer = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Priority"
-              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200"
-            />
-            <select className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring focus:ring-blue-200">
-              <option value="">Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
-
-          <div className="flex justify-end mt-4">
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-            >
-              Save Task
-            </button>
+          {/* Priority & Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">PRIORITY</label>
+              <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-100">
+                <option value="Low">LOW</option>
+                <option value="Medium">MEDIUM</option>
+                <option value="High">HIGH</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">STATUS</label>
+              <select className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-100">
+                <option value="Pending">PENDING</option>
+                <option value="In Progress">IN PROGRESS</option>
+                <option value="Completed">COMPLETED</option>
+              </select>
+            </div>
           </div>
         </form>
+
+        {/* Footer */}
+        <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 flex gap-3 sm:gap-4 bg-white flex-shrink-0">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+          >
+            CANCEL
+          </button>
+          <button 
+            type="submit" 
+            form="taskForm"
+            className="flex-1 py-3 sm:py-4 bg-[#64748b] text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all"
+          >
+            SAVE TASK
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default AddTaskDrawer;
+export default AddTaskModal;
