@@ -1,15 +1,22 @@
 import { NavLink } from "react-router-dom";
-import { UsersIcon, FolderIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { 
+  UserGroupIcon, 
+  SquaresPlusIcon, 
+  AdjustmentsHorizontalIcon 
+} from "@heroicons/react/24/solid";
 
+
+import { useState } from "react";
 const NavBarVertical = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
 
-  const navLinks = [
-    { name: "People", to: "/people", icon: UsersIcon },
-    { name: "Project", to: "/project", icon: FolderIcon },
-    { name: "Admin", to: "/admin", icon: Cog6ToothIcon },
-  ];
+
+
+const navLinks = [
+  { name: "People", to: "/people", icon: UserGroupIcon },
+  { name: "Project", to: "/project", icon: SquaresPlusIcon },
+  { name: "Admin", to: "/admin", icon: AdjustmentsHorizontalIcon },
+];
 
   return (
     <nav className="w-[2.75rem] flex flex-col items-end gap-2 mt-8 bg-transparent z-20">
