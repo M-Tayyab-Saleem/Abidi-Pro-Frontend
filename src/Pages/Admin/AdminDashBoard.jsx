@@ -1,15 +1,10 @@
 import React from 'react'
-import AttendanceCard from '../../Components/AttendanceCard';
-import { HiOutlineUserRemove } from 'react-icons/hi';
-import { FaHospital, FaUmbrellaBeach, FaUserFriends } from 'react-icons/fa';
 import { BsFileEarmarkCheckFill } from "react-icons/bs";
 import { MdPeople } from "react-icons/md";
-import ProjectCard from '../../Components/ProjectCard';
-import ProjectDashboardCards from '../../Components/ProjectDashboardCard';
 import AdminDashboardCards from '../../Components/AdminDashboardCard';
 
 const AdminDashBoard = () => {
- const donutData = {
+  const donutData = {
     labels: ['Completed', 'Remaining'],
     datasets: [{
       data: [80, 20],
@@ -27,59 +22,82 @@ const AdminDashBoard = () => {
       barThickness: 30,
     }],
   };
-   const leaveData = [
-      {
-        icon: <BsFileEarmarkCheckFill color='#C8928D'  className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-[#C8928D]"/>,
-        label: 'Users',
-        available: 0,
-        badgeColor: 'bg-[#FFC2C2]',
-      },
-      {
-        icon: <BsFileEarmarkCheckFill color='#EDB789'  className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-[#C8928D]" />,
-        label: 'Apps',
-        available: 10,
-        badgeColor: 'bg-[#F4D4B5]',
-      },
-      {
-        icon: <BsFileEarmarkCheckFill color='#8AC090'  className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-[#C8928D]" />,
-        label: 'Groups',
-        available: 10,
-        badgeColor: 'bg-[#B5F4BC]',
-      },
-      {
-        icon: <MdPeople color='#86ABEF'  className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-[#C8928D]"/>, 
-        label: 'Work Location',
-        available: 0,
-        badgeColor: 'bg-[#AAC8FF]',
-      },
-     
-    ];
 
-
+  const statsData = [
+    {
+      icon: <BsFileEarmarkCheckFill className="w-4 h-4 text-[#C8928D]" />,
+      label: 'Users',
+      value: 0,
+      subText: 'Total users'
+    },
+    {
+      icon: <BsFileEarmarkCheckFill className="w-4 h-4 text-[#EDB789]" />,
+      label: 'Apps',
+      value: 10,
+      subText: 'Applications'
+    },
+    {
+      icon: <BsFileEarmarkCheckFill className="w-4 h-4 text-[#8AC090]" />,
+      label: 'Groups',
+      value: 10,
+      subText: 'Active groups'
+    },
+    {
+      icon: <MdPeople className="w-4 h-4 text-[#86ABEF]" />,
+      label: 'Work Location',
+      value: 0,
+      subText: 'Work locations'
+    },
+  ];
 
   return (
-    // MainBody
-    <div className='px-4 py-2 '>
-      {/* roundercorner main Content */}
-      <div className='p-8 rounded-xl bg-primary'>
-      <div className='bg-white px-8 py-4 font-semibold rounded-lg mb-5'>Admin Dashboard</div>
-       {/* attendance summary card view horizontal */}
-        <div className='mt-12 flex flex-wrap items-start justify-start gap-6 '>
-          {
-            leaveData.map((item, index) => {
-              return (
-                <ProjectCard title={item.label} value={item.available} icon={item.icon} badgeColor={item.badgeColor} />
-              )
-            })
-          }
+    <div className="min-h-screen bg-transparent p-2">
+      {/* Main content area */}
+      <div className="space-y-4">
+        
+        {/* Dashboard Header Card */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Admin Dashboard</h2>
+              <p className="text-[10px] font-medium text-slate-500 mt-1">System overview and statistics</p>
+            </div>
+          </div>
         </div>
-        <div>
+
+        {/* Stats Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {statsData.map((item, index) => (
+            <div 
+              key={index}
+              className="relative bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    {item.icon}
+                    <h3 className="text-xs font-bold text-slate-800 uppercase tracking-tight">{item.label}</h3>
+                  </div>
+                  <p className="text-[10px] font-medium text-slate-500">{item.subText}</p>
+                </div>
+              </div>
+
+              {/* Value Display */}
+              <div className="flex items-baseline">
+                <span className="text-2xl font-bold text-slate-800">{item.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
           <AdminDashboardCards donutData={donutData} barData={barData} />
         </div>
-      </div>    
+      </div>
     </div>
   )
 }
 
-export default AdminDashBoard
-
+export default AdminDashBoard;
