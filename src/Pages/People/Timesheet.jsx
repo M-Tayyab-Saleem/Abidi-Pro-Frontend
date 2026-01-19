@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoCalendarNumberOutline } from "react-icons/io5";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import timesheetApi from "../../api/timesheetApi";
-import { toast } from "react-toastify";
 
 const Timesheet = ({ timesheets, fetchTimesheets }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -13,8 +11,39 @@ const Timesheet = ({ timesheets, fetchTimesheets }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const calendarRef = useRef(null);
+
   useEffect(() => {
-    fetchTimesheets();
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setShowCalendar(false);
+      }
+    };
+
+    if (showCalendar) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showCalendar]);
+
+  useEffect(() => {
+    const loadTimesheets = async () => {
+      setLoading(true);
+      try {
+        const month = selectedDate.getMonth() + 1;
+        const year = selectedDate.getFullYear();
+        await fetchTimesheets(month, year);
+      } catch (error) {
+        console.error("Error loading timesheets:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTimesheets();
   }, [selectedDate]);
 
   const navigateToPreviousMonth = () => {
@@ -46,7 +75,7 @@ const Timesheet = ({ timesheets, fetchTimesheets }) => {
   return (
     <>
       {/* Header Card */}
-      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-2">
+      <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-2 relative z-20">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Timesheets</h2>
 
@@ -58,7 +87,7 @@ const Timesheet = ({ timesheets, fetchTimesheets }) => {
               <FaAngleLeft size={18} />
             </button>
 
-            <div className="relative">
+            <div className="relative" ref={calendarRef}>
               <button
                 className="px-3 py-2 text-blue-800 bg-blue-100 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition shadow-sm text-sm font-medium"
                 onClick={() => setShowCalendar(!showCalendar)}

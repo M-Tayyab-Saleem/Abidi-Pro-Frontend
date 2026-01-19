@@ -55,8 +55,7 @@ export const fetchCurrentStatus = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state = getState();
-      const userId = state.auth?.user?.id || state.auth?.user?._id;
-
+      const userId = state.auth.user.user._id;
       if (!userId) {
         return rejectWithValue({ message: "User not authenticated" });
       }

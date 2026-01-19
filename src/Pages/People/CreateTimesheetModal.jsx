@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated }) {
   const [timesheetName, setTimesheetName] = useState("");
+  const [selectedDate, setSelectedDate] = useState(""); // State for the chosen date
   const [description, setDescription] = useState("");
   const [attachment, setAttachment] = useState(null);
   const [logs, setLogs] = useState([]);
@@ -12,35 +13,55 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
   const [fetchingLogs, setFetchingLogs] = useState(false);
   const modalRef = useRef(null);
 
-  const formatDate = (date) => {
-    const d = new Date(date);
+  // Helper to format date for the Timesheet Name (MM-DD-YYYY)
+  const formatNameDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-"); // Input is YYYY-MM-DD
+    return `${month}-${day}-${year}`;
+  };
+
+  // Get today's date string in YYYY-MM-DD for defaults and max restriction
+  const getTodayString = () => {
+    const d = new Date();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     const year = d.getFullYear();
-    return `${month}-${day}-${year}`;
+    return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
     if (open) {
-      const today = new Date();
-      setTimesheetName(`Timesheet (${formatDate(today)})`);
+      const todayStr = getTodayString();
+      setSelectedDate(todayStr);
       setDescription("");
       setAttachment(null);
       setLogs([]);
-      fetchTodaysLogs();
+      // Fetching will be triggered by the selectedDate useEffect below
     }
   }, [open]);
 
-  const fetchTodaysLogs = async () => {
+  // Refetch logs and update name whenever selectedDate changes
+  useEffect(() => {
+    if (open && selectedDate) {
+      setTimesheetName(`Timesheet (${formatNameDate(selectedDate)})`);
+      fetchLogsForDate(selectedDate);
+    }
+  }, [selectedDate, open]);
+
+  const fetchLogsForDate = async (dateStr) => {
     try {
       setFetchingLogs(true);
-      const today = new Date();
-      const response = await timeLogApi.getEmployeeTimeLogs(today.toISOString().split('T')[0]);
+      // Pass the selected specific date to the API
+      const response = await timeLogApi.getEmployeeTimeLogs(dateStr);
       const availableLogs = response.filter(log => !log.isAddedToTimesheet);
       setLogs(availableLogs);
-      if (availableLogs.length === 0) toast.warning("No available time logs for today");
+      
+      if (availableLogs.length === 0) {
+        // Optional: toast.info(`No available logs found for ${dateStr}`);
+      }
     } catch (err) {
-      toast.error("Failed to load today's logs");
+      console.error(err);
+      toast.error("Failed to load time logs");
     } finally {
       setFetchingLogs(false);
     }
@@ -60,6 +81,10 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
       const formData = new FormData();
       formData.append('name', timesheetName);
       formData.append('description', description);
+      // Send the date to backend if needed, or backend infers it. 
+      // Usually timesheet date is creation date, but if you need to backdate the timesheet record itself:
+      // formData.append('date', selectedDate); 
+      
       if (attachment) formData.append('attachments', attachment);
       logs.forEach(log => formData.append('timeLogs', log._id));
 
@@ -103,16 +128,30 @@ export default function CreateTimesheetModal({ open, onClose, onTimesheetCreated
           className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto custom-scrollbar"
           onSubmit={handleSubmit}
         >
+          {/* Date Selection */}
+          <div>
+            <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+              SELECT DATE
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              max={getTodayString()} // Restrict future dates
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100 font-medium"
+            />
+          </div>
+
           {/* Logs Section */}
           <div>
             <label className="block text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">
-              TODAY'S TIME LOGS
+              TIME LOGS ({selectedDate ? formatNameDate(selectedDate) : '...'})
             </label>
             {fetchingLogs ? (
               <div className="text-center p-4 text-xs font-bold text-slate-400 animate-pulse">FETCHING...</div>
             ) : logs.length === 0 ? (
               <div className="p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400 italic">
-                No time logs found for today.
+                No time logs found for this date.
               </div>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">

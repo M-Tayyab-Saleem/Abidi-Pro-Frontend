@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SubNavbar from "../../Components/PeopleSubNavbar";
 import AddTimeLogModal from "../People/AddTimeLogModal";
 import {
@@ -40,6 +40,24 @@ const TimeTracker = () => {
     { title: "Timesheets" },
   ];
 
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setShowCalendar(false);
+      }
+    };
+
+    if (showCalendar) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showCalendar]);
+
   const fetchTimeLogs = async () => {
     try {
       setLoading(true);
@@ -54,12 +72,13 @@ const TimeTracker = () => {
     }
   };
 
-  const fetchTimesheets = async () => {
+const fetchTimesheets = async (month, year) => {
     try {
       const today = new Date();
-      const month = today.getMonth() + 1;
-      const year = today.getFullYear();
-      const response = await timesheetApi.getEmployeeTimesheets(month, year);
+      const targetMonth = month || today.getMonth() + 1;
+      const targetYear = year || today.getFullYear();
+      
+      const response = await timesheetApi.getEmployeeTimesheets(targetMonth, targetYear);
       setTimesheets(response);
     } catch (error) {
       console.error("Failed to fetch timesheets:", error);
@@ -73,19 +92,25 @@ const TimeTracker = () => {
     }
   }, [activeTab]);
 
-  const parseDate = (dateStr) => {
-    if (!dateStr) return new Date();
+  // Helper to safely parse backend date without timezone shift
+  const getBackendDateParts = (dateStr) => {
+    if (!dateStr) return null;
     const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? new Date() : date;
+    return {
+      day: date.getUTCDate(),
+      month: date.getUTCMonth(),
+      year: date.getUTCFullYear()
+    };
   };
 
   const filteredData = selectedDate
     ? timeLogs.filter(item => {
-      const itemDate = parseDate(item.date);
+      const parts = getBackendDateParts(item.date);
       return (
-        itemDate.getDate() === selectedDate.getDate() &&
-        itemDate.getMonth() === selectedDate.getMonth() &&
-        itemDate.getFullYear() === selectedDate.getFullYear()
+        parts &&
+        parts.day === selectedDate.getDate() &&
+        parts.month === selectedDate.getMonth() &&
+        parts.year === selectedDate.getFullYear()
       );
     })
     : timeLogs;
@@ -158,7 +183,7 @@ const TimeTracker = () => {
       ...log,
       jobTitle: log.job,
       totalHours: log.hours,
-      attachmentName: log.attachments?.[0]?.filename
+      attachmentName: log.attachments?.[0]?.originalname
     });
   };
 
@@ -169,6 +194,18 @@ const TimeTracker = () => {
       day: 'numeric'
     }) : '';
   };
+  
+  // Display backend date correctly (using UTC)
+  const formatBackendDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', {
+      timeZone: 'UTC',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    });
+  };
 
   const navigateToPreviousDay = () => {
     const newDate = new Date(selectedDate);
@@ -178,59 +215,67 @@ const TimeTracker = () => {
 
   const navigateToNextDay = () => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 1);
-    setSelectedDate(newDate);
+    const today = new Date();
+    // Optional: Limit next day navigation to not go beyond today
+    if (newDate < today.setHours(0,0,0,0)) {
+        newDate.setDate(newDate.getDate() + 1);
+        setSelectedDate(newDate);
+    } else {
+        // Allow going to today
+         const nextDate = new Date(selectedDate);
+         nextDate.setDate(nextDate.getDate() + 1);
+         if(nextDate <= new Date()) setSelectedDate(nextDate);
+    }
   };
 
   return (
     <>
       <div className="min-h-screen bg-transparent p-2">
-        {/* Tab Bar */}
        {/* Tab Bar & Action Button Container */}
-<div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-  <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white/90 backdrop-blur-sm p-1.5 rounded-[1.2rem] shadow-sm border border-white/50">
-    {tabs.map((item, index) => (
-      <div key={item.title} className="flex items-center">
-        <button
-          className={`px-5 py-2.5 text-sm font-medium transition-all duration-200 rounded-xl
-          ${activeTab === index
-              ? "text-slate-800 bg-white shadow-sm font-bold"
-              : "text-slate-600 hover:text-slate-800 hover:bg-slate-50/80"
-            }`}
-          onClick={() => setActiveTab(index)}
-        >
-          {item.title}
-        </button>
-        {index !== tabs.length - 1 && (
-          <span className="w-px h-5 bg-slate-200 mx-1.5"></span>
-        )}
-      </div>
-    ))}
-  </div>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+          <div className="inline-flex flex-row flex-wrap items-center justify-center bg-white/90 backdrop-blur-sm p-1.5 rounded-[1.2rem] shadow-sm border border-white/50">
+            {tabs.map((item, index) => (
+              <div key={item.title} className="flex items-center">
+                <button
+                  className={`px-5 py-2.5 text-sm font-medium transition-all duration-200 rounded-xl
+                  ${activeTab === index
+                      ? "text-slate-800 bg-white shadow-sm font-bold"
+                      : "text-slate-600 hover:text-slate-800 hover:bg-slate-50/80"
+                    }`}
+                  onClick={() => setActiveTab(index)}
+                >
+                  {item.title}
+                </button>
+                {index !== tabs.length - 1 && (
+                  <span className="w-px h-5 bg-slate-200 mx-1.5"></span>
+                )}
+              </div>
+            ))}
+          </div>
 
-  {/* Dynamic Action Button */}
-  <button
-    onClick={() => {
-      if (activeTab === 0) {
-        setModalMode("add");
-        setIsAddTimeLogModalOpen(true);
-      } else {
-        setIsCreateTimesheetModalOpen(true);
-      }
-    }}
-    className="w-full sm:w-auto px-6 py-3 bg-[#64748b] text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
-  >
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-    </svg>
-    {activeTab === 0 ? "Add Time Log" : "Create Timesheet"}
-  </button>
-</div>
+          {/* Dynamic Action Button */}
+          <button
+            onClick={() => {
+              if (activeTab === 0) {
+                setModalMode("add");
+                setIsAddTimeLogModalOpen(true);
+              } else {
+                setIsCreateTimesheetModalOpen(true);
+              }
+            }}
+            className="w-full sm:w-auto px-6 py-3 bg-[#64748b] text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {activeTab === 0 ? "Add Time Log" : "Create Timesheet"}
+          </button>
+        </div>
 
         {activeTab === 0 && (
           <>
             {/* Header Card */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-2">
+            <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-2 relative z-20">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Time Logs</h2>
 
@@ -242,8 +287,7 @@ const TimeTracker = () => {
                     <FaAngleLeft size={18} />
                   </button>
 
-                  <div className="relative">
-                    <button
+<div className="relative" ref={calendarRef}>                    <button
                       className="px-3 py-2 text-blue-800 bg-blue-100 rounded-lg flex items-center gap-2 hover:bg-blue-200 transition shadow-sm text-sm font-medium"
                       onClick={() => setShowCalendar(!showCalendar)}
                     >
@@ -267,6 +311,7 @@ const TimeTracker = () => {
                               setSelectedDate(date);
                               setShowCalendar(false);
                             }}
+                            maxDate={new Date()} // Block future dates
                             inline
                           />
                         </motion.div>
@@ -276,7 +321,8 @@ const TimeTracker = () => {
 
                   <button
                     onClick={navigateToNextDay}
-                    className="p-2.5 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 transition shadow-sm"
+                    disabled={selectedDate >= new Date().setHours(0,0,0,0)} // Disable if today
+                    className={`p-2.5 rounded-lg transition shadow-sm ${selectedDate >= new Date().setHours(0,0,0,0) ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-100 text-blue-800 hover:bg-blue-200'}`}
                   >
                     <FaAngleRight size={18} />
                   </button>
@@ -340,17 +386,23 @@ const TimeTracker = () => {
                           paginatedData.map((item, index) => (
                             <tr key={item._id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
                               <td className="p-4 text-slate-700 font-medium cursor-pointer" onClick={() => handleViewLog(item)}>{item.job || "-"}</td>
-                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>{new Date(item.date).toLocaleDateString()}</td>
+                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>{formatBackendDate(item.date)}</td>
                               <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>{item.description}</td>
                               <td className="p-4 text-slate-700 font-medium cursor-pointer" onClick={() => handleViewLog(item)}>{item.hours}</td>
-                              <td className="p-4 text-slate-600 cursor-pointer" onClick={() => handleViewLog(item)}>
+                              <td className="p-4 text-slate-600">
                                 {item.attachments?.[0]?.originalname ? (
-                                  <span className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800">
+                                  <a 
+                                    href={item.attachments[0].url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                                    onClick={(e) => e.stopPropagation()} // Prevent row click
+                                  >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                     </svg>
                                     {item.attachments[0].originalname}
-                                  </span>
+                                  </a>
                                 ) : "-"}
                               </td>
                               <td className="p-4">
@@ -418,10 +470,13 @@ const TimeTracker = () => {
         onSave={handleSaveLogs}
         onTimeLogAdded={fetchTimeLogs}
       />
+      
+      {/* Pass selectedDate so the modal knows for which date to create the timesheet */}
       <CreateTimesheetModal
         open={isCreateTimesheetModalOpen}
         onClose={() => setIsCreateTimesheetModalOpen(false)}
         onTimesheetCreated={fetchTimesheets}
+        selectedDate={selectedDate} 
       />
 
       <EditTimeLogModal
