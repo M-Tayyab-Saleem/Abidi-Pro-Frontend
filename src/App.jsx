@@ -45,6 +45,8 @@ import FAQs from "./Pages/People/FAQ";
 // import useTokenRefresh from "./Hooks/useTokenRefresh";
 import AssignTicket from "./Pages/Tickets/AssignTickets";
 import ProjectDetail from "./Pages/Projects/ProjectDetail";
+import ComingSoon from "./Pages/Projects/ComingSoon";
+
 
 function App() {
   // useAutoLogin();
@@ -135,15 +137,13 @@ function App() {
           {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
         {/* </Route> */}
         
-        <Route path="/project/*" element={<AppLayout />}>
-          <Route index element={<Navigate to="projectDashboard" replace />} />
-          <Route index path="projectDashboard" element={<ProjectDashBoard />} />
-          <Route path="projects" element={<Projects />} />
-            <Route path="projectDetailed/:id" element={<ProjectDetail />} />
-            {/* <Route path="myTask" element={<MyTask />} /> */}
-
-          {/* <Route path ="leaveTrackerAdmin" element={<LeaveTrackerAdmin/>}/> */}
-        </Route>
+       <Route path="/project/*" element={<AppLayout />}>
+  {/* You can point everything inside projects to ComingSoon */}
+  <Route index element={<ComingSoon />} />
+  <Route path="projectDashboard" element={<ComingSoon />} />
+  <Route path="projects" element={<ComingSoon />} />
+  <Route path="projectDetailed/:id" element={<ComingSoon />} />
+</Route>
 
         <Route path="/faq/*" element={<AppLayout />}>
           <Route index element={<FAQs />} />

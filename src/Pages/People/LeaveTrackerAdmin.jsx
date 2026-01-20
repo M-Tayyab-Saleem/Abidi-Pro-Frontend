@@ -4,16 +4,24 @@ import StatusDropDown from "../../Components/StatusDropDown";
 import { FaPlus } from "react-icons/fa";
 import HolidayTable from "../../Components/HolidayTable";
 import AddHolidayModal from "../../Components/AddHolidayModal";
+import Toast from "../../Components/Toast"; // Added Toast import
 
 const LeaveTrackerAdmin = () => {
   const [departmentLeaveRecord, setDepartmentLeaveRecord] = useState([]);
   const [holidays, setHolidays] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [toast, setToast] = useState(null); // Added toast state
 
   const [loading, setLoading] = useState({
     leaves: true,
     holidays: true
   });
+
+  // Helper to show toast
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const fetchLeaves = async () => {
     try {
@@ -35,6 +43,7 @@ const LeaveTrackerAdmin = () => {
       setDepartmentLeaveRecord(formatted);
     } catch (err) {
       console.error("Failed to fetch leaves:", err);
+      showToast("Failed to load leave records", "error");
     } finally {
       setLoading(prev => ({ ...prev, leaves: false }));
     }
@@ -46,6 +55,7 @@ const LeaveTrackerAdmin = () => {
       setHolidays(response.data);
     } catch (err) {
       console.error("Failed to fetch holidays:", err);
+      showToast("Failed to load holidays", "error");
     } finally {
       setLoading(prev => ({ ...prev, holidays: false }));
     }
@@ -54,18 +64,21 @@ const LeaveTrackerAdmin = () => {
   const handleStatusChange = async (leaveId, newStatus) => {
     try {
       await api.put(`/leaves/${leaveId}/status`, { status: newStatus });
+      showToast(`Leave status updated to ${newStatus}`);
       await fetchLeaves();
     } catch (error) {
       console.error(
         "Failed to update status:",
         error.response?.data || error.message
       );
+      showToast("Failed to update status", "error");
     }
   };
 
   const handleHolidayAdded = () => {
-    fetchHolidays(); // Refresh the holiday list
-    setIsOpen(false); // Close the modal
+    showToast("Holiday added successfully");
+    fetchHolidays();
+    setIsOpen(false);
   };
 
   useEffect(() => {
@@ -75,6 +88,15 @@ const LeaveTrackerAdmin = () => {
 
   return (
     <div className="min-h-screen bg-transparent p-2">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
+
       {/* Main content area */}
       <div className="space-y-4">
         
@@ -137,6 +159,7 @@ const LeaveTrackerAdmin = () => {
                         <StatusDropDown
                           status={task.status}
                           onChange={(newStatus) => {
+                            // Optimistic UI update
                             setDepartmentLeaveRecord((records) =>
                               records.map((row, i) =>
                                 i === index

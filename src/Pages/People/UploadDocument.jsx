@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useSelector } from "react-redux"
 import { Drawer, TextField, Menu, MenuItem, IconButton } from "@mui/material"
-import { FiUpload } from "react-icons/fi"
+import { FiUpload, FiFolderPlus } from "react-icons/fi"
 import { Spin, Alert } from "antd"
 import {
   useFolderContents,
@@ -14,6 +14,7 @@ import {
 } from "../../Hooks/useDrive"
 import { toast } from "react-toastify"
 import { IoEllipsisVertical } from "react-icons/io5"
+import { FaFolder, FaFile, FaDownload, FaShare, FaTrash } from "react-icons/fa"
 
 const UploadDocument = () => {
   const [folderStack, setFolderStack] = useState([])
@@ -120,31 +121,31 @@ const UploadDocument = () => {
     }
   }
 
-const handleSaveAccessSettings = async () => {
-  try {
-    if (currentFile) {
-      const formData = new FormData();
-      formData.append('file', currentFile);
-      formData.append('folderId', folderId); 
-      formData.append('isPublic', accessSettings.isPublic);
-      formData.append('sharedWithRoles', JSON.stringify(accessSettings.sharedWithRoles));
-      formData.append('userEmails', JSON.stringify(accessSettings.userEmails));
+  const handleSaveAccessSettings = async () => {
+    try {
+      if (currentFile) {
+        const formData = new FormData();
+        formData.append('file', currentFile);
+        formData.append('folderId', folderId); 
+        formData.append('isPublic', accessSettings.isPublic);
+        formData.append('sharedWithRoles', JSON.stringify(accessSettings.sharedWithRoles));
+        formData.append('userEmails', JSON.stringify(accessSettings.userEmails));
 
-      await upload(formData);
-      toast.success('File uploaded with access settings!');
-    } else if (selectedFileId) {
-      await updateFileAccess(selectedFileId, accessSettings);
-      toast.success('Access updated successfully');
+        await upload(formData);
+        toast.success('File uploaded with access settings!');
+      } else if (selectedFileId) {
+        await updateFileAccess(selectedFileId, accessSettings);
+        toast.success('Access updated successfully');
+      }
+      
+      setShareModalOpen(false);
+      setCurrentFile(null);
+      reload();
+    } catch (err) {
+      toast.error('Failed to process file');
+      console.error(err);
     }
-    
-    setShareModalOpen(false);
-    setCurrentFile(null); // Reset current file
-    reload();
-  } catch (err) {
-    toast.error('Failed to process file');
-    console.error(err);
-  }
-};
+  };
 
   const handleOpenFolder = (folder) => {
     setFolderStack([...folderStack, folder])
@@ -207,17 +208,24 @@ const handleSaveAccessSettings = async () => {
     setSelectedFileId(null)
   }
 
-  if (error) return <Alert message={error.message} type="error" />
+  if (error) return (
+    <div className="min-h-screen bg-transparent p-2">
+      <Alert message={error.message} type="error" className="bg-red-50 border-red-200" />
+    </div>
+  )
 
   return (
     <>
+      {/* Share Modal */}
       {shareModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Share {currentFile?.name || files.find(f => f._id === selectedFileId)?.name}</h3>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/95 backdrop-blur-sm rounded-[1.2rem] shadow-lg border border-white/50 p-6 w-full max-w-md">
+            <h3 className="text-base font-bold text-slate-800 uppercase tracking-tight mb-4">
+              Share {currentFile?.name || files.find(f => f._id === selectedFileId)?.name}
+            </h3>
             
             <div className="mb-4">
-              <label className="flex items-center">
+              <label className="flex items-center text-sm text-slate-700">
                 <input 
                   type="checkbox" 
                   checked={accessSettings.isPublic}
@@ -225,37 +233,43 @@ const handleSaveAccessSettings = async () => {
                     ...accessSettings,
                     isPublic: e.target.checked
                   })}
-                  className="mr-2"
+                  className="mr-2 h-4 w-4 text-blue-600"
                 />
                 Make public (anyone with link can view)
               </label>
             </div>
 
             <div className="mb-4">
-              <label className="block mb-2">Share with roles:</label>
-              {['manager', 'employee', 'hr'].map(role => (
-                <label key={role} className="flex items-center mr-4">
-                  <input
-                    type="checkbox"
-                    checked={accessSettings.sharedWithRoles.includes(role)}
-                    onChange={(e) => {
-                      const newRoles = e.target.checked
-                        ? [...accessSettings.sharedWithRoles, role]
-                        : accessSettings.sharedWithRoles.filter(r => r !== role);
-                      setAccessSettings({
-                        ...accessSettings,
-                        sharedWithRoles: newRoles
-                      });
-                    }}
-                    className="mr-2"
-                  />
-                  {role}
-                </label>
-              ))}
+              <label className="block text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">
+                Share with roles:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {['manager', 'employee', 'hr'].map(role => (
+                  <label key={role} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={accessSettings.sharedWithRoles.includes(role)}
+                      onChange={(e) => {
+                        const newRoles = e.target.checked
+                          ? [...accessSettings.sharedWithRoles, role]
+                          : accessSettings.sharedWithRoles.filter(r => r !== role);
+                        setAccessSettings({
+                          ...accessSettings,
+                          sharedWithRoles: newRoles
+                        });
+                      }}
+                      className="mr-1.5 h-3.5 w-3.5 text-blue-600"
+                    />
+                    <span className="text-sm text-slate-700 capitalize">{role}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="mb-4">
-              <label className="block mb-2">Share with specific people:</label>
+              <label className="block text-xs font-medium text-slate-600 uppercase tracking-wide mb-2">
+                Share with specific people:
+              </label>
               <input
                 type="email"
                 placeholder="Enter email"
@@ -268,18 +282,18 @@ const handleSaveAccessSettings = async () => {
                     e.target.value = '';
                   }
                 }}
-                className="border p-2 w-full"
+                className="w-full p-2.5 border border-slate-200 rounded-lg text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-blue-300"
               />
               <div className="mt-2 flex flex-wrap gap-2">
                 {accessSettings.userEmails.map(email => (
-                  <span key={email} className="bg-gray-100 px-2 py-1 rounded flex items-center">
+                  <span key={email} className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
                     {email}
                     <button
                       onClick={() => setAccessSettings({
                         ...accessSettings,
                         userEmails: accessSettings.userEmails.filter(e => e !== email)
                       })}
-                      className="ml-2 text-red-500"
+                      className="ml-2 text-blue-500 hover:text-blue-700"
                     >
                       ×
                     </button>
@@ -294,24 +308,26 @@ const handleSaveAccessSettings = async () => {
                   setShareModalOpen(false);
                   setCurrentFile(null);
                 }}
-                className="px-4 py-2 border rounded"
+                className="px-4 py-2.5 border border-slate-200 text-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50/80 transition shadow-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveAccessSettings}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
+                className="px-4 py-2.5 bg-[#64748b] text-white rounded-xl text-sm font-medium hover:brightness-110 transition shadow-sm"
                 disabled={uploading}
               >
-                {uploading ? 'Saving...' : 'Save'}
+                {uploading ? 'Saving...' : 'Save Settings'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Create Folder Drawer */}
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
-        <div className="w-full sm:w-80 md:w-96 h-full bg-white p-6 flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-gray-800">Create Folder</h2>
+        <div className="w-full sm:w-80 md:w-96 h-full bg-white/95 backdrop-blur-sm p-6 flex flex-col gap-4">
+          <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Create Folder</h2>
           <TextField
             label="Folder Name"
             variant="outlined"
@@ -319,62 +335,63 @@ const handleSaveAccessSettings = async () => {
             value={folderName}
             onChange={(e) => setFolderName(e.target.value)}
             size="small"
+            className="bg-white/80"
           />
           <button
             onClick={handleNewFolder}
             disabled={creating}
-            className="mt-2 bg-[#497a71] text-white text-sm py-2 rounded-md hover:bg-[#99c7be] hover:text-black"
+            className="mt-2 bg-[#64748b] text-white text-sm font-medium py-2.5 rounded-xl hover:brightness-110 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {creating ? "Creating…" : "Create Folder"}
           </button>
-          {createErr && <Alert message={createErr.message} type="error" />}
+          {createErr && <Alert message={createErr.message} type="error" className="mt-2" />}
         </div>
       </Drawer>
 
-      <div className="min-h-screen bg-primary p-2 sm:p-4 mx-2 my-4 sm:m-6 rounded-lg shadow-md">
-        {/* Header with breadcrumb */}
-        <div className="flex flex-col mb-5 bg-white rounded-lg px-4 py-4 sm:px-8">
+      <div className="min-h-screen bg-transparent p-2">
+        {/* Header Controls Card */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-4">
           {/* Breadcrumb */}
-          <div className="mb-4 text-sm text-gray-600">
-            <span 
-              className="cursor-pointer hover:text-blue-600" 
+          <div className="flex items-center gap-1 text-sm text-slate-600 mb-3">
+            <button 
+              className="hover:text-blue-600 transition"
               onClick={() => setFolderStack([])}
             >
               Root
-            </span>
+            </button>
             {folderStack.map((folder, index) => (
               <span key={folder._id}>
-                {' > '}
-                <span 
-                  className="cursor-pointer hover:text-blue-600"
+                <span className="mx-1">/</span>
+                <button 
+                  className="hover:text-blue-600 transition"
                   onClick={() => setFolderStack(folderStack.slice(0, index + 1))}
                 >
                   {folder.name}
-                </span>
+                </button>
               </span>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
-            <div className="flex flex-wrap items-center gap-3 mb-3 sm:mb-0">
-              <div className="flex items-center space-x-2">
-                <label className="text-sm">Show</label>
-                <select className="text-sm px-2 py-1 bg-secondary rounded-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-700 uppercase tracking-wide">Show</label>
+                <select className="text-sm px-3 py-1.5 text-slate-700 bg-white/80 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
                   <option>10</option>
                   <option>25</option>
                   <option>50</option>
                 </select>
-                <span className="text-sm">entries</span>
+                <span className="text-xs font-medium text-slate-700 uppercase tracking-wide">entries</span>
               </div>
               <input
                 type="text"
-                placeholder="Search..."
-                className="border-0 px-3 py-1.5 rounded-md shadow-md w-64 text-sm bg-secondary"
+                placeholder="Search files and folders..."
+                className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm bg-white/80 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-64"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input 
                 type="file" 
                 onChange={(e) => handleFileChange(e.target.files[0])} 
@@ -383,8 +400,9 @@ const handleSaveAccessSettings = async () => {
               />
               <label
                 htmlFor="file-upload"
-                className="cursor-pointer bg-[#497a71] text-white text-sm px-4 py-2 rounded-md hover:bg-[#99c7be] hover:text-black"
+                className="cursor-pointer bg-[#64748b] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:brightness-110 transition shadow-sm hover:shadow-md flex items-center gap-2"
               >
+                <FiUpload size={14} />
                 Upload Files
               </label>
               <input 
@@ -395,20 +413,22 @@ const handleSaveAccessSettings = async () => {
               />
               <label
                 htmlFor="file-upload-with-share"
-                className="cursor-pointer bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600"
+                className="cursor-pointer bg-blue-100 text-blue-800 text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-blue-200 transition shadow-sm hover:shadow-md flex items-center gap-2"
               >
+                <FaShare size={14} />
                 Upload & Share
               </label>
               <button
                 onClick={toggleDrawer(true)}
-                className="flex items-center gap-2 bg-[#497a71] text-white text-sm px-4 py-2 rounded-md hover:bg-[#99c7be] hover:text-black"
+                className="flex items-center gap-2 bg-[#64748b] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:brightness-110 transition shadow-sm hover:shadow-md"
               >
-                <FiUpload /> New Folder
+                <FiFolderPlus size={14} />
+                New Folder
               </button>
               {folderStack.length > 0 && (
                 <button 
                   onClick={handleGoBack} 
-                  className="bg-gray-300 text-sm px-4 py-2 rounded-md hover:bg-gray-400"
+                  className="bg-slate-100 text-slate-700 text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-slate-200 transition shadow-sm hover:shadow-md"
                 >
                   Go Back
                 </button>
@@ -417,55 +437,87 @@ const handleSaveAccessSettings = async () => {
           </div>
         </div>
 
-        {uploadErr && <Alert message={uploadErr.message} type="error" />}
+        {uploadErr && (
+          <div className="mb-4">
+            <Alert message={uploadErr.message} type="error" className="bg-red-50 border-red-200" />
+          </div>
+        )}
 
+        {/* Files and Folders Grid */}
         <Spin spinning={loading || uploading || creating || fileDeleteLoading || folderDeleteLoading || downloadLoading}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 p-4">
             {/* Show empty state if no folders and no files */}
             {folders.length === 0 && files.length === 0 && !loading && (
-              <div className="col-span-full text-center py-12 bg-white rounded-lg">
-                <div className="text-gray-500 text-lg">📁</div>
-                <p className="text-gray-500 mt-2">
+              <div className="text-center py-12">
+                <div className="text-slate-300 text-4xl mb-3">📁</div>
+                <p className="text-slate-500 text-sm font-medium">
                   {currentFolder.name === 'Root' ? 'No folders or files yet' : 'This folder is empty'}
                 </p>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-slate-400 text-xs mt-1">
                   Upload files or create folders to get started
                 </p>
               </div>
             )}
 
-            {/* Folders */}
-            {folders.map((folder) => (
-              <div
-                key={folder._id}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleOpenFolder(folder)
-                }}
-                className="flex justify-between items-center bg-white rounded p-4 shadow cursor-pointer hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-center">
-                  <span className="text-2xl mr-2">📁</span>
-                  <span className="truncate">{folder.name}</span>
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {/* Folders */}
+              {folders.map((folder) => (
+                <div
+                  key={folder._id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleOpenFolder(folder)
+                  }}
+                  className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 hover:border-slate-200 cursor-pointer"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center min-w-0">
+                      <div className="p-2 rounded-lg bg-blue-100 text-blue-800 mr-3">
+                        <FaFolder size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate">{folder.name}</p>
+                        <p className="text-xs text-slate-500">Folder</p>
+                      </div>
+                    </div>
+                    <IconButton 
+                      size="small" 
+                      onClick={(e) => handleFolderMenuClick(e, folder._id)} 
+                      className="p-1 hover:bg-slate-100"
+                    >
+                      <IoEllipsisVertical className="text-slate-600" />
+                    </IconButton>
+                  </div>
                 </div>
-                <IconButton size="small" onClick={(e) => handleFolderMenuClick(e, folder._id)} className="p-1">
-                  <IoEllipsisVertical />
-                </IconButton>
-              </div>
-            ))}
+              ))}
 
-            {/* Files */}
-            {files.map((file) => (
-              <div key={file._id} className="flex justify-between items-center bg-white rounded p-4 shadow hover:shadow-md transition-shadow">
-                <div className="flex items-center min-w-0">
-                  <span className="text-2xl mr-2">📄</span>
-                  <span className="truncate" title={file.name}>{file.name}</span>
+              {/* Files */}
+              {files.map((file) => (
+                <div key={file._id} className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-200 hover:border-slate-200">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center min-w-0">
+                      <div className="p-2 rounded-lg bg-green-100 text-green-800 mr-3">
+                        <FaFile size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate" title={file.name}>{file.name}</p>
+                        <p className="text-xs text-slate-500">
+                          {file.size ? `${(file.size / 1024).toFixed(1)} KB` : 'File'}
+                        </p>
+                      </div>
+                    </div>
+                    <IconButton 
+                      size="small" 
+                      onClick={(e) => handleFileMenuClick(e, file._id)} 
+                      className="p-1 hover:bg-slate-100"
+                    >
+                      <IoEllipsisVertical className="text-slate-600" />
+                    </IconButton>
+                  </div>
                 </div>
-                <IconButton size="small" onClick={(e) => handleFileMenuClick(e, file._id)} className="p-1 flex-shrink-0">
-                  <IoEllipsisVertical />
-                </IconButton>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </Spin>
 
@@ -482,23 +534,23 @@ const handleSaveAccessSettings = async () => {
             vertical: "top",
             horizontal: "right",
           }}
+          PaperProps={{
+            className: "bg-white/95 backdrop-blur-sm border border-white/50 shadow-lg rounded-xl"
+          }}
         >
-          {/* <MenuItem
-            onClick={() => {
-              console.log("Update folder:", selectedFolderId)
-              handleCloseFolderMenu()
-              // TODO: Trigger update modal or logic here
-            }}
-          >
-            Rename
-          </MenuItem> */}
           <MenuItem
             onClick={() => {
               console.log("Delete folder clicked:", selectedFolderId)
               handleDeleteFolder(selectedFolderId)
             }}
-            sx={{ color: "red" }}
+            sx={{ 
+              color: "rgb(239, 68, 68)",
+              fontSize: "14px",
+              padding: "8px 16px"
+            }}
+            className="flex items-center gap-2"
           >
+            <FaTrash size={14} />
             Delete
           </MenuItem>
         </Menu>
@@ -516,39 +568,53 @@ const handleSaveAccessSettings = async () => {
             vertical: "top",
             horizontal: "right",
           }}
+          PaperProps={{
+            className: "bg-white/95 backdrop-blur-sm border border-white/50 shadow-lg rounded-xl"
+          }}
         >
-           <MenuItem onClick={() => {
+          <MenuItem 
+            onClick={() => {
               setSelectedFileId(selectedFileId);
               handleCloseFileMenu();
               handleOpenAccessModal();
-            }}>
+            }}
+            sx={{ 
+              fontSize: "14px",
+              padding: "8px 16px"
+            }}
+            className="flex items-center gap-2 text-slate-700"
+          >
+            <FaShare size={14} />
             Share
-            </MenuItem>
-           <MenuItem
+          </MenuItem>
+          <MenuItem
             onClick={() => {
               console.log("Download file:", selectedFileId)
               handleFileDownload(selectedFileId)
               handleCloseFileMenu()
             }}
-          >
-            Download
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              console.log("Update file:", selectedFileId)
-              handleCloseFileMenu()
-              // TODO: Trigger update modal or logic here
+            sx={{ 
+              fontSize: "14px",
+              padding: "8px 16px"
             }}
+            className="flex items-center gap-2 text-slate-700"
           >
-            Rename
+            <FaDownload size={14} />
+            Download
           </MenuItem>
           <MenuItem
             onClick={() => {
               console.log("Delete file clicked:", selectedFileId)
               handleDeleteFile(selectedFileId)
             }}
-            sx={{ color: "red" }}
+            sx={{ 
+              color: "rgb(239, 68, 68)",
+              fontSize: "14px",
+              padding: "8px 16px"
+            }}
+            className="flex items-center gap-2"
           >
+            <FaTrash size={14} />
             Delete
           </MenuItem>
         </Menu>

@@ -14,7 +14,7 @@ import {
   FaRegCalendarAlt
 } from "react-icons/fa";
 import api from "../../axios";
-import { toast } from "react-toastify";
+import Toast from "../../Components/Toast"; // Updated import
 
 const StatusBadge = ({ status }) => {
   const statusConfig = {
@@ -39,14 +39,6 @@ const formatTime = (dateString) => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 
-const formatDate = (date) => {
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric"
-  });
-};
-
 const Attendance = () => {
   const today = new Date();
   const [weekStart, setWeekStart] = useState(() => {
@@ -63,6 +55,14 @@ const Attendance = () => {
   const [expandedView, setExpandedView] = useState(false);
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Custom Toast State
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const fetchAttendanceData = async (startDate) => {
     try {
@@ -72,9 +72,8 @@ const Attendance = () => {
 
       const response = await api.get(`/timetrackers/attendance/${month}/${year}`);
       setAttendanceData(response.data);
-      console.log(response.data);
     } catch (error) {
-      toast.error("Failed to load attendance data");
+      showToast("Failed to load attendance data", "error"); // Updated to use showToast
       console.error("Error fetching attendance:", error);
     } finally {
       setLoading(false);
@@ -106,7 +105,6 @@ const Attendance = () => {
       });
 
       if (dayData) {
-        // Day with attendance record (can be past, present, or future)
         days.push({
           date: day.getDate(),
           dayName: day.toLocaleDateString("en-US", { weekday: "short" }),
@@ -118,7 +116,6 @@ const Attendance = () => {
           notes: dayData.notes,
         });
       } else if (day > today) {
-        // Future day with no attendance record
         days.push({
           date: day.getDate(),
           dayName: day.toLocaleDateString("en-US", { weekday: "short" }),
@@ -130,7 +127,6 @@ const Attendance = () => {
           notes: null,
         });
       } else {
-        // Past day with no record
         days.push({
           date: day.getDate(),
           dayName: day.toLocaleDateString("en-US", { weekday: "short" }),
@@ -143,7 +139,6 @@ const Attendance = () => {
         });
       }
     }
-
     return days;
   };
 
@@ -173,9 +168,7 @@ const Attendance = () => {
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setShowCalendar(false);
-
-    // Adjust to the Monday of the selected week
-    const dayOfWeek = date.getDay(); // 0=Sun,...6=Sat
+    const dayOfWeek = date.getDay();
     const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     const newStart = new Date(date);
     newStart.setDate(diff);
@@ -188,6 +181,15 @@ const Attendance = () => {
 
   return (
     <div className="min-h-screen bg-transparent p-2">
+      {/* Toast Notification Rendering */}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
+
       {/* Header card with updated calendar navigation */}
       <div className="bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50 mb-4 p-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -281,23 +283,19 @@ const Attendance = () => {
           </div>
         ) : (
           <div className="relative">
-            {/* Timeline connector */}
             <div className="absolute left-20 top-0 h-full w-0.5 bg-slate-200 transform translate-x-1/2"></div>
-
             <div className="space-y-4">
               {weeklyData.map((day, index) => (
                 <div
                   key={index}
                   className="relative flex items-start group transition-all duration-150"
                 >
-                  {/* Timeline dot with pulse animation for today */}
                   <div className={`absolute left-[66px] top-6 h-4 w-4 rounded-full transform translate-x-1/2 z-10 border-2 border-white ${day.status === "Present" ? "bg-green-500" :
                       day.status === "Absent" ? "bg-red-500" :
                         day.status === "Half Day" ? "bg-yellow-500" :
                           day.status === "Leave" ? "bg-blue-500" : "bg-purple-500"
                     } ${new Date(day.fullDate).toDateString() === today.toDateString() ? "animate-pulse shadow-lg" : ""}`}></div>
 
-                  {/* Date/Day badge */}
                   <div className="flex-shrink-0 w-20 text-center pt-1">
                     <div className={`text-xs text-slate-600 font-medium uppercase tracking-wide ${day.dayName === 'Sat' || day.dayName === 'Sun' ? 'text-blue-600' : ''
                       }`}>
@@ -311,7 +309,6 @@ const Attendance = () => {
                     </div>
                   </div>
 
-                  {/* Attendance card */}
                   <div
                     className={`flex-grow ml-8 p-4 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer ${selectedDay === index ?
                         "border-blue-300 shadow-md bg-blue-50/80" :
@@ -336,11 +333,6 @@ const Attendance = () => {
                           <div className="flex items-center">
                             <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
                             <span className="font-medium">In:</span> <span className="font-mono ml-1">{day.checkIn}</span>
-                            {day.late && (
-                              <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-medium">
-                                {day.late}
-                              </span>
-                            )}
                           </div>
                         )}
                         {day.checkOut && (

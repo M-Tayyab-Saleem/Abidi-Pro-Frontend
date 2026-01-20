@@ -1,9 +1,40 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { BsFileEarmarkCheckFill } from "react-icons/bs";
 import { MdPeople } from "react-icons/md";
 import AdminDashboardCards from '../../Components/AdminDashboardCard';
+import api from "../../axios";
+import Toast from "../../Components/Toast";
 
 const AdminDashBoard = () => {
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Toast Helper
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Placeholder for fetching actual dashboard stats
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      // Example API call: 
+      // const res = await api.get('/admin/stats');
+      // Update your statsData state here if needed
+      
+      // showToast('Dashboard stats updated'); 
+    } catch (error) {
+      showToast('Failed to fetch dashboard data', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
   const donutData = {
     labels: ['Completed', 'Remaining'],
     datasets: [{
@@ -52,6 +83,15 @@ const AdminDashBoard = () => {
 
   return (
     <div className="min-h-screen bg-transparent p-2">
+      {/* Toast Component */}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
+
       {/* Main content area */}
       <div className="space-y-4">
         
@@ -62,6 +102,9 @@ const AdminDashBoard = () => {
               <h2 className="text-base font-bold text-slate-800 uppercase tracking-tight">Admin Dashboard</h2>
               <p className="text-[10px] font-medium text-slate-500 mt-1">System overview and statistics</p>
             </div>
+            {loading && (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+            )}
           </div>
         </div>
 
