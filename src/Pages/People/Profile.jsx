@@ -26,6 +26,7 @@ export default function Profile() {
           withCredentials: true,
         });
         setUser(res.data.user);
+        console.log(res.data.user);
       } catch (err) {
         console.error("Failed to load user profile", err);
       } finally {
@@ -38,8 +39,9 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
-        <Spin size="large" tip="Loading profile..." />
+      <div className="text-center p-6 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+        <p className="mt-3 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading profile...</p>
       </div>
     );
   }
@@ -63,7 +65,7 @@ export default function Profile() {
     {
       icon: Briefcase,
       label: "Department",
-      value: user.department || "N/A",
+      value: user.department.name || "N/A",
       bg: "bg-yellow-100",
       iconColor: "text-yellow-600",
     },
@@ -182,7 +184,7 @@ export default function Profile() {
         <div className="flex flex-col min-w-0">
           <p className="text-slate-800 font-bold text-sm uppercase tracking-wide">Reporting to</p>
           <p className="font-medium text-slate-600 text-sm break-words">
-            {user.reportsTo || "—"}
+            {user.reportsTo.name || "—"}
           </p>
         </div>
       </div>

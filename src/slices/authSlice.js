@@ -1,12 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../axios";
+import { setUser } from "./userSlice"; // Import setUser from userSlice
 
 // Sync user with backend after Azure login
 export const syncAzureUser = createAsyncThunk(
   "auth/syncAzureUser",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get("/auth/me");
+      
+      dispatch(setUser(response.data));
+      
       return response.data;
     } catch (error) {
       console.error("Sync error:", error.response?.data || error.message);
@@ -21,13 +25,13 @@ const authSlice = createSlice({
     user: null,
     azureAccount: null,
     isAuthenticated: false,
-    loading: false, // Changed to false - we'll set it to true only when actively checking
+    loading: false,
   },
   reducers: {
     setAzureAccount: (state, action) => {
       state.azureAccount = action.payload;
     },
-    logout: (state) => {
+    logout: (state, action) => {
       state.user = null;
       state.azureAccount = null;
       state.isAuthenticated = false;
@@ -35,6 +39,10 @@ const authSlice = createSlice({
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
+    },
+    setAuthUser: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -56,5 +64,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAzureAccount, logout, setLoading } = authSlice.actions;
+export const { setAzureAccount, logout, setLoading, setAuthUser } = authSlice.actions;
 export default authSlice.reducer;

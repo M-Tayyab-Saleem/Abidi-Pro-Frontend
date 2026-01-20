@@ -31,9 +31,17 @@ const deleteTimeLog = async (id) => {
   return response.data;
 };
 
+const downloadAttachment = async (logId, attachmentId) => {
+  const response = await api.get(`/time-logs/${logId}/attachments/${attachmentId}/download`, {
+    responseType: 'blob'
+  });
+  return response.data;
+}
+
 export default {
   getEmployeeTimeLogs,
   createTimeLog,
   updateTimeLog,
   deleteTimeLog,
+  downloadAttachment
 };

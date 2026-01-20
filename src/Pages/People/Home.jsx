@@ -27,11 +27,17 @@ const Home = () => {
   const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.auth.user);
   const { checkInn } = useSelector((state) => state.attendanceTimer);
-  
+
   const profileImage = userInfo?.user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e";
-  const firstName = userInfo?.user.name || "User";
+  const getSafeName = (data) => {
+    if (typeof data === "string") return data;
+    if (data && typeof data === "object" && data.name) return data.name;
+    return "User";
+  };
+
+  const firstName = getSafeName(userInfo?.user?.name);
   const userId = userInfo?.user._id || userInfo?.user.id;
-  
+
   const [loading, setLoading] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [cards, setCards] = useState([]);
@@ -52,16 +58,16 @@ const Home = () => {
   // Calculate elapsed time from check-in
   useEffect(() => {
     let interval;
-    
+
     if (checkInn?.log?.checkInTime && !checkInn?.log?.checkOutTime) {
       const startTime = new Date(checkInn.log.checkInTime).getTime();
-      
+
       const updateElapsed = () => {
         const now = Date.now();
         const elapsedSeconds = Math.floor((now - startTime) / 1000);
         setElapsed(elapsedSeconds);
       };
-      
+
       updateElapsed();
       interval = setInterval(updateElapsed, 1000);
     } else {

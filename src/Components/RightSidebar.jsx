@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
     UserCircleIcon,
     ChevronLeftIcon,
@@ -7,91 +7,42 @@ import {
     UsersIcon
 } from "@heroicons/react/24/solid";
 import { useDispatch, useSelector } from "react-redux";
-import { checkInNow, checkOutNow } from "../slices/attendanceTimer";
+import { checkInNow, checkOutNow, fetchCurrentStatus } from "../slices/attendanceTimer";
 import { toast } from "react-toastify";
-import api from "../axios"; // Make sure this path is correct
-import { fetchCurrentStatus } from "../slices/attendanceTimer";
-
-
 
 const RightSidebar = ({ isOpen, toggleSidebar }) => {
     const dispatch = useDispatch();
     const [elapsedTime, setElapsedTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
     const [timerInterval, setTimerInterval] = useState(null);
 
-    // Team data states
-    const [manager, setManager] = useState(null);
-    const [teamMembers, setTeamMembers] = useState([]);
-    const [loadingTeam, setLoadingTeam] = useState(true);
-
-    // Get data from Redux store
-    const { checkInn, checkOut, loading } = useSelector((state) => state.attendanceTimer);
+    // Redux state
+    const { checkInn, loading } = useSelector((state) => state.attendanceTimer);
     const { user } = useSelector((state) => state.auth);
-    const profileImage = user?.user?.avatar || "";
-    const firstName = user?.user?.name || "User";
 
-    console.log(user.user.name);
+    const currentUser = user?.user;
+    const profileImage = currentUser?.avatar || "";
+    const firstName = currentUser?.name || "User";
+
+    const manager = currentUser?.reportsTo || null;
+
+    const teamMembers = useMemo(() => {
+        if (!currentUser?.department?.members) return [];
+
+        return currentUser.department.members
+            .filter(member => member._id !== currentUser._id)
+            .slice(0, 5);
+    }, [currentUser]);
 
     useEffect(() => {
         dispatch(fetchCurrentStatus());
     }, [dispatch]);
-
-
-    // Fetch team data (manager and team members)
-    useEffect(() => {
-        const fetchTeamData = async () => {
-            if (!user) return;
-
-            try {
-                setLoadingTeam(true);
-
-                // 1. Fetch Manager Details
-                let managerId = null;
-                if (user.reportsTo && typeof user.reportsTo === 'object') {
-                    setManager(user.reportsTo);
-                    managerId = user.reportsTo._id;
-                } else if (user.reportsTo) {
-                    managerId = user.reportsTo;
-                    const mgrRes = await api.get(`/users/${user.reportsTo}`);
-                    setManager(mgrRes.data);
-                } else {
-                    setManager(null); // No manager assigned
-                }
-
-                // 2. Fetch Team Members
-                const allUsersRes = await api.get('/users');
-                const allUsers = allUsersRes.data;
-
-                // Filter: Users who report to the same manager (Peers) AND are not me
-                const myTeam = allUsers.filter(u =>
-                    u._id !== user._id && // Exclude self
-                    u.empStatus === 'Active' &&
-                    (
-                        (managerId && u.reportsTo?._id === managerId) || // Same Manager
-                        (managerId && u.reportsTo === managerId) ||
-                        (u.department?._id === user.department?._id) // Fallback: Same Department
-                    )
-                );
-
-                setTeamMembers(myTeam.slice(0, 5)); // Limit to 5 for sidebar
-            } catch (error) {
-                console.error("Failed to fetch sidebar info", error);
-                toast.error("Failed to load team data");
-            } finally {
-                setLoadingTeam(false);
-            }
-        };
-
-        if (isOpen && user) {
-            fetchTeamData();
-        }
-    }, [user, isOpen]);
-
-    // Avatar component for team members
+    
+    // Avatar component
     const Avatar = ({ url, name, size = "sm" }) => {
-        const sizeClasses = size === "lg" ? "w-14 h-14" :
+        const sizeClasses =
+            size === "lg" ? "w-14 h-14" :
             size === "md" ? "w-10 h-10" :
-                "w-8 h-8";
+            "w-8 h-8";
 
         if (url) {
             return (
@@ -112,7 +63,6 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
         );
     };
 
-    // Format time from seconds
     const formatTimeFromSeconds = (totalSeconds) => {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -120,9 +70,7 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
         return { hours, minutes, seconds };
     };
 
-    // Calculate elapsed time from check-in
     useEffect(() => {
-        // Check if session is active (has checkInTime but no checkOutTime)
         if (checkInn?.log?.checkInTime && !checkInn?.log?.checkOutTime) {
             const startTime = new Date(checkInn.log.checkInTime).getTime();
 
@@ -136,70 +84,34 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
             const interval = setInterval(updateElapsed, 1000);
             setTimerInterval(interval);
 
-            return () => {
-                if (interval) clearInterval(interval);
-            };
+            return () => clearInterval(interval);
         } else {
-            // Session is closed or doesn't exist - stop timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                setTimerInterval(null);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             setElapsedTime({ hours: 0, minutes: 0, seconds: 0 });
         }
     }, [checkInn]);
 
-    // Handle check-in button click
     const handleCheckIn = () => {
-        if (!checkInn?.log?.checkInTime || checkInn?.log?.checkOutTime) {
-            dispatch(checkInNow())
-                .unwrap()
-                .catch((error) => {
-                    toast.error(error?.message || "Failed to check in");
-                });
-        }
+        dispatch(checkInNow()).unwrap().catch(err =>
+            toast.error(err?.message || "Failed to check in")
+        );
     };
 
-    // Handle check-out button click
     const handleCheckOut = () => {
-        if (checkInn?.log?.checkInTime && !checkInn?.log?.checkOutTime) {
-            dispatch(checkOutNow())
-                .unwrap()
-                .then(() => {
-                    toast.success("Checked out successfully!");
-                })
-                .catch((error) => {
-                    toast.error(error?.message || "Failed to check out");
-                });
-        }
+        dispatch(checkOutNow())
+            .unwrap()
+            .then(() => toast.success("Checked out successfully!"))
+            .catch(err => toast.error(err?.message || "Failed to check out"));
     };
 
-    // Determine button state and text
     const getButtonState = () => {
         if (!checkInn?.log) {
-            return {
-                text: "Check In",
-                onClick: handleCheckIn,
-                bgColor: "bg-emerald-500 hover:bg-emerald-600",
-                disabled: false
-            };
+            return { text: "Check In", onClick: handleCheckIn, bgColor: "bg-emerald-500 hover:bg-emerald-600", disabled: false };
         }
-
         if (checkInn?.log?.checkInTime && !checkInn?.log?.checkOutTime) {
-            return {
-                text: "Check Out",
-                onClick: handleCheckOut,
-                bgColor: "bg-red-500 hover:bg-red-600",
-                disabled: false
-            };
+            return { text: "Check Out", onClick: handleCheckOut, bgColor: "bg-red-500 hover:bg-red-600", disabled: false };
         }
-
-        return {
-            text: "Already Checked Out",
-            onClick: null,
-            bgColor: "bg-slate-400",
-            disabled: true
-        };
+        return { text: "Already Checked Out", bgColor: "bg-slate-400", disabled: true };
     };
 
     const buttonState = getButtonState();
@@ -213,11 +125,7 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
                 onClick={toggleSidebar}
                 className="absolute -left-0 top-12 z-[70] p-1.5 bg-white border border-slate-200 shadow-md rounded-full text-slate-600 hover:text-slate-900 hover:shadow-lg transition-all active:scale-90"
             >
-                {isOpen ? (
-                    <ChevronRightIcon className="w-4 h-4" />
-                ) : (
-                    <ChevronLeftIcon className="w-4 h-4" />
-                )}
+                {isOpen ? <ChevronRightIcon className="w-4 h-4" /> : <ChevronLeftIcon className="w-4 h-4" />}
             </button>
 
             {/* Sidebar Content */}
@@ -228,11 +136,7 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
                 <div className="flex flex-col items-center w-full">
                     <div className="w-20 h-20 rounded-full border-2 border-white shadow-md overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100 mb-2">
                         {profileImage ? (
-                            <img
-                                src={profileImage}
-                                alt={firstName}
-                                className="w-full h-full object-cover"
-                            />
+                            <img src={profileImage} alt={firstName} className="w-full h-full object-cover" />
                         ) : (
                             <div className="h-full w-full rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-slate-700 flex items-center justify-center text-2xl font-bold">
                                 {firstName.charAt(0).toUpperCase()}
@@ -242,10 +146,10 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
 
                     <div className="text-center bg-white rounded-xl px-4 py-2 w-full mb-2 shadow-sm border border-slate-100">
                         <h3 className="text-sm font-bold text-slate-800">
-                            {user?.user?.name || "- Name -"}
+                            {currentUser?.name || "- Name -"}
                         </h3>
                         <p className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
-                            {user?.user?.designation || "- Designation -"}
+                            {currentUser?.designation || "- Designation -"}
                         </p>
                     </div>
 
@@ -288,15 +192,7 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
                         <UserIcon className="w-4 h-4 text-slate-400" />
                     </div>
 
-                    {loadingTeam ? (
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-lg bg-slate-200 animate-pulse"></div>
-                            <div className="flex-1">
-                                <div className="h-3 bg-slate-200 rounded animate-pulse mb-1"></div>
-                                <div className="h-2 bg-slate-200 rounded animate-pulse w-3/4"></div>
-                            </div>
-                        </div>
-                    ) : manager ? (
+                    {manager ? (
                         <div className="flex items-center gap-2.5">
                             <Avatar url={manager.avatar} name={manager.name} size="md" />
                             <div className="overflow-hidden">
@@ -331,24 +227,13 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
                         <div className="flex items-center gap-1">
                             <UsersIcon className="w-4 h-4 text-slate-400" />
                             <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded-full text-slate-600">
-                                {loadingTeam ? "..." : teamMembers.length}
+                                {teamMembers.length}
                             </span>
                         </div>
                     </div>
 
                     <div className="flex flex-col overflow-y-auto no-scrollbar flex-1">
-                        {loadingTeam ? (
-                            // Loading skeletons
-                            Array.from({ length: 3 }).map((_, i) => (
-                                <div key={i} className="flex items-center gap-2.5">
-                                    <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse"></div>
-                                    <div className="flex-1">
-                                        <div className="h-2.5 bg-slate-200 rounded animate-pulse mb-1 w-20"></div>
-                                        <div className="h-2 bg-slate-200 rounded animate-pulse w-16"></div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : teamMembers.length > 0 ? (
+                        {teamMembers.length > 0 ? (
                             teamMembers.map((member) => (
                                 <div
                                     key={member._id}

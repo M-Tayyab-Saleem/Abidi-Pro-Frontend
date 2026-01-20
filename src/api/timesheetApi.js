@@ -9,13 +9,16 @@ const getEmployeeTimesheets = async (month, year) => {
   return response.data;
 };
 
+// New function for weekly timesheets
+const getWeeklyTimesheets = async (weekStart) => {
+  const response = await api.get(`${API_URL}/weekly`, {
+    params: { weekStart }
+  });
+  return response.data;
+};
+
 const createTimesheet = async (timesheetData) => {
-  const config = {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  };
-  const response = await api.post(API_URL, timesheetData, config);
+  const response = await api.post(API_URL, timesheetData);
   return response.data;
 };
 
@@ -36,10 +39,19 @@ const updateTimesheetStatus = async (id, updateData) => {
   return response.data;
 };
 
+const downloadAttachment = async (timesheetId, attachmentId) => {
+  const response = await api.get(`/timesheets/${timesheetId}/attachments/${attachmentId}/download`, {
+    responseType: 'blob'
+  });
+  return response.data;
+}
+
 export default {
   getEmployeeTimesheets,
+  getWeeklyTimesheets, // Add this
   createTimesheet,
   getTimesheetById,
   getAllTimesheets,
-  updateTimesheetStatus
+  updateTimesheetStatus,
+  downloadAttachment // Add this
 };

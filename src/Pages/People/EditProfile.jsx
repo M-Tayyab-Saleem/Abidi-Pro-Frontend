@@ -317,9 +317,10 @@ export default function EditProfile() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
-        <Spin size="large" tip="Loading profile..." />
-      </div>
+      <div className="text-center p-6 bg-white/90 backdrop-blur-sm rounded-[1.2rem] shadow-md border border-white/50">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+                <p className="mt-3 text-slate-600 text-xs font-medium uppercase tracking-wide">Loading profile...</p>
+              </div>
     );
   }
 

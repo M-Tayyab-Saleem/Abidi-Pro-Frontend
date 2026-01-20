@@ -24,6 +24,9 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
   const isDescriptionValid = description.trim().length >= 5;
   const isCurrentInputValid = isJobTitleValid && isDateValid && isHoursValid && isDescriptionValid;
 
+  // Get today's date in YYYY-MM-DD format for max date attribute
+  const today = new Date().toISOString().split("T")[0];
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e) => {
@@ -154,6 +157,7 @@ const AddTimeLogModal = ({ isOpen, onClose, onTimeLogAdded }) => {
               <input
                 type="date"
                 value={date}
+                max={today} // Restrict future dates
                 onChange={(e) => setDate(e.target.value)}
                 className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
               />

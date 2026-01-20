@@ -1,5 +1,9 @@
 import React, { useRef } from "react";
 import { FiPaperclip } from "react-icons/fi";
+import api from "../../axios";
+import { toast } from "react-toastify";
+import { FaDownload } from "react-icons/fa";
+
 
 const ViewTicketDetailsModal = ({ ticket, onClose }) => {
   const modalRef = useRef(null);
@@ -9,6 +13,38 @@ const ViewTicketDetailsModal = ({ ticket, onClose }) => {
   const handleBackdropClick = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       onClose();
+    }
+  };
+
+    const downloadAttachment = async (ticketId, attachmentId, filename) => {
+    try {
+      // Use the direct download endpoint
+      const response = await api.get(`/tickets/${ticketId}/attachments/${attachmentId}/download`, {
+        responseType: 'blob'
+      });
+      
+      // Create blob and download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      
+      toast.success(`Downloading ${filename}`);
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Failed to download file");
+    }
+  };
+
+
+    // Handle ticket download
+  const handleDownloadAttachment = (ticket) => {
+    if (ticket.attachments?.[0]) {
+      const attachment = ticket.attachments[0];
+      downloadAttachment(ticket._id, attachment._id, attachment.name || attachment.originalname);
     }
   };
 
@@ -81,15 +117,13 @@ const ViewTicketDetailsModal = ({ ticket, onClose }) => {
               ATTACHMENT
             </label>
             {ticket.attachments && ticket.attachments.length > 0 ? (
-              <a
-                href={ticket.attachments[0].url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => handleDownloadAttachment(ticket)}
                 className="flex items-center gap-2 text-blue-500 hover:text-blue-600 font-bold text-xs transition-colors"
               >
-                <FiPaperclip className="w-3 h-3" />
-                <span className="truncate">{ticket.attachments[0].name || "VIEW FILE"}</span>
-              </a>
+                <FaDownload className="w-3 h-3" />
+                <span className="truncate">{ticket.attachments[0].name?.split('.').pop().toUpperCase() || "FILE"}</span>
+              </button>
             ) : (
               <span className="text-[10px] text-slate-300 font-bold uppercase">No file attached</span>
             )}

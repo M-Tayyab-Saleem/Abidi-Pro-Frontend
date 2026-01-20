@@ -1,16 +1,27 @@
 import React, { useState, useEffect, useRef } from "react";
-import api from "../axios";
+import { useDispatch, useSelector } from "react-redux";
+import { applyForLeave, refreshUserData } from "../slices/userSlice";
 import { toast } from "react-toastify";
 
-const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) => {
+const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded }) => {
+  const dispatch = useDispatch();
   const [leaveType, setLeaveType] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [quotaError, setQuotaError] = useState("");
   const [daysRequested, setDaysRequested] = useState(0);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const modalRef = useRef(null);
+
+  // Get user data from both auth and user slices
+  const { user: authUser } = useSelector((state) => state.auth);
+  const { userInfo, loading, error } = useSelector((state) => state.user);
+  
+  // Use userInfo if available, otherwise fall back to auth user
+  const userData = userInfo || authUser?.user || authUser;
+  const userLeaves = userData?.leaves || {};
 
   const calculateDays = (start, end) => {
     if (!start || !end) return 0;
@@ -26,10 +37,22 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
   };
 
   const handleBackdropClick = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
+    if (!isSubmitting && modalRef.current && !modalRef.current.contains(e.target)) {
       setIsOpen(false);
     }
   };
+
+  // Clear error when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setLeaveType("");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setQuotaError("");
+      setDaysRequested(0);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (leaveType && startDate && endDate) {
@@ -55,14 +78,53 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
       toast.error("PLEASE FILL ALL REQUIRED FIELDS.");
       return;
     }
+    
+    if (quotaError) {
+      toast.error("INSUFFICIENT LEAVE BALANCE");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const payload = { leaveType, startDate, endDate, reason };
-      await api.post("/leaves", payload);
+      const leaveData = {
+        leaveType,
+        startDate,
+        endDate,
+        reason,
+        userId: userData?._id || userData?.id,
+        days: daysRequested
+      };
+
+      // Dispatch the applyForLeave action
+      const result = await dispatch(applyForLeave(leaveData)).unwrap();
+      
       toast.success("LEAVE REQUEST SUBMITTED");
+      
+      // Refresh user data to get updated balances
+      if (userData?._id) {
+        dispatch(refreshUserData(userData._id));
+      }
+      
       setIsOpen(false);
-      if (onLeaveAdded) onLeaveAdded();
+      
+      // Reset form
+      setLeaveType("");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setQuotaError("");
+      setDaysRequested(0);
+      
+      // Call the callback if provided
+      if (onLeaveAdded) {
+        onLeaveAdded();
+      }
+      
     } catch (error) {
-      toast.error(error.response?.data?.message || "FAILED TO SUBMIT");
+      toast.error(error || "FAILED TO SUBMIT");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,8 +144,9 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
       >
         {/* CLOSE BUTTON */}
         <button 
-          onClick={() => setIsOpen(false)} 
-          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10"
+          onClick={() => !isSubmitting && setIsOpen(false)} 
+          disabled={isSubmitting}
+          className="absolute top-4 right-4 sm:top-5 sm:right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-red-500 transition-all text-2xl font-light z-10 disabled:opacity-50"
         >
           &times;
         </button>
@@ -108,10 +171,11 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
             </label>
             <div className="relative">
               <select
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-100"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 value={leaveType}
                 onChange={(e) => setLeaveType(e.target.value)}
                 required
+                disabled={isSubmitting}
               >
                 <option value="">SELECT TYPE</option>
                 <option value="PTO">PTO (PAID TIME OFF)</option>
@@ -138,10 +202,11 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               </label>
               <input
                 type="date"
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-50"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -152,10 +217,11 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               </label>
               <input
                 type="date"
-                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 disabled:opacity-50"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -173,11 +239,12 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               REASON FOR LEAVE
             </label>
             <textarea
-              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300 resize-none"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium outline-none focus:ring-2 focus:ring-blue-100 placeholder:text-slate-300 resize-none disabled:opacity-50"
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. family vacation"
+              disabled={isSubmitting}
             ></textarea>
           </div>
 
@@ -189,24 +256,45 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               </p>
             </div>
           )}
+
+          {/* API ERROR DISPLAY */}
+          {error && (
+            <div className="bg-red-50 p-3 rounded-xl border border-red-100">
+              <p className="text-[10px] font-black text-red-500 uppercase tracking-tight text-center">
+                {error}
+              </p>
+            </div>
+          )}
         </form>
 
         {/* FOOTER */}
         <div className="px-6 py-6 sm:px-10 sm:py-8 border-t border-slate-100 flex gap-3 sm:gap-4 bg-white flex-shrink-0">
           <button 
             type="button" 
-            onClick={() => setIsOpen(false)} 
-            className="flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+            onClick={() => !isSubmitting && setIsOpen(false)} 
+            disabled={isSubmitting}
+            className="flex-1 py-3 sm:py-4 font-black text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors disabled:opacity-50"
           >
             CANCEL
           </button>
           <button 
             type="submit" 
             form="leaveForm"
-            disabled={quotaError !== "" || !leaveType || !startDate || !endDate}
-            className="flex-1 py-3 sm:py-4 bg-[#64748b] text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg shadow-slate-100 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={quotaError !== "" || !leaveType || !startDate || !endDate || isSubmitting}
+            className={`flex-1 py-3 sm:py-4 text-white rounded-2xl font-black text-[10px] sm:text-[11px] uppercase tracking-widest shadow-lg transition-all ${
+              quotaError !== "" || !leaveType || !startDate || !endDate || isSubmitting
+                ? "bg-slate-300 shadow-none cursor-not-allowed"
+                : "bg-[#64748b] shadow-slate-100 hover:brightness-110 active:scale-95"
+            }`}
           >
-            SUBMIT REQUEST
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>SUBMITTING...</span>
+              </div>
+            ) : (
+              "SUBMIT REQUEST"
+            )}
           </button>
         </div>
       </div>

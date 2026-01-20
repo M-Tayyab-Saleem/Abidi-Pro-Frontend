@@ -18,19 +18,20 @@ const RaiseTicketModal = ({ onClose, onSubmit }) => {
     setForm((prev) => ({ ...prev, [name]: files ? files[0] : value }));
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       const ticketData = new FormData();
-      ticketData.append("emailAddress", user.email);
+      ticketData.append("emailAddress", user?.user?.email);
       ticketData.append("subject", form.subject);
       ticketData.append("description", form.description);
       if (form.attachment) ticketData.append("attachment", form.attachment);
 
-      const response = await api.post("/tickets", ticketData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // --- FIX IS HERE: Removed headers object ---
+      const response = await api.post("/tickets", ticketData); 
+      // ------------------------------------------
+
       onSubmit(response.data);
       onClose();
       toast.success("TICKET SUBMITTED SUCCESSFULLY");
@@ -40,7 +41,6 @@ const RaiseTicketModal = ({ onClose, onSubmit }) => {
       setSubmitting(false);
     }
   };
-
   return (
     <div 
       className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex justify-center items-center p-4 sm:p-6" 

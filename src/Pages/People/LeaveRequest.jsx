@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
-import api from "../../axios";
+import { useDispatch, useSelector } from "react-redux";
+import { applyForLeave, refreshUserData } from "../../slices/userSlice";
 import { toast } from "react-toastify";
 
-const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) => {
+const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded }) => {
+  const dispatch = useDispatch();
   const [leaveType, setLeaveType] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [quotaError, setQuotaError] = useState("");
   const [daysRequested, setDaysRequested] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get user data from both auth and user slices
+  const { user: authUser } = useSelector((state) => state.auth);
+  const { userInfo, loading, error } = useSelector((state) => state.user);
+  
+  // Use userInfo if available, otherwise fall back to auth user
+  const userData = userInfo || authUser?.user || authUser;
+  const userLeaves = userData?.leaves || {};
 
   const calculateDays = (start, end) => {
     if (!start || !end) return 0;
@@ -22,6 +33,18 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
     const mapping = { "PTO": "pto", "Sick": "sick" };
     return mapping[leaveType] || leaveType.toLowerCase();
   };
+
+  // Clear error when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setLeaveType("");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setQuotaError("");
+      setDaysRequested(0);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (leaveType && startDate && endDate) {
@@ -47,14 +70,53 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
       toast.error("PLEASE FILL ALL REQUIRED FIELDS.");
       return;
     }
+    
+    if (quotaError) {
+      toast.error("INSUFFICIENT LEAVE BALANCE");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      const payload = { leaveType, startDate, endDate, reason };
-      await api.post("/leaves", payload);
-      toast.success("LEAVE REQUEST SUBMITTED");
+      const leaveData = {
+        leaveType,
+        startDate,
+        endDate,
+        reason,
+        userId: userData?._id || userData?.id,
+        days: daysRequested
+      };
+
+      // Dispatch the applyForLeave action
+      const result = await dispatch(applyForLeave(leaveData)).unwrap();
+      
+      toast.success("LEAVE REQUEST SUBMITTED SUCCESSFULLY");
+      
+      // Refresh user data to get updated balances
+      if (userData?._id) {
+        dispatch(refreshUserData(userData._id));
+      }
+      
       setIsOpen(false);
-      if (onLeaveAdded) onLeaveAdded();
+      
+      // Reset form
+      setLeaveType("");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setQuotaError("");
+      setDaysRequested(0);
+      
+      // Call the callback if provided
+      if (onLeaveAdded) {
+        onLeaveAdded();
+      }
+      
     } catch (error) {
-      toast.error(error.response?.data?.message || "FAILED TO SUBMIT");
+      toast.error(error || "FAILED TO SUBMIT LEAVE REQUEST");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -67,14 +129,15 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
     <div className="fixed inset-0 bg-brand-bg/80 backdrop-blur-sm z-[100] flex justify-end">
       <div className="w-full sm:w-[450px] bg-white h-full shadow-2xl flex flex-col animate-fade-left animate-duration-300">
         
-        {/* HEADER - ALL CAPS */}
+        {/* HEADER */}
         <div className="flex justify-between items-center px-8 py-6 border-b border-slate-100">
           <h2 className="text-lg font-black text-slate-800 tracking-widest uppercase">
             APPLY FOR LEAVE
           </h2>
           <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+            onClick={() => !isSubmitting && setIsOpen(false)}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors disabled:opacity-50"
+            disabled={isSubmitting}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -94,6 +157,7 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               value={leaveType}
               onChange={(e) => setLeaveType(e.target.value)}
               required
+              disabled={isSubmitting}
             >
               <option value="">SELECT LEAVE TYPE</option>
               <option value="PTO">PTO (PAID TIME OFF)</option>
@@ -118,6 +182,7 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -132,6 +197,7 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -154,6 +220,7 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="ENTER REASON..."
+              disabled={isSubmitting}
             ></textarea>
           </div>
 
@@ -165,28 +232,45 @@ const ApplyLeaveModal = ({ isOpen, setIsOpen, onLeaveAdded, userLeaves = {} }) =
               </p>
             </div>
           )}
+
+          {/* API ERROR DISPLAY */}
+          {error && (
+            <div className="bg-red-50 p-4 rounded-xl border border-red-200">
+              <p className="text-[10px] font-black text-red-600 tracking-tighter uppercase text-center">
+                {error}
+              </p>
+            </div>
+          )}
         </form>
 
-        {/* FOOTER ACTIONS - ALL CAPS */}
+        {/* FOOTER ACTIONS */}
         <div className="p-8 border-t border-slate-100 flex gap-4 bg-slate-50/50">
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
-            className="flex-1 px-6 py-4 rounded-2xl font-black text-[11px] text-slate-400 uppercase tracking-widest hover:bg-slate-100 transition-all"
+            onClick={() => !isSubmitting && setIsOpen(false)}
+            disabled={isSubmitting}
+            className="flex-1 px-6 py-4 rounded-2xl font-black text-[11px] text-slate-400 uppercase tracking-widest hover:bg-slate-100 transition-all disabled:opacity-50"
           >
             CANCEL
           </button>
           <button
             type="submit"
             onClick={handleSubmit}
-            disabled={quotaError !== "" || !leaveType || !startDate || !endDate}
+            disabled={quotaError !== "" || !leaveType || !startDate || !endDate || isSubmitting}
             className={`flex-1 px-6 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all shadow-lg ${
-              quotaError !== "" || !leaveType || !startDate || !endDate
+              quotaError !== "" || !leaveType || !startDate || !endDate || isSubmitting
                 ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
                 : "bg-brand-btnGreen text-brand-stroke-green hover:opacity-90 shadow-brand-btnGreen/20"
             }`}
           >
-            SUBMIT REQUEST
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>SUBMITTING...</span>
+              </div>
+            ) : (
+              "SUBMIT REQUEST"
+            )}
           </button>
         </div>
       </div>
