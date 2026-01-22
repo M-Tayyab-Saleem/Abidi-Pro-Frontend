@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../axios';
 import { FaUserTie, FaNetworkWired } from 'react-icons/fa';
-import UserDetailModal from '../../Components/UserDetailModal'; // reusing your existing modal
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // --- Recursive Node Component ---
 const OrgNode = ({ node, onNodeClick }) => {
@@ -85,7 +85,7 @@ const OrgNode = ({ node, onNodeClick }) => {
 const OrgChartPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const navigate = useNavigate(); // Use navigate instead of modal
 
   useEffect(() => {
     const fetchOrgChart = async () => {
@@ -100,6 +100,11 @@ const OrgChartPage = () => {
     };
     fetchOrgChart();
   }, []);
+
+  const handleNodeClick = (user) => {
+    // Navigate to the user's profile page
+    navigate(`/people/profile/${user._id}`);
+  };
 
   return (
     <div className="p-6 h-[calc(100vh-80px)] overflow-hidden flex flex-col">
@@ -122,7 +127,7 @@ const OrgChartPage = () => {
               <OrgNode 
                 key={rootNode._id} 
                 node={rootNode} 
-                onNodeClick={(user) => setSelectedUser(user)} 
+                onNodeClick={handleNodeClick} 
               />
             ))
           ) : (
@@ -134,17 +139,6 @@ const OrgChartPage = () => {
           )}
         </div>
       </div>
-
-      {/* User Detail Modal */}
-      {selectedUser && (
-        <UserDetailModal 
-          user={selectedUser} // We assume the modal takes 'user' object or 'userId'
-          isOpen={!!selectedUser}
-          onClose={() => setSelectedUser(null)}
-          // If your modal needs just ID to fetch fresh data:
-          // userId={selectedUser._id} 
-        />
-      )}
     </div>
   );
 };

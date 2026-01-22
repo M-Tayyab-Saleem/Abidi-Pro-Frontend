@@ -23,8 +23,7 @@ const LeaveSummary = () => {
     const { userInfo, refreshing } = useSelector((state) => state.user);
 
     // Use userInfo if available, otherwise fall back to auth user
-    const userData = userInfo || authUser?.user || authUser;
-    console.log("userData", userData);
+    const userData = userInfo?.user || authUser?.user || authUser;
 
     // Extract data from user
     const leaveBalances = userData?.leaves || {};
