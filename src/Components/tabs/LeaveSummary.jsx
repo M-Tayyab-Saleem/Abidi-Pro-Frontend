@@ -17,13 +17,15 @@ const LeaveSummary = () => {
     });
     const [errorMsg, setErrorMsg] = useState("");
 
-
-    // Get user data from Redux
-    const { user: authUser } = useSelector((state) => state.auth);
     const { userInfo, refreshing } = useSelector((state) => state.user);
 
-    // Use userInfo if available, otherwise fall back to auth user
-    const userData = userInfo?.user || authUser?.user || authUser;
+    useEffect(() => {
+        if (userInfo?._id) {
+            dispatch(refreshUserData(userInfo._id));
+        }
+    }, [dispatch, userInfo?._id]);
+
+    const userData = userInfo
 
     // Extract data from user
     const leaveBalances = userData?.leaves || {};
@@ -31,7 +33,6 @@ const LeaveSummary = () => {
     const bookedLeaves = userData?.bookedLeaves || 0;
     const leaveHistory = userData?.leaveHistory || [];
 
-    console.log("leaveHistory", leaveHistory);
 
     // Calculate total leaves
     const totalLeaves = Object.values(leaveBalances).reduce((sum, balance) => sum + (balance || 0), 0);

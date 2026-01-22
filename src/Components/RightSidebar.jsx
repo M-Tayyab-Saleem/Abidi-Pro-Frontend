@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { checkInNow, checkOutNow, fetchCurrentStatus } from "../slices/attendanceTimer";
 import { toast } from "react-toastify";
+import { refreshUserData } from "../slices/userSlice";
 
 const RightSidebar = ({ isOpen, toggleSidebar }) => {
     const dispatch = useDispatch();
@@ -17,14 +18,21 @@ const RightSidebar = ({ isOpen, toggleSidebar }) => {
 
     // Redux state
     const { checkInn, loading } = useSelector((state) => state.attendanceTimer);
-    const { user } = useSelector((state) => state.auth);
 
-    const currentUser = user?.user;
+    const {userInfo} = useSelector((state) => state.user);
+
+    useEffect(() => {
+        if (userInfo?._id) {
+            dispatch(refreshUserData(userInfo._id));
+        }
+    }, [dispatch, userInfo?._id]);
+
+    const currentUser = userInfo;
     const profileImage = currentUser?.avatar || "";
     const firstName = currentUser?.name || "User";
 
     const manager = currentUser?.reportsTo || null;
-
+  
     const teamMembers = useMemo(() => {
         if (!currentUser?.department?.members) return [];
 
