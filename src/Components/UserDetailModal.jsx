@@ -16,7 +16,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
   useEffect(() => {
     if (user) {
       setFormData({
-        empID: user.empID || "",
         name: user.name || "",
         email: user.email || "",
         designation: user.designation || "",
@@ -36,8 +35,6 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
 
   const validateField = (name, value) => {
     switch (name) {
-      case "empID":
-        return value.trim() ? "" : "Employee ID is required";
       case "name":
         return value.trim() ? "" : "Name is required";
       case "email":
@@ -61,7 +58,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Validate field on change
     const error = validateField(name, value);
     setErrors(prev => ({
@@ -72,8 +69,8 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
 
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ["empID", "name", "email", "phoneNumber", "designation", "department", "joiningDate", "branch"];
-    
+    const requiredFields = ["name", "email", "phoneNumber", "designation", "department", "joiningDate", "branch"];
+
     requiredFields.forEach(field => {
       const error = validateField(field, formData[field]);
       if (error) {
@@ -93,7 +90,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error("Please fix all validation errors");
       return;
@@ -101,10 +98,41 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
 
     setIsLoading(true);
     try {
-      await api.put(`/users/${user._id}`, formData);
+      // Calculate changed fields
+      const changedFields = {};
+      Object.keys(formData).forEach(key => {
+        let originalValue = user[key];
+        let newValue = formData[key];
+
+        // Normalization for comparison
+        if (key === 'department') originalValue = user.department?._id || "";
+        if (key === 'reportsTo') originalValue = user.reportsTo?._id || "";
+        // Handle joiningDate comparison (user.joiningDate is ISO, formData is YYYY-MM-DD)
+        if (key === 'joiningDate') {
+          originalValue = user.joiningDate?.split('T')[0] || "";
+        }
+
+        // Handle null/undefined as empty string
+        if (originalValue === null || originalValue === undefined) originalValue = "";
+        if (newValue === null || newValue === undefined) newValue = "";
+
+        // Compare values
+        if (String(newValue) !== String(originalValue)) {
+          changedFields[key] = newValue;
+        }
+      });
+
+      if (Object.keys(changedFields).length === 0) {
+        toast.info("No changes to save");
+        setIsLoading(false);
+        setIsEditing(false);
+        return;
+      }
+
+      await api.put(`/users/${user._id}`, changedFields);
       onUserUpdated();
       setIsEditing(false);
-      toast.success("User updated successfully");
+    onClose(); // Auto-close modal
     } catch (error) {
       console.error("Failed to update user:", error);
       toast.error(error.response?.data?.message || "Failed to update user");
@@ -141,7 +169,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
 
   const renderField = (label, name, value, type = "text", options = [], isRequired = true) => {
     const error = errors[name];
-    
+
     return (
       <div>
         <label className="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
@@ -202,22 +230,19 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
         ) : (
           <div className="bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 font-medium">
             {type === "status" ? (
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
-                value === "Active"
-                  ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                  : "bg-rose-50 text-rose-600 border-rose-100"
-              }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${
-                  value === "Active" ? "bg-emerald-500" : "bg-rose-500"
-                }`}></span>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${value === "Active"
+                ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                : "bg-rose-50 text-rose-600 border-rose-100"
+                }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${value === "Active" ? "bg-emerald-500" : "bg-rose-500"
+                  }`}></span>
                 {value}
               </span>
             ) : type === "role" ? (
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${
-                value === "Admin"
-                  ? "bg-purple-50 text-purple-600 border-purple-100"
-                  : "bg-blue-50 text-blue-600 border-blue-100"
-              }`}>
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${value === "Admin"
+                ? "bg-purple-50 text-purple-600 border-purple-100"
+                : "bg-blue-50 text-blue-600 border-blue-100"
+                }`}>
                 {value}
               </span>
             ) : name === "department" ? (
@@ -281,7 +306,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 {!isEditing && (
                   <button
@@ -322,7 +347,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
                   Personal Information
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {renderField("Employee ID", "empID", formData.empID)}
+
                   {renderField("Full Name", "name", formData.name)}
                   {renderField("Email", "email", formData.email, "email")}
                   {renderField("Phone Number", "phoneNumber", formData.phoneNumber, "tel")}
@@ -383,24 +408,21 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdated, allManagers, al
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">Status</div>
-                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border mt-1 ${
-                      user.empStatus === "Active"
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                        : "bg-rose-50 text-rose-600 border-rose-100"
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        user.empStatus === "Active" ? "bg-emerald-500" : "bg-rose-500"
-                      }`}></span>
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border mt-1 ${user.empStatus === "Active"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                      : "bg-rose-50 text-rose-600 border-rose-100"
+                      }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${user.empStatus === "Active" ? "bg-emerald-500" : "bg-rose-500"
+                        }`}></span>
                       {user.empStatus}
                     </div>
                   </div>
                   <div className="text-center">
                     <div className="text-xs font-medium text-slate-400 uppercase tracking-wider">Role</div>
-                    <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border mt-1 ${
-                      user.role === "Admin"
-                        ? "bg-purple-50 text-purple-600 border-purple-100"
-                        : "bg-blue-50 text-blue-600 border-blue-100"
-                    }`}>
+                    <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold border mt-1 ${user.role === "Admin"
+                      ? "bg-purple-50 text-purple-600 border-purple-100"
+                      : "bg-blue-50 text-blue-600 border-blue-100"
+                      }`}>
                       {user.role}
                     </div>
                   </div>

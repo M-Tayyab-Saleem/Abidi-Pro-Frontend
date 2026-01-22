@@ -28,7 +28,7 @@ const Home = () => {
   const userInfo = useSelector((state) => state.auth.user);
   const { checkInn } = useSelector((state) => state.attendanceTimer);
 
-  const profileImage = userInfo?.user.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e";
+  const profileImage = userInfo?.user?.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e";
   const getSafeName = (data) => {
     if (typeof data === "string") return data;
     if (data && typeof data === "object" && data.name) return data.name;
@@ -36,7 +36,7 @@ const Home = () => {
   };
 
   const firstName = getSafeName(userInfo?.user?.name);
-  const userId = userInfo?.user._id || userInfo?.user.id;
+  const userId = userInfo?.user?._id || userInfo?.user?.id;
 
   const [loading, setLoading] = useState(true);
   const [elapsed, setElapsed] = useState(0);
